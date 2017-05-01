@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Linq;
-using Cake.Core.IO;
-using Cake.Core.Scripting;
 using Cake.Core.Text;
 using Cake.ScriptServer.Arguments;
-using Cake.ScriptServer.CodeGen;
+using Cake.ScriptServer.Core;
+using Cake.ScriptServer.Core.Models;
 using Cake.ScriptServer.Diagnostics;
-using Cake.ScriptServer.Documentation;
 using Cake.ScriptServer.Polyfill;
-using Cake.ScriptServer.Reflection;
+using Cake.ScriptServer.RequestHandlers;
 
 namespace Cake.ScriptServer
 {
@@ -30,17 +28,18 @@ namespace Cake.ScriptServer
             {
                 if (args.ContainsKey(Constants.CommandLine.Assembly))
                 {
-                    var verify = args.ContainsKey(Constants.CommandLine.Verify);
-                    var aliasFinder = new ScriptAliasFinder(log);
-                    var fileSystem = new FileSystem();
-                    var assemblyVerifier = new AssemblyVerifier(log, !verify);
-                    var assemblyLoader = new AssemblyLoader(fileSystem, assemblyVerifier);
-                    var documentationProvider = new DocumentationProvider(fileSystem);
+                    var request = new GenerateAliasRequest
+                    {
+                        AssemblyPath = args[Constants.CommandLine.Assembly],
+                        VerifyAssembly = args.ContainsKey(Constants.CommandLine.Verify)
+                    };
 
-                    var aliasGenerator = new CakeAliasGenerator(
-                        aliasFinder, assemblyLoader, fileSystem, documentationProvider);
+                    var handler = new AliasRequestHandler(log);
+                    var serializer = new DataContractSerializer();
+                    var responseWriter = new ResponseWriter(console.StdOut);
+                    var response = handler.Handle(request);
 
-                    var scriptModel = aliasGenerator.Generate(args[Constants.CommandLine.Assembly], verify);
+                    responseWriter.WriteResponse(serializer.Serialize(response));
                 }
                 else if (args.ContainsKey(Constants.CommandLine.File))
                 {

@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Cake.ScriptServer.Core.Models
 {
     [DataContract]
-    public class ScriptModel
+    public class ScriptResponse
     {
         private HashSet<string> _references;
         private HashSet<string> _usings;

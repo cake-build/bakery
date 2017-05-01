@@ -4,8 +4,8 @@
 
 using System;
 using System.Reflection;
-using Cake.Core.IO;
 using Cake.Core;
+using Cake.Core.IO;
 using Cake.ScriptServer.Reflection;
 
 namespace Cake.ScriptServer.Polyfill

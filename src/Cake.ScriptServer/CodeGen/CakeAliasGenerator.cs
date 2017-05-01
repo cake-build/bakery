@@ -30,18 +30,18 @@ namespace Cake.ScriptServer.CodeGen
             _codeGenerator = new CodeGenerator(_documentationProvider);
         }
 
-        public ScriptModel Generate(FilePath assemblyFilePath, bool verify)
+        public ScriptResponse Generate(FilePath assemblyFilePath, bool verify)
         {
             if (assemblyFilePath == null)
             {
                 throw new ArgumentNullException(nameof(assemblyFilePath));
             }
 
-            var scriptModel = new ScriptModel();
+            var script = new ScriptResponse();
 
             if (!_fileSystem.Exist(assemblyFilePath))
             {
-                return scriptModel;
+                return script;
             }
 
             _documentationProvider.SetAssembly(assemblyFilePath);
@@ -49,11 +49,11 @@ namespace Cake.ScriptServer.CodeGen
             var assembly = _assemblyLoader.Load(assemblyFilePath, verify);
             var aliases = _aliasFinder.FindAliases(new[] {assembly});
 
-            scriptModel.Source = _codeGenerator.Generate(aliases);
-            scriptModel.Usings.AddRange(aliases.SelectMany(a => a.Namespaces));
-            scriptModel.References.Add(assemblyFilePath.FullPath);
+            script.Source = _codeGenerator.Generate(aliases);
+            script.Usings.AddRange(aliases.SelectMany(a => a.Namespaces));
+            script.References.Add(assemblyFilePath.FullPath);
 
-            return scriptModel;
+            return script;
         }
     }
 }
