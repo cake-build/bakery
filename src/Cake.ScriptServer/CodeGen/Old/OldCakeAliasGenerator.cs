@@ -7,17 +7,17 @@ using Cake.ScriptServer.Core.Models;
 using Cake.ScriptServer.Documentation;
 using Cake.ScriptServer.Extensions;
 
-namespace Cake.ScriptServer.CodeGen
+namespace Cake.ScriptServer.CodeGen.Old
 {
-    internal class CakeAliasGenerator
+    internal class OldCakeAliasGenerator
     {
         private readonly IScriptAliasFinder _aliasFinder;
         private readonly IAssemblyLoader _assemblyLoader;
         private readonly IFileSystem _fileSystem;
         private readonly IDocumentationProvider _documentationProvider;
-        private readonly CodeGenerator _codeGenerator;
+        private readonly OldCodeGenerator _oldCodeGenerator;
 
-        public CakeAliasGenerator(
+        public OldCakeAliasGenerator(
             IScriptAliasFinder aliasFinder,
             IAssemblyLoader assemblyLoader,
             IFileSystem fileSystem,
@@ -27,7 +27,7 @@ namespace Cake.ScriptServer.CodeGen
             _assemblyLoader = assemblyLoader ?? throw new ArgumentNullException(nameof(assemblyLoader));
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
             _documentationProvider = documentationProvider ?? throw new ArgumentNullException(nameof(documentationProvider));
-            _codeGenerator = new CodeGenerator(_documentationProvider);
+            _oldCodeGenerator = new OldCodeGenerator(_documentationProvider);
         }
 
         public ScriptResponse Generate(FilePath assemblyFilePath, bool verify)
@@ -49,7 +49,7 @@ namespace Cake.ScriptServer.CodeGen
             var assembly = _assemblyLoader.Load(assemblyFilePath, verify);
             var aliases = _aliasFinder.FindAliases(new[] {assembly});
 
-            script.Source = _codeGenerator.Generate(aliases);
+            script.Source = _oldCodeGenerator.Generate(aliases);
             script.Usings.AddRange(aliases.SelectMany(a => a.Namespaces));
             script.References.Add(assemblyFilePath.FullPath);
 

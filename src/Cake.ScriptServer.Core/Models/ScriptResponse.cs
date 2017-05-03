@@ -9,6 +9,9 @@ namespace Cake.ScriptServer.Core.Models
         private HashSet<string> _references;
         private HashSet<string> _usings;
 
+        [IgnoreDataMember]
+        public static ScriptResponse Empty = new ScriptResponse();
+
         [DataMember(Name = "source", IsRequired = true)]
         public string Source { get; set; }
 

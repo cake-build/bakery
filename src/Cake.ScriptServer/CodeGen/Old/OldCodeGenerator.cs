@@ -4,23 +4,15 @@ using Cake.Core.Scripting;
 using Cake.Core.Scripting.CodeGen;
 using Cake.ScriptServer.Documentation;
 
-namespace Cake.ScriptServer.CodeGen
+namespace Cake.ScriptServer.CodeGen.Old
 {
-    internal class CodeGenerator
+    internal class OldCodeGenerator
     {
         private readonly IDocumentationProvider _documentationProvider;
 
-        public CodeGenerator(IDocumentationProvider documentationProvider)
+        public OldCodeGenerator(IDocumentationProvider documentationProvider)
         {
             _documentationProvider = documentationProvider ?? throw new ArgumentNullException(nameof(documentationProvider));
-        }
-
-        public string Generate(Script script)
-        {
-            var usingDirectives = string.Join("\r\n", script.UsingAliasDirectives);
-            var aliases = Generate(script.Aliases);
-            var code = string.Join("\r\n", script.Lines);
-            return string.Join("\r\n", usingDirectives, aliases, code);
         }
 
         public string Generate(IEnumerable<ScriptAlias> aliases)

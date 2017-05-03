@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Cake.Core.IO;
 using Cake.Core.Text;
 using Cake.ScriptServer.Arguments;
 using Cake.ScriptServer.Core;
@@ -23,6 +24,7 @@ namespace Cake.ScriptServer
             // Init dependencies
             var console = new IO.Console();
             var log = new ConsoleLogger(console);
+            var fileSystem = new FileSystem();
 
             try
             {
@@ -34,7 +36,7 @@ namespace Cake.ScriptServer
                         VerifyAssembly = args.ContainsKey(Constants.CommandLine.Verify)
                     };
 
-                    var handler = new AliasRequestHandler(log);
+                    var handler = new AliasRequestHandler(fileSystem);
                     var serializer = new DataContractSerializer();
                     var responseWriter = new ResponseWriter(console.StdOut);
                     var response = handler.Handle(request);

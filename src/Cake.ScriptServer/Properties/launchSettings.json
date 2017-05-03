@@ -2,7 +2,7 @@
   "profiles": {
     "Cake.ScriptServer": {
       "commandName": "Project",
-      "commandLineArgs": "\"--assembly=C:\\Users\\mb\\src\\cake-vscode-debug-example\\tools\\Cake\\Cake.Common.dll\""
+      "commandLineArgs": "\"--assembly=C:\\Users\\Patrik\\Desktop\\Cake.Common\\Cake.Common.dll\""
     }
   }
 }
