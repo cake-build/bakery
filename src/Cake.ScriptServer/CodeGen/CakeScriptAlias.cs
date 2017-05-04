@@ -1,5 +1,6 @@
 ﻿using Cake.Core.Scripting;
 using System.Collections.Generic;
+using Cake.ScriptServer.Reflection;
 using Mono.Cecil;
 
 namespace Cake.ScriptServer.CodeGen
@@ -8,7 +9,7 @@ namespace Cake.ScriptServer.CodeGen
     {
         public string Name { get; set; }
 
-        public MethodDefinition Method { get; set; }
+        public MethodSignature Method { get; set; }
 
         public ScriptAliasType Type { get; set; }
 

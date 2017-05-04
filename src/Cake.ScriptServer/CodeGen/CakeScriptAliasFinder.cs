@@ -4,6 +4,7 @@ using System.Linq;
 using Cake.Core.IO;
 using Cake.Core.Scripting;
 using Cake.ScriptServer.Extensions;
+using Cake.ScriptServer.Reflection;
 using Mono.Cecil;
 
 namespace Cake.ScriptServer.CodeGen
@@ -86,7 +87,7 @@ namespace Cake.ScriptServer.CodeGen
                         // Create the alias.
                         var alias = new CakeScriptAlias()
                         {
-                            Method = method,
+                            Method = MethodSignature.Create(method),
                             Type = isPropertyAlias ? ScriptAliasType.Property : ScriptAliasType.Method,
                             Name = method.Name,
                             Namespaces = new HashSet<string>(StringComparer.Ordinal)
