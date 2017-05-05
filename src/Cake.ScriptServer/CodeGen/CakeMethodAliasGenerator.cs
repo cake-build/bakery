@@ -4,7 +4,7 @@ using Cake.ScriptServer.Reflection;
 
 namespace Cake.ScriptServer.CodeGen
 {
-    internal sealed class CakeMethodAliasGenerator
+    public sealed class CakeMethodAliasGenerator
     {
         private readonly TypeSignatureWriter _typeWriter;
 
@@ -42,13 +42,12 @@ namespace Cake.ScriptServer.CodeGen
 
             writer.WriteLine();
             writer.WriteLine("{");
-            writer.Write("\t");
+            writer.Write("    ");
 
             // Render the method invocation.
             WriteInvokation(writer, alias);
 
-            writer.WriteLine("}");
-            writer.WriteLine();
+            writer.Write("}");
         }
 
         private void WriteMethodParameters(TextWriter writer, CakeScriptAlias alias, bool invokation)
@@ -75,7 +74,7 @@ namespace Cake.ScriptServer.CodeGen
         {
             var kind = parameter.IsOutParameter ? "out " : parameter.IsRefParameter ? "ref " : string.Empty;
 
-            var options = includeNamespace ? TypeRenderOption.Namespace | TypeRenderOption.Name : TypeRenderOption.Name;
+            var options = includeNamespace ? TypeRenderingOptions.Namespace | TypeRenderingOptions.Name : TypeRenderingOptions.Name;
             var type = includeType ? _typeWriter.GetString(parameter.ParameterType, options) : string.Empty;
 
             return includeName

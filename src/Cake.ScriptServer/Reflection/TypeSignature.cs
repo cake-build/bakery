@@ -1,27 +1,27 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Cake.ScriptServer.Documentation;
 using Mono.Cecil;
 
 namespace Cake.ScriptServer.Reflection
 {
     public sealed class TypeSignature
     {
+        public string CRef { get; set; }
         public string Name { get; set; }
-
         public bool IsGenericArgumentType { get; set; }
-
         public NamespaceSignature Namespace { get; }
-
         public IReadOnlyList<string> GenericArguments { get; }
-
         public IReadOnlyList<TypeSignature> GenericParameters { get; }
 
         private TypeSignature(
+            string cref,
             string name,
             NamespaceSignature @namespace,
             IEnumerable<string> genericArguments,
             IEnumerable<TypeSignature> genericParameters)
         {
+            CRef = cref;
             Name = name;
             Namespace = @namespace;
             IsGenericArgumentType = string.IsNullOrWhiteSpace(Namespace.Name);
@@ -31,6 +31,8 @@ namespace Cake.ScriptServer.Reflection
 
         public static TypeSignature Create(TypeReference type)
         {
+            var cref = CRefGenerator.GetTypeCRef(type);
+
             // Get the namespace of the type.
             var @namespace = new NamespaceSignature(type.Namespace);
 
@@ -41,7 +43,6 @@ namespace Cake.ScriptServer.Reflection
             {
                 name = name.Substring(0, index);
             }
-
             if (name.EndsWith("&"))
             {
                 name = name.TrimEnd('&');
@@ -68,7 +69,7 @@ namespace Cake.ScriptServer.Reflection
             }
 
             // Return the type description.
-            return new TypeSignature(name, @namespace, genericParameters, genericArguments);
+            return new TypeSignature(cref, name, @namespace, genericParameters, genericArguments);
         }
     }
 }

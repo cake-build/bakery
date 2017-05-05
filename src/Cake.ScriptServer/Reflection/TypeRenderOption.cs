@@ -3,7 +3,7 @@
 namespace Cake.ScriptServer.Reflection
 {
     [Flags]
-    public enum TypeRenderOption
+    public enum TypeRenderingOptions
     {
         None = 1 << 0,
         Namespace = 1 << 1,

@@ -9,9 +9,9 @@ using Mono.Cecil;
 
 namespace Cake.ScriptServer.CodeGen
 {
-    internal class CakeScriptAliasFinder
+    public static class CakeScriptAliasFinder
     {
-        public IReadOnlyList<CakeScriptAlias> FindAliases(ICollection<FilePath> paths)
+        public static IReadOnlyList<CakeScriptAlias> FindAliases(ICollection<FilePath> paths)
         {
             var parameters = new ReaderParameters
             {
@@ -23,6 +23,11 @@ namespace Cake.ScriptServer.CodeGen
                 .Select(path => AssemblyDefinition.ReadAssembly(path.FullPath, parameters))
                 .ToList();
 
+            return FindAliases(assemblies);
+        }
+
+        public static IReadOnlyList<CakeScriptAlias> FindAliases(ICollection<AssemblyDefinition> assemblies)
+        {
             // Find all aliases in the loaded assembly definitions.
             var result = new List<CakeScriptAlias>();
             foreach (var assembly in assemblies)

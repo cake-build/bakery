@@ -9,13 +9,11 @@ namespace Cake.ScriptServer.CodeGen
     internal sealed class CakeScriptGenerator
     {
         private readonly IFileSystem _fileSystem;
-        private readonly CakeScriptAliasFinder _finder;
         private readonly CakeCodeGenerator _codeGenerator;
 
         public CakeScriptGenerator(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
-            _finder = new CakeScriptAliasFinder();
             _codeGenerator = new CakeCodeGenerator();
         }
 
@@ -32,7 +30,7 @@ namespace Cake.ScriptServer.CodeGen
             }
 
             // Find aliases.
-            var aliases = _finder.FindAliases(new[] { assembly });
+            var aliases = CakeScriptAliasFinder.FindAliases(new[] { assembly });
 
             // Create the response.
             var response = new ScriptResponse();

@@ -5,7 +5,7 @@ using Mono.Cecil;
 
 namespace Cake.ScriptServer.CodeGen
 {
-    internal sealed class CakeScriptAlias
+    public sealed class CakeScriptAlias
     {
         public string Name { get; set; }
 

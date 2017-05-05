@@ -7,10 +7,10 @@ namespace Cake.ScriptServer.Reflection
     {
         public string GetString(TypeSignature signature)
         {
-            return GetString(signature, TypeRenderOption.Default);
+            return GetString(signature, TypeRenderingOptions.Default);
         }
 
-        public string GetString(TypeSignature signature, TypeRenderOption option)
+        public string GetString(TypeSignature signature, TypeRenderingOptions option)
         {
             var temp = new StringWriter();
             Write(temp, signature, option);
@@ -19,37 +19,46 @@ namespace Cake.ScriptServer.Reflection
 
         public void Write(TextWriter writer, TypeSignature signature)
         {
-            Write(writer, signature, TypeRenderOption.Default);
+            Write(writer, signature, TypeRenderingOptions.Default);
         }
 
-        public void Write(TextWriter writer, TypeSignature signature, TypeRenderOption options)
+        public void Write(TextWriter writer, TypeSignature signature, TypeRenderingOptions options)
         {
             if (signature.IsGenericArgumentType)
             {
-                if ((options & TypeRenderOption.Name) == TypeRenderOption.Name)
+                if ((options & TypeRenderingOptions.Name) == TypeRenderingOptions.Name)
                 {
                     writer.Write(signature.Name);
                 }
                 return;
             }
 
+            var alias = CSharpAliasProvider.GetTypeAlias(signature);
+
             // Write type namespace?
-            if ((options & TypeRenderOption.Namespace) == TypeRenderOption.Namespace)
+            if (options.HasFlag(TypeRenderingOptions.Namespace))
             {
-                writer.Write(signature.Namespace.Name);
+                if (options.HasFlag(TypeRenderingOptions.Name))
+                {
+                    if (alias == null)
+                    {
+                        writer.Write(signature.Namespace.Name);
+                        writer.Write(".");
+                    }
+                }
+                else
+                {
+                    writer.Write(signature.Namespace.Name);
+                }
             }
 
             // Write type name?
-            if ((options & TypeRenderOption.Name) == TypeRenderOption.Name)
+            if (options.HasFlag(TypeRenderingOptions.Name))
             {
-                if ((options & TypeRenderOption.Namespace) == TypeRenderOption.Namespace)
-                {
-                    writer.Write(".");
-                }
-                writer.Write(signature.Name);
+                writer.Write(alias ?? signature.Name);
 
                 // Write generic arguments/parameters?
-                if (options.HasFlag(TypeRenderOption.GenericParameters))
+                if (options.HasFlag(TypeRenderingOptions.GenericParameters))
                 {
                     if (signature.GenericArguments.Count != 0)
                     {
@@ -74,7 +83,7 @@ namespace Cake.ScriptServer.Reflection
                             Write(writer, parameter, options);
                             if (parameterIndex != signature.GenericParameters.Count)
                             {
-                                writer.Write(",");
+                                writer.Write(", ");
                             }
                         }
                         writer.Write(">");

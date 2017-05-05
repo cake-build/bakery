@@ -10,7 +10,7 @@ using Cake.ScriptServer.Reflection;
 
 namespace Cake.ScriptServer.CodeGen
 {
-    internal sealed class CakeCodeGenerator
+    public sealed class CakeCodeGenerator
     {
         private readonly CakeMethodAliasGenerator _methodGenerator;
 
@@ -31,9 +31,11 @@ namespace Cake.ScriptServer.CodeGen
                 {
                     _methodGenerator.Generate(writer, alias);
                 }
+
+                writer.WriteLine();
+                writer.WriteLine();
             }
 
-            writer.WriteLine();
             return writer.ToString();
         }
     }
