@@ -33,7 +33,9 @@ namespace Cake.ScriptServer.Reflection
                 return;
             }
 
-            var alias = CSharpAliasProvider.GetTypeAlias(signature);
+            var alias = options.HasFlag(TypeRenderingOptions.Aliases) 
+                ? CSharpAliasProvider.GetTypeAlias(signature)
+                : null;
 
             // Write type namespace?
             if (options.HasFlag(TypeRenderingOptions.Namespace))
@@ -88,6 +90,12 @@ namespace Cake.ScriptServer.Reflection
                         }
                         writer.Write(">");
                     }
+                }
+
+                if (signature.IsArray)
+                {
+                    // TODO: Handle dimensions
+                    writer.Write("[]");
                 }
             }
         }

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using Cake.ScriptServer.Reflection;
 
@@ -20,7 +21,15 @@ namespace Cake.ScriptServer.CodeGen
             // Return type
             if (alias.Method.ReturnType != null)
             {
-                _typeWriter.Write(writer, alias.Method.ReturnType);
+                if (alias.Method.ReturnType.Namespace.Name == "System" && alias.Method.ReturnType.Name == "Void")
+                {
+                    writer.Write("void");
+                }
+                else
+                {
+                    _typeWriter.Write(writer, alias.Method.ReturnType);
+
+                }
                 writer.Write(" ");
             }
 
@@ -56,7 +65,7 @@ namespace Cake.ScriptServer.CodeGen
             var includeParameterTypes = !invokation;
 
             var parameterResult = alias.Method.Parameters
-                .Select(p => BuildParameter(p, includeNamespace, includeParameterTypes, true))
+                .Select(p => BuildParameter(p, includeNamespace, includeParameterTypes, true, invokation))
                 .ToList();
 
             if (parameterResult.Count > 0)
@@ -70,11 +79,13 @@ namespace Cake.ScriptServer.CodeGen
             }
         }
 
-        private string BuildParameter(ParameterSignature parameter, bool includeNamespace, bool includeType, bool includeName)
+        private string BuildParameter(ParameterSignature parameter, bool includeNamespace, bool includeType, bool includeName, bool invokation)
         {
-            var kind = parameter.IsOutParameter ? "out " : parameter.IsRefParameter ? "ref " : string.Empty;
+            var kind = parameter.IsOutParameter ? "out " 
+                : parameter.IsRefParameter ? "ref " 
+                : parameter.IsParams && !invokation ? "params " :  string.Empty;
 
-            var options = includeNamespace ? TypeRenderingOptions.Namespace | TypeRenderingOptions.Name : TypeRenderingOptions.Name;
+            var options = includeNamespace ? TypeRenderingOptions.Default : TypeRenderingOptions.Name;
             var type = includeType ? _typeWriter.GetString(parameter.ParameterType, options) : string.Empty;
 
             return includeName

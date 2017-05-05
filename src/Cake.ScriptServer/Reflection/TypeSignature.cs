@@ -10,6 +10,7 @@ namespace Cake.ScriptServer.Reflection
         public string CRef { get; set; }
         public string Name { get; set; }
         public bool IsGenericArgumentType { get; set; }
+        public bool IsArray { get; set; }
         public NamespaceSignature Namespace { get; }
         public IReadOnlyList<string> GenericArguments { get; }
         public IReadOnlyList<TypeSignature> GenericParameters { get; }
@@ -17,12 +18,14 @@ namespace Cake.ScriptServer.Reflection
         private TypeSignature(
             string cref,
             string name,
+            bool isArray,
             NamespaceSignature @namespace,
             IEnumerable<string> genericArguments,
             IEnumerable<TypeSignature> genericParameters)
         {
             CRef = cref;
             Name = name;
+            IsArray = isArray;
             Namespace = @namespace;
             IsGenericArgumentType = string.IsNullOrWhiteSpace(Namespace.Name);
             GenericArguments = new List<string>(genericArguments);
@@ -31,6 +34,14 @@ namespace Cake.ScriptServer.Reflection
 
         public static TypeSignature Create(TypeReference type)
         {
+            var isArray = false;
+            if (type.IsArray)
+            {
+                isArray = true;
+                var arrayType = type as ArrayType;
+                type = arrayType.ElementType;
+            }
+
             var cref = CRefGenerator.GetTypeCRef(type);
 
             // Get the namespace of the type.
@@ -51,6 +62,7 @@ namespace Cake.ScriptServer.Reflection
             // Get generic parameters and arguments.
             var genericParameters = new List<string>();
             var genericArguments = new List<TypeSignature>();
+
             if (type.IsGenericInstance)
             {
                 // Generic arguments
@@ -60,7 +72,7 @@ namespace Cake.ScriptServer.Reflection
                     genericArguments.AddRange(genericInstanceType.GenericArguments.Select(Create));
                 }
             }
-            else if (type.HasGenericParameters)
+            if (type.HasGenericParameters)
             {
                 // Generic parameters
                 genericParameters.AddRange(
@@ -69,7 +81,7 @@ namespace Cake.ScriptServer.Reflection
             }
 
             // Return the type description.
-            return new TypeSignature(cref, name, @namespace, genericParameters, genericArguments);
+            return new TypeSignature(cref, name, isArray, @namespace, genericParameters, genericArguments);
         }
     }
 }

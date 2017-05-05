@@ -8,8 +8,8 @@ namespace Cake.ScriptServer.Reflection
         None = 1 << 0,
         Namespace = 1 << 1,
         Name = 1 << 2,
-        GenericArguments = 1 << 3,
-        GenericParameters = 1 << 4,
+        GenericParameters = 1 << 3,
+        Aliases = 1 << 4,
         Default = Namespace | Name | GenericParameters
     }
 }

@@ -26,34 +26,25 @@ namespace Cake.ScriptServer
             var log = new ConsoleLogger(console);
             var fileSystem = new FileSystem();
 
-            try
+            if (args.ContainsKey(Constants.CommandLine.Assembly))
             {
-                if (args.ContainsKey(Constants.CommandLine.Assembly))
+                var request = new GenerateAliasRequest
                 {
-                    var request = new GenerateAliasRequest
-                    {
-                        AssemblyPath = args[Constants.CommandLine.Assembly],
-                        VerifyAssembly = args.ContainsKey(Constants.CommandLine.Verify)
-                    };
+                    AssemblyPath = args[Constants.CommandLine.Assembly],
+                    VerifyAssembly = args.ContainsKey(Constants.CommandLine.Verify)
+                };
 
-                    var handler = new AliasRequestHandler(fileSystem);
-                    var serializer = new DataContractSerializer();
-                    var responseWriter = new ResponseWriter(console.StdOut);
-                    var response = handler.Handle(request);
+                var handler = new AliasRequestHandler(fileSystem);
+                var serializer = new DataContractSerializer();
+                var responseWriter = new ResponseWriter(console.StdOut);
+                var response = handler.Handle(request);
 
-                    responseWriter.WriteResponse(serializer.Serialize(response));
-                }
-                else if (args.ContainsKey(Constants.CommandLine.File))
-                {
-
-                }
+                responseWriter.WriteResponse(serializer.Serialize(response));
             }
-            catch (Exception e)
+            else if (args.ContainsKey(Constants.CommandLine.File))
             {
-                console.StdErr.WriteLine(e.ToString());
-                throw;
-            }
 
+            }
             return 0;
         }
     }
