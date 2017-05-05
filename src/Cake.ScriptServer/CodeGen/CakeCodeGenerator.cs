@@ -12,19 +12,24 @@ namespace Cake.ScriptServer.CodeGen
 {
     internal sealed class CakeCodeGenerator
     {
+        private readonly CakeMethodAliasGenerator _methodGenerator;
+
+        public CakeCodeGenerator()
+        {
+            var typeWriter = new TypeSignatureWriter();
+
+            _methodGenerator = new CakeMethodAliasGenerator(typeWriter);
+        }
+
         public string Generate(IEnumerable<CakeScriptAlias> aliases)
         {
-            var result = new List<string>();
             var writer = new StringWriter();
-
-            var typeRenderer = new TypeSignatureRenderer();
-            var methodRenderer = new MethodSignatureRenderer(typeRenderer);
 
             foreach (var alias in aliases)
             {
                 if (alias.Type == ScriptAliasType.Method)
                 {
-                    CakeMethodAliasGenerator.Generate(typeRenderer, methodRenderer, writer, alias);
+                    _methodGenerator.Generate(writer, alias);
                 }
             }
 

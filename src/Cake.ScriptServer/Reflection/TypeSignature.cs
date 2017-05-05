@@ -8,6 +8,8 @@ namespace Cake.ScriptServer.Reflection
     {
         public string Name { get; set; }
 
+        public bool IsGenericArgumentType { get; set; }
+
         public NamespaceSignature Namespace { get; }
 
         public IReadOnlyList<string> GenericArguments { get; }
@@ -22,6 +24,7 @@ namespace Cake.ScriptServer.Reflection
         {
             Name = name;
             Namespace = @namespace;
+            IsGenericArgumentType = string.IsNullOrWhiteSpace(Namespace.Name);
             GenericArguments = new List<string>(genericArguments);
             GenericParameters = new List<TypeSignature>(genericParameters);
         }
