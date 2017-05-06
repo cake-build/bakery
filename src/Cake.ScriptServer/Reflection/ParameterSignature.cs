@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Cake.ScriptServer.Reflection.Emitters;
 using Mono.Cecil;
 
 namespace Cake.ScriptServer.Reflection

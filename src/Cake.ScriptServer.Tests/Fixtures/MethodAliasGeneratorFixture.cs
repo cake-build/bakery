@@ -9,7 +9,6 @@ using System.Linq;
 using System.Reflection;
 using Cake.Core.IO;
 using Cake.ScriptServer.CodeGen;
-using Cake.ScriptServer.Reflection;
 using Cake.ScriptServer.Reflection.Emitters;
 
 namespace Cake.ScriptServer.Tests.Fixtures
@@ -18,17 +17,19 @@ namespace Cake.ScriptServer.Tests.Fixtures
     {
         private readonly Assembly _assembly;
         private readonly CakeMethodAliasGenerator _generator;
+        private readonly CakeScriptAliasFinder _finder;
         private readonly IReadOnlyList<CakeScriptAlias> _aliases;
 
         public MethodAliasGeneratorFixture()
         {
             // Get all aliases in the current assembly.
             _assembly = typeof(MethodAliasGeneratorFixture).GetTypeInfo().Assembly;
+            _finder = new CakeScriptAliasFinder(new FileSystem());
 
             // Load all Cake aliases.
             // TODO: Not ideal with IO-access here, but we need to load the assembly.
             // See if we can load the information by providing the assembly directly.
-            _aliases = CakeScriptAliasFinder.FindAliases(new[] { new FilePath(_assembly.Location) });
+            _aliases = _finder.FindAliases(new[] { new FilePath(_assembly.Location) });
 
             // Create the generator.
             var typeEmitter = new TypeEmitter();

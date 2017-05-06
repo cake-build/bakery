@@ -1,79 +1,61 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Xml;
 using System.Xml.Linq;
-using Cake.Core;
 using Cake.Core.IO;
-using Cake.Core.Scripting;
 
 namespace Cake.ScriptServer.Documentation
 {
-    internal class DocumentationProvider : IDocumentationProvider
+    public sealed class DocumentationProvider
     {
         private readonly IFileSystem _fileSystem;
-        private XDocument _documentation;
 
         public DocumentationProvider(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
-            _documentation = null;
         }
 
-        public void SetAssembly(FilePath assemblyFilePath)
+        public IDictionary<string, XElement> Load(FilePath path)
         {
-            var documentationPath = assemblyFilePath.ChangeExtension("xml");
-
-            if (!_fileSystem.Exist(documentationPath))
+            var document = LoadXml(path);
+            if (document == null)
             {
-                _documentation = null;
-
-                return;
+                return new Dictionary<string, XElement>(StringComparer.OrdinalIgnoreCase);
             }
-
-            using (var stream = _fileSystem.GetFile(documentationPath).OpenRead())
-            using (var xmlReader = XmlReader.Create(stream, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit }))
-            {
-                _documentation = XDocument.Load(xmlReader);
-            }
+            return Build(document);
         }
 
-        public string GetDocumentation(ScriptAlias alias)
+        private static Dictionary<string, XElement> Build(XDocument document)
         {
-            var name = GetName(alias);
+            var result = new Dictionary<string, XElement>(StringComparer.Ordinal);
 
-            var element = (from doc in _documentation.Elements("doc")
+            var elements = from doc in document.Elements("doc")
                 from members in doc.Elements("members")
                 from member in members.Elements("member")
                 let nameAttribute = member.Attribute("name")
-                where nameAttribute != null && nameAttribute.Value.Equals(name, StringComparison.Ordinal)
-                select member).FirstOrDefault();
+                select Tuple.Create(nameAttribute.Value, member);
 
-            if (element == null)
+            foreach (var element in elements)
             {
-                return string.Empty;
+                result.Add(element.Item1, element.Item2);
             }
 
-            var builder = new StringBuilder();
-
-            foreach (var xmlDoc in element.Elements())
-            {
-                builder.AppendLine($"/// {xmlDoc.ToString().Replace("\r\n", "\r\n///")}");
-            }
-
-            return builder.ToString();
+            return result;
         }
 
-        private static string GetName(ScriptAlias alias)
+        private XDocument LoadXml(FilePath path)
         {
-            var builder = new StringBuilder();
-            builder.Append(alias.Type == ScriptAliasType.Method ? "M:" : "P:");
-            builder.Append(alias.Method.GetFullName());
-            builder.Append("(");
-            builder.Append(string.Join(",", alias.Method.GetParameters().Select(p => p.ParameterType.FullName)));
-            builder.Append(")");
+            if (!_fileSystem.Exist(path))
+            {
+                return null;
+            }
 
-            return builder.ToString();
+            using (var stream = _fileSystem.GetFile(path).OpenRead())
+            using (var xmlReader = XmlReader.Create(stream, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit }))
+            {
+                return XDocument.Load(xmlReader);
+            }
         }
     }
 }

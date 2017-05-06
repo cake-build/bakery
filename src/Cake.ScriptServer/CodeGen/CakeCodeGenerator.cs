@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Cake.Core.Scripting;
-using Cake.ScriptServer.Reflection;
 using Cake.ScriptServer.Reflection.Emitters;
 
 namespace Cake.ScriptServer.CodeGen

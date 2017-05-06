@@ -10,11 +10,13 @@ namespace Cake.ScriptServer.CodeGen
     {
         private readonly IFileSystem _fileSystem;
         private readonly CakeCodeGenerator _codeGenerator;
+        private readonly CakeScriptAliasFinder _aliasFinder;
 
         public CakeScriptGenerator(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
             _codeGenerator = new CakeCodeGenerator();
+            _aliasFinder = new CakeScriptAliasFinder(fileSystem);
         }
 
         public ScriptResponse Generate(FilePath assembly, bool verify)
@@ -30,7 +32,7 @@ namespace Cake.ScriptServer.CodeGen
             }
 
             // Find aliases.
-            var aliases = CakeScriptAliasFinder.FindAliases(new[] { assembly });
+            var aliases = _aliasFinder.FindAliases(new[] { assembly });
 
             // Create the response.
             var response = new ScriptResponse();

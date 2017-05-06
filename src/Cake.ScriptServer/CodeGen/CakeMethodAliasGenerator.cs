@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
+using System.Text;
+using System.Xml.Linq;
 using Cake.ScriptServer.Reflection.Emitters;
 
 namespace Cake.ScriptServer.CodeGen
@@ -17,6 +19,8 @@ namespace Cake.ScriptServer.CodeGen
 
         public void Generate(TextWriter writer, CakeScriptAlias alias)
         {
+            WriteDocs(writer, alias.Documentation);
+
             writer.Write("public ");
 
             // Return type
@@ -141,6 +145,19 @@ namespace Cake.ScriptServer.CodeGen
                     parameterResult.Insert(0, "Context");
                 }
                 writer.Write(string.Join(", ", parameterResult));
+            }
+        }
+
+        private void WriteDocs(TextWriter writer, XElement element)
+        {
+            if (element != null)
+            {
+                var builder = new StringBuilder();
+                foreach (var xmlDoc in element.Elements())
+                {
+                    builder.AppendLine($"/// {xmlDoc.ToString().Replace("\r\n", "\r\n///")}");
+                }
+                writer.Write(builder.ToString());
             }
         }
 

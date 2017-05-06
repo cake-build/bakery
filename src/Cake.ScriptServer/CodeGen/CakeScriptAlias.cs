@@ -1,5 +1,6 @@
 ﻿using Cake.Core.Scripting;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using Cake.ScriptServer.Reflection;
 
 namespace Cake.ScriptServer.CodeGen
@@ -9,6 +10,8 @@ namespace Cake.ScriptServer.CodeGen
         public string Name { get; set; }
 
         public MethodSignature Method { get; set; }
+
+        public XElement Documentation { get; set; }
 
         public ScriptAliasType Type { get; set; }
 

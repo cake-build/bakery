@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cake.ScriptServer.Documentation;
 using Mono.Cecil;
 
 namespace Cake.ScriptServer.Reflection
 {
     public sealed class MethodSignature
     {
+        public string CRef { get; }
         public string Name { get; set; }
         public ObsoleteAttribute Obsolete { get; set; }
         public TypeSignature ReturnType { get; }
@@ -15,13 +17,14 @@ namespace Cake.ScriptServer.Reflection
         public IReadOnlyList<ParameterSignature> Parameters { get; }
 
         private MethodSignature(
-            string name,
+            string cref, string name,
             ObsoleteAttribute obsolete,
             TypeSignature declaringType,
             TypeSignature returnType,
             IEnumerable<string> genericParameters,
             IEnumerable<ParameterSignature> parameters)
         {
+            CRef = cref;
             Name = name;
             Obsolete = obsolete;
             ReturnType = returnType;
@@ -33,6 +36,7 @@ namespace Cake.ScriptServer.Reflection
         public static MethodSignature Create(MethodDefinition method)
         {
             // Get the method Identity and name.
+            var cref = CRefGenerator.GetMethodCRef(method);
             var name = GetMethodName(method);
 
             // Get the declaring type and return type.
@@ -54,7 +58,10 @@ namespace Cake.ScriptServer.Reflection
 
             // Return the method signature.
             return new MethodSignature(
-                name, method.GetObsoleteAttribute(), declaringType, returnType, genericParameters, parameters);
+                cref, name, 
+                method.GetObsoleteAttribute(), 
+                declaringType, returnType, 
+                genericParameters, parameters);
         }
 
         private static string GetMethodName(MethodDefinition definition)

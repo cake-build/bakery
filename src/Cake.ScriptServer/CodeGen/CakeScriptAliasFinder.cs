@@ -1,17 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using Cake.Core.IO;
 using Cake.Core.Scripting;
+using Cake.ScriptServer.Documentation;
 using Cake.ScriptServer.Extensions;
 using Cake.ScriptServer.Reflection;
 using Mono.Cecil;
 
 namespace Cake.ScriptServer.CodeGen
 {
-    public static class CakeScriptAliasFinder
+    public sealed class CakeScriptAliasFinder
     {
-        public static IReadOnlyList<CakeScriptAlias> FindAliases(ICollection<FilePath> paths)
+        private readonly DocumentationProvider _documentation;
+
+        public CakeScriptAliasFinder(IFileSystem fileSystem)
+        {
+            _documentation = new DocumentationProvider(fileSystem);
+        }
+
+        public IReadOnlyList<CakeScriptAlias> FindAliases(ICollection<FilePath> paths)
         {
             var parameters = new ReaderParameters
             {
@@ -20,23 +29,10 @@ namespace Cake.ScriptServer.CodeGen
 
             // Load all assembly definitions.
             var assemblies = paths
-                .Select(path => AssemblyDefinition.ReadAssembly(path.FullPath, parameters))
+                .Select(path => Tuple.Create(AssemblyDefinition.ReadAssembly(path.FullPath, parameters), path))
                 .ToList();
 
             return FindAliases(assemblies);
-        }
-
-        public static IReadOnlyList<CakeScriptAlias> FindAliases(ICollection<AssemblyDefinition> assemblies)
-        {
-            // Find all aliases in the loaded assembly definitions.
-            var result = new List<CakeScriptAlias>();
-            foreach (var assembly in assemblies)
-            {
-                InspectAssembly(assembly, result);
-            }
-
-            // Return the result.
-            return result;
         }
 
         private static IAssemblyResolver GetResolver(IEnumerable<FilePath> paths)
@@ -53,8 +49,23 @@ namespace Cake.ScriptServer.CodeGen
 #endif
         }
 
-        private static void InspectAssembly(AssemblyDefinition assembly, ICollection<CakeScriptAlias> result)
+        private IReadOnlyList<CakeScriptAlias> FindAliases(IEnumerable<Tuple<AssemblyDefinition, FilePath>> assemblies)
         {
+            // Find all aliases in the loaded assembly definitions.
+            var result = new List<CakeScriptAlias>();
+            foreach (var assembly in assemblies)
+            {
+                InspectAssembly(assembly.Item1, assembly.Item2, result);
+            }
+
+            // Return the result.
+            return result;
+        }
+
+        private void InspectAssembly(AssemblyDefinition assembly, FilePath path, ICollection<CakeScriptAlias> result)
+        {
+            var documentation = _documentation.Load(path.ChangeExtension("xml"));
+
             foreach (var module in assembly.Modules)
             {
                 foreach (var type in module.Types)
@@ -76,12 +87,16 @@ namespace Cake.ScriptServer.CodeGen
                         continue;
                     }
 
-                    InspectType(assembly, type, result);
+                    InspectType(assembly, type, documentation, result);
                 }
             }
         }
 
-        private static void InspectType(AssemblyDefinition assembly, TypeDefinition type, ICollection<CakeScriptAlias> result)
+        private void InspectType(
+            AssemblyDefinition assembly,
+            TypeDefinition type,
+            IDictionary<string, XElement> documentation,
+            ICollection<CakeScriptAlias> result)
         {
             if (type.IsStatic())
             {
@@ -97,6 +112,12 @@ namespace Cake.ScriptServer.CodeGen
                             Name = method.Name,
                             Namespaces = new HashSet<string>(StringComparer.Ordinal)
                         };
+
+                        // Get documentation.
+                        if (documentation.TryGetValue(alias.Method.CRef, out XElement element))
+                        {
+                            alias.Documentation = element;
+                        }
 
                         // Get namespaces.
                         alias.Namespaces.AddRange(assembly.GetCakeNamespaces());
