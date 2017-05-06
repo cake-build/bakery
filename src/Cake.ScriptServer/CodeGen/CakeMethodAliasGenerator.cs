@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Cake.ScriptServer.Reflection;
@@ -46,51 +46,49 @@ namespace Cake.ScriptServer.CodeGen
 
             // Arguments
             writer.Write("(");
-            WriteMethodParameters(writer, alias, invokation: false);
+            WriteMethodParameters(writer, alias, invocation: false);
             writer.Write(")");
 
             writer.WriteLine();
             writer.WriteLine("{");
-            writer.Write("    ");
 
-            // Render the method invocation.
-            WriteInvokation(writer, alias);
+            // Method is obsolete?
+            var performInvocation = true;
+            if (alias.Method.Obsolete != null)
+            {
+                var message = GetObsoleteMessage(alias.Method);
+
+                if (alias.Method.Obsolete.IsError)
+                {
+                    performInvocation = false;
+                    writer.Write("    ");
+                    writer.WriteLine($"throw new Cake.ScriptServer.CakeException(\"{message}\");");
+                }
+                else
+                {
+                    writer.Write("    ");
+                    writer.WriteLine($"Context.Log.Warning(\"Warning: {message}\");");
+                }
+            }
+
+            // Render the method invocation?
+            if (performInvocation)
+            {
+                if (alias.Method.Obsolete != null)
+                {
+                    writer.WriteLine("#pragma warning disable 0618");
+                }
+
+                writer.Write("    ");
+                WriteInvokation(writer, alias);
+
+                if (alias.Method.Obsolete != null)
+                {
+                    writer.WriteLine("#pragma warning restore 0618");
+                }
+            }
 
             writer.Write("}");
-        }
-
-        private void WriteMethodParameters(TextWriter writer, CakeScriptAlias alias, bool invokation)
-        {
-            var includeNamespace = !invokation;
-            var includeParameterTypes = !invokation;
-
-            var parameterResult = alias.Method.Parameters
-                .Select(p => BuildParameter(p, includeNamespace, includeParameterTypes, true, invokation))
-                .ToList();
-
-            if (parameterResult.Count > 0)
-            {
-                parameterResult.RemoveAt(0);
-                if (invokation)
-                {
-                    parameterResult.Insert(0, "Context");
-                }
-                writer.Write(string.Join(", ", parameterResult));
-            }
-        }
-
-        private string BuildParameter(ParameterSignature parameter, bool includeNamespace, bool includeType, bool includeName, bool invokation)
-        {
-            var kind = parameter.IsOutParameter ? "out " 
-                : parameter.IsRefParameter ? "ref " 
-                : parameter.IsParams && !invokation ? "params " :  string.Empty;
-
-            var options = includeNamespace ? TypeRenderingOptions.Default : TypeRenderingOptions.Name;
-            var type = includeType ? _typeWriter.GetString(parameter.ParameterType, options) : string.Empty;
-
-            return includeName
-                ? $"{kind}{type} {parameter.Name}".Trim()
-                : $"{kind}{type}".Trim();
         }
 
         private void WriteInvokation(TextWriter writer, CakeScriptAlias alias)
@@ -117,8 +115,65 @@ namespace Cake.ScriptServer.CodeGen
 
             // Arguments
             writer.Write("(");
-            WriteMethodParameters(writer, alias, invokation: true);
+            WriteMethodParameters(writer, alias, invocation: true);
             writer.WriteLine(");");
+        }
+
+        private void WriteMethodParameters(TextWriter writer, CakeScriptAlias alias, bool invocation)
+        {
+            var parameterResult = alias.Method.Parameters
+                .Select(p => string.Join(" ", GetParameterTokens(p, invocation)))
+                .ToList();
+
+            if (parameterResult.Count > 0)
+            {
+                parameterResult.RemoveAt(0);
+                if (invocation)
+                {
+                    parameterResult.Insert(0, "Context");
+                }
+                writer.Write(string.Join(", ", parameterResult));
+            }
+        }
+
+        private IEnumerable<string> GetParameterTokens(ParameterSignature parameter, bool invokation)
+        {
+            if (parameter.IsOutParameter)
+            {
+                yield return "out";
+            }
+            else if (parameter.IsRefParameter)
+            {
+                yield return "ref";
+            }
+
+            if (!invokation)
+            {
+                if (parameter.IsParams)
+                {
+                    yield return "params";
+                }
+                yield return _typeWriter.GetString(parameter.ParameterType);
+            }
+
+            yield return parameter.Name;
+
+            if (!invokation && parameter.IsOptional)
+            {
+                yield return "=";
+                yield return DefaultValueEmitter.GetDefaultValue(parameter, _typeWriter);
+            }
+        }
+
+        private static string GetObsoleteMessage(MethodSignature method)
+        {
+            var message = string.Concat(" ", method.Obsolete.Message ?? string.Empty).TrimEnd();
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                message = string.Empty;
+            }
+            var code = $"The alias {method.Name} has been made obsolete.{message}";
+            return code;
         }
     }
 }

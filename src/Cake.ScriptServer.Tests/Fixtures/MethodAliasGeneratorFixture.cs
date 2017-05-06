@@ -10,7 +10,6 @@ using System.Reflection;
 using Cake.Core.IO;
 using Cake.ScriptServer.CodeGen;
 using Cake.ScriptServer.Reflection;
-using Cake.ScriptServer.Tests.Data;
 
 namespace Cake.ScriptServer.Tests.Fixtures
 {
@@ -62,8 +61,7 @@ namespace Cake.ScriptServer.Tests.Fixtures
 
             using (var writer = new StringWriter())
             {
-                var generator = new CakeMethodAliasGenerator(new TypeSignatureWriter());
-                generator.Generate(writer, alias);
+                _generator.Generate(writer, alias);
 
                 // Return the generated code.
                 return writer.ToString();

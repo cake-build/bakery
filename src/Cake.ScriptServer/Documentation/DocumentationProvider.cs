@@ -64,7 +64,7 @@ namespace Cake.ScriptServer.Documentation
             return builder.ToString();
         }
 
-        private static string GetName(ScriptAlias @alias)
+        private static string GetName(ScriptAlias alias)
         {
             var builder = new StringBuilder();
             builder.Append(alias.Type == ScriptAliasType.Method ? "M:" : "P:");

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Mono.Cecil;
 
 namespace Cake.ScriptServer.Reflection
 {
-    internal sealed class ParameterFormatter
+    internal static class ParameterEmitter
     {
         private static readonly HashSet<string> Keywords;
 
-        static ParameterFormatter()
+        static ParameterEmitter()
         {
             // https://msdn.microsoft.com/en-us/library/x53a06bb.aspx
             // reserved keywords are a no-go, contextual keywords were added in later versions
@@ -30,24 +29,13 @@ namespace Cake.ScriptServer.Reflection
             };
         }
 
-        public static string FormatName(ParameterReference parameter)
-        {
-            if (parameter == null)
-            {
-                throw new ArgumentNullException(nameof(parameter));
-            }
-
-            return FormatName(parameter.Name);
-        }
-
-        public static string FormatName(string parameterName)
+        public static string GetName(string parameterName)
         {
             if (string.IsNullOrWhiteSpace(parameterName))
             {
                 throw new ArgumentException("Parameter name cannot be null or whitespace", nameof(parameterName));
             }
-            return Keywords.Contains(parameterName) 
-                ? $"@{parameterName}" : parameterName;
+            return Keywords.Contains(parameterName) ? $"@{parameterName}" : parameterName;
         }
     }
 }

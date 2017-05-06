@@ -1,11 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Cake.Core.IO;
 using Cake.Core.Text;
 using Cake.ScriptServer.Arguments;
 using Cake.ScriptServer.Core;
 using Cake.ScriptServer.Core.Models;
-using Cake.ScriptServer.Diagnostics;
 using Cake.ScriptServer.Polyfill;
 using Cake.ScriptServer.RequestHandlers;
 
@@ -23,7 +21,6 @@ namespace Cake.ScriptServer
 
             // Init dependencies
             var console = new IO.Console();
-            var log = new ConsoleLogger(console);
             var fileSystem = new FileSystem();
 
             if (args.ContainsKey(Constants.CommandLine.Assembly))

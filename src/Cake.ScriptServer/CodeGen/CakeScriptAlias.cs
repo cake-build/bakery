@@ -1,7 +1,6 @@
 ﻿using Cake.Core.Scripting;
 using System.Collections.Generic;
 using Cake.ScriptServer.Reflection;
-using Mono.Cecil;
 
 namespace Cake.ScriptServer.CodeGen
 {

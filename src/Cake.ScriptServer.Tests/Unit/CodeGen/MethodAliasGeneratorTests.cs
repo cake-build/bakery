@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
 using Cake.ScriptServer.Tests.Fixtures;
 using Xunit;
 
@@ -18,17 +17,6 @@ namespace Cake.ScriptServer.Tests.Unit.CodeGen
             {
                 _fixture = fixture;
             }
-
-            //[Fact]
-            //public void Should_Throw_If_Method_Is_Null()
-            //{
-            //    // Given, When
-            //    var result = Record.Exception(() => { _fixture.Generate(null); });
-
-            //    // Then
-            //    Assert.IsType<ArgumentNullException>(result);
-            //    Assert.Equal("method", ((ArgumentNullException)result).ParamName);
-            //}
 
             [Theory]
             [InlineData("NonGeneric_ExtensionMethodWithNoParameters")]
@@ -66,38 +54,38 @@ namespace Cake.ScriptServer.Tests.Unit.CodeGen
                 Assert.Equal(expected, result);
             }
 
-        //    [Theory]
-        //    [InlineData("Generic_ExtensionMethod")]
-        //    [InlineData("Generic_ExtensionMethodWithParameter")]
-        //    [InlineData("Generic_ExtensionMethodWithGenericReturnValue")]
-        //    public void Should_Return_Correct_Generated_Code_For_Generic_Methods(string name)
-        //    {
-        //        // Given
-        //        var expected = _fixture.GetExpectedCode(name);
+            [Theory]
+            [InlineData("Generic_ExtensionMethod")]
+            [InlineData("Generic_ExtensionMethodWithParameter")]
+            [InlineData("Generic_ExtensionMethodWithGenericReturnValue")]
+            public void Should_Return_Correct_Generated_Code_For_Generic_Methods(string name)
+            {
+                // Given
+                var expected = _fixture.GetExpectedCode(name);
 
-        //        // When
-        //        var result = _fixture.Generate(name);
+                // When
+                var result = _fixture.Generate(name);
 
-        //        // Then
-        //        Assert.Equal(expected, result);
-        //    }
+                // Then
+                Assert.Equal(expected, result);
+            }
 
-        //    [Theory]
-        //    [InlineData("Obsolete_ImplicitWarning_NoMessage")]
-        //    [InlineData("Obsolete_ImplicitWarning_WithMessage")]
-        //    [InlineData("Obsolete_ExplicitWarning_WithMessage")]
-        //    [InlineData("Obsolete_ExplicitError_WithMessage")]
-        //    public void Should_Return_Correct_Generated_Code_For_Obsolete_Methods(string name)
-        //    {
-        //        // Given
-        //        var expected = _fixture.GetExpectedCode(name);
+            [Theory]
+            [InlineData("Obsolete_ImplicitWarning_NoMessage")]
+            [InlineData("Obsolete_ImplicitWarning_WithMessage")]
+            [InlineData("Obsolete_ExplicitWarning_WithMessage")]
+            [InlineData("Obsolete_ExplicitError_WithMessage")]
+            public void Should_Return_Correct_Generated_Code_For_Obsolete_Methods(string name)
+            {
+                // Given
+                var expected = _fixture.GetExpectedCode(name);
 
-        //        // When
-        //        var result = _fixture.Generate(name);
+                // When
+                var result = _fixture.Generate(name);
 
-        //        // Then
-        //        Assert.Equal(expected, result);
-        //    }
+                // Then
+                Assert.Equal(expected, result);
+            }
         }
     }
 }

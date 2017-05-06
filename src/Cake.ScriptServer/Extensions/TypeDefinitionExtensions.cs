@@ -6,18 +6,17 @@ namespace Cake.ScriptServer
 {
     internal static class TypeDefinitionExtensions
     {
-        public static TypeReference TryResolve(this TypeReference type)
+        public static TypeDefinition TryResolve(this TypeReference type)
         {
-            var resolved = type;
             if (!type.IsDefinition && !type.IsGenericParameter)
             {
-                resolved = resolved.Resolve();
-                if (resolved == null)
+                var resolved = type.Resolve();
+                if (resolved != null)
                 {
-                    resolved = type;
+                    return resolved;
                 }
             }
-            return resolved;
+            return null;
         }
 
         public static bool IsAnonymousType(this TypeDefinition type)

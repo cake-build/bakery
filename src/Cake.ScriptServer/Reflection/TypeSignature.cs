@@ -11,14 +11,14 @@ namespace Cake.ScriptServer.Reflection
         public string Name { get; set; }
         public bool IsGenericArgumentType { get; set; }
         public bool IsArray { get; set; }
+        public bool IsEnum { get; }
         public NamespaceSignature Namespace { get; }
         public IReadOnlyList<string> GenericArguments { get; }
         public IReadOnlyList<TypeSignature> GenericParameters { get; }
 
         private TypeSignature(
-            string cref,
-            string name,
-            bool isArray,
+            string cref, string name,
+            bool isArray, bool isEnum,
             NamespaceSignature @namespace,
             IEnumerable<string> genericArguments,
             IEnumerable<TypeSignature> genericParameters)
@@ -26,6 +26,7 @@ namespace Cake.ScriptServer.Reflection
             CRef = cref;
             Name = name;
             IsArray = isArray;
+            IsEnum = isEnum;
             Namespace = @namespace;
             IsGenericArgumentType = string.IsNullOrWhiteSpace(Namespace.Name);
             GenericArguments = new List<string>(genericArguments);
@@ -39,7 +40,17 @@ namespace Cake.ScriptServer.Reflection
             {
                 isArray = true;
                 var arrayType = type as ArrayType;
-                type = arrayType.ElementType;
+                if (arrayType != null)
+                {
+                    type = arrayType.ElementType;
+                }
+            }
+
+            var isEnum = false;
+            var definition = type.TryResolve();
+            if (definition != null)
+            {
+                isEnum = definition.IsEnum;
             }
 
             var cref = CRefGenerator.GetTypeCRef(type);
@@ -81,7 +92,7 @@ namespace Cake.ScriptServer.Reflection
             }
 
             // Return the type description.
-            return new TypeSignature(cref, name, isArray, @namespace, genericParameters, genericArguments);
+            return new TypeSignature(cref, name, isArray, isEnum, @namespace, genericParameters, genericArguments);
         }
     }
 }
