@@ -2,6 +2,7 @@
 using System.IO;
 using Cake.Core.Scripting;
 using Cake.ScriptServer.Reflection;
+using Cake.ScriptServer.Reflection.Emitters;
 
 namespace Cake.ScriptServer.CodeGen
 {
@@ -11,9 +12,10 @@ namespace Cake.ScriptServer.CodeGen
 
         public CakeCodeGenerator()
         {
-            var typeWriter = new TypeSignatureWriter();
+            var typeEmitter = new TypeEmitter();
+            var parameterEmitter = new ParameterEmitter(typeEmitter);
 
-            _methodGenerator = new CakeMethodAliasGenerator(typeWriter);
+            _methodGenerator = new CakeMethodAliasGenerator(typeEmitter, parameterEmitter);
         }
 
         public string Generate(IEnumerable<CakeScriptAlias> aliases)

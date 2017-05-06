@@ -10,6 +10,7 @@ using System.Reflection;
 using Cake.Core.IO;
 using Cake.ScriptServer.CodeGen;
 using Cake.ScriptServer.Reflection;
+using Cake.ScriptServer.Reflection.Emitters;
 
 namespace Cake.ScriptServer.Tests.Fixtures
 {
@@ -30,7 +31,9 @@ namespace Cake.ScriptServer.Tests.Fixtures
             _aliases = CakeScriptAliasFinder.FindAliases(new[] { new FilePath(_assembly.Location) });
 
             // Create the generator.
-            _generator = new CakeMethodAliasGenerator(new TypeSignatureWriter());
+            var typeEmitter = new TypeEmitter();
+            var parameterEmitter = new ParameterEmitter(typeEmitter);
+            _generator = new CakeMethodAliasGenerator(typeEmitter, parameterEmitter);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]

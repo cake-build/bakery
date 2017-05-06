@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace Cake.ScriptServer.Reflection
+namespace Cake.ScriptServer.Reflection.Emitters
 {
     [Flags]
-    public enum TypeRenderingOptions
+    public enum TypeEmitOptions
     {
         None = 1 << 0,
         Namespace = 1 << 1,

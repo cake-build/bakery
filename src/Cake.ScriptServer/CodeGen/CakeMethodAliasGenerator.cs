@@ -1,17 +1,18 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using Cake.ScriptServer.Reflection;
+using Cake.ScriptServer.Reflection.Emitters;
 
 namespace Cake.ScriptServer.CodeGen
 {
     public sealed class CakeMethodAliasGenerator
     {
-        private readonly TypeSignatureWriter _typeWriter;
+        private readonly TypeEmitter _typeEmitter;
+        private readonly ParameterEmitter _parameterEmitter;
 
-        public CakeMethodAliasGenerator(TypeSignatureWriter typeWriter)
+        public CakeMethodAliasGenerator(TypeEmitter typeEmitter, ParameterEmitter parameterEmitter)
         {
-            _typeWriter = typeWriter;
+            _typeEmitter = typeEmitter;
+            _parameterEmitter = parameterEmitter;
         }
 
         public void Generate(TextWriter writer, CakeScriptAlias alias)
@@ -27,8 +28,7 @@ namespace Cake.ScriptServer.CodeGen
                 }
                 else
                 {
-                    _typeWriter.Write(writer, alias.Method.ReturnType);
-
+                    _typeEmitter.Write(writer, alias.Method.ReturnType);
                 }
                 writer.Write(" ");
             }
@@ -56,16 +56,18 @@ namespace Cake.ScriptServer.CodeGen
             var performInvocation = true;
             if (alias.Method.Obsolete != null)
             {
-                var message = GetObsoleteMessage(alias.Method);
+                var message = GetObsoleteMessage(alias);
 
                 if (alias.Method.Obsolete.IsError)
                 {
+                    // Error
                     performInvocation = false;
                     writer.Write("    ");
                     writer.WriteLine($"throw new Cake.ScriptServer.CakeException(\"{message}\");");
                 }
                 else
                 {
+                    // Warning
                     writer.Write("    ");
                     writer.WriteLine($"Context.Log.Warning(\"Warning: {message}\");");
                 }
@@ -101,7 +103,7 @@ namespace Cake.ScriptServer.CodeGen
             }
 
             // Method name.
-            _typeWriter.Write(writer, alias.Method.DeclaringType);
+            _typeEmitter.Write(writer, alias.Method.DeclaringType);
             writer.Write(".");
             writer.Write(alias.Method.Name);
 
@@ -121,8 +123,14 @@ namespace Cake.ScriptServer.CodeGen
 
         private void WriteMethodParameters(TextWriter writer, CakeScriptAlias alias, bool invocation)
         {
+            var options = ParameterEmitOptions.Default;
+            if (invocation)
+            {
+                options = options | ParameterEmitOptions.Invocation;
+            }
+
             var parameterResult = alias.Method.Parameters
-                .Select(p => string.Join(" ", GetParameterTokens(p, invocation)))
+                .Select(p => string.Join(" ", _parameterEmitter.GetString(p, options)))
                 .ToList();
 
             if (parameterResult.Count > 0)
@@ -136,44 +144,15 @@ namespace Cake.ScriptServer.CodeGen
             }
         }
 
-        private IEnumerable<string> GetParameterTokens(ParameterSignature parameter, bool invokation)
+        private static string GetObsoleteMessage(CakeScriptAlias alias)
         {
-            if (parameter.IsOutParameter)
-            {
-                yield return "out";
-            }
-            else if (parameter.IsRefParameter)
-            {
-                yield return "ref";
-            }
-
-            if (!invokation)
-            {
-                if (parameter.IsParams)
-                {
-                    yield return "params";
-                }
-                yield return _typeWriter.GetString(parameter.ParameterType);
-            }
-
-            yield return parameter.Name;
-
-            if (!invokation && parameter.IsOptional)
-            {
-                yield return "=";
-                yield return DefaultValueEmitter.GetDefaultValue(parameter, _typeWriter);
-            }
-        }
-
-        private static string GetObsoleteMessage(MethodSignature method)
-        {
-            var message = string.Concat(" ", method.Obsolete.Message ?? string.Empty).TrimEnd();
+            var message = string.Concat(" ", alias.Method.Obsolete.Message ?? string.Empty).TrimEnd();
             if (string.IsNullOrWhiteSpace(message))
             {
                 message = string.Empty;
             }
-            var code = $"The alias {method.Name} has been made obsolete.{message}";
-            return code;
+            message = $"The alias {alias.Method.Name} has been made obsolete.{message}";
+            return message;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Cake.ScriptServer.Reflection.Emitters;
 using Mono.Cecil;
 
 namespace Cake.ScriptServer.Reflection
@@ -50,7 +51,7 @@ namespace Cake.ScriptServer.Reflection
             }
 
             return new ParameterSignature(
-                ParameterEmitter.GetName(parameter.Name),
+                parameter.Name,
                 TypeSignature.Create(parameter.ParameterType),
                 parameter.IsOptional,
                 defaultValue,
@@ -59,7 +60,7 @@ namespace Cake.ScriptServer.Reflection
                 parameter.ParameterType is ByReferenceType);
         }
 
-        private static bool TryParseDecimal(ParameterDefinition parameter, out decimal value)
+        private static bool TryParseDecimal(ICustomAttributeProvider parameter, out decimal value)
         {
             var name = typeof(DecimalConstantAttribute).Name;
 

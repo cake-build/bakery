@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace Cake.ScriptServer.Reflection
+namespace Cake.ScriptServer.Reflection.Emitters
 {
-    public sealed class TypeSignatureWriter
+    public sealed class TypeEmitter
     {
         public string GetString(TypeSignature signature)
         {
-            return GetString(signature, TypeRenderingOptions.Default);
+            return GetString(signature, TypeEmitOptions.Default);
         }
 
-        public string GetString(TypeSignature signature, TypeRenderingOptions option)
+        public string GetString(TypeSignature signature, TypeEmitOptions option)
         {
             var temp = new StringWriter();
             Write(temp, signature, option);
@@ -19,34 +19,28 @@ namespace Cake.ScriptServer.Reflection
 
         public void Write(TextWriter writer, TypeSignature signature)
         {
-            Write(writer, signature, TypeRenderingOptions.Default);
+            Write(writer, signature, TypeEmitOptions.Default);
         }
 
-        public void Write(TextWriter writer, TypeSignature signature, TypeRenderingOptions options)
+        public void Write(TextWriter writer, TypeSignature signature, TypeEmitOptions options)
         {
             if (signature.IsGenericArgumentType)
             {
-                if ((options & TypeRenderingOptions.Name) == TypeRenderingOptions.Name)
+                if ((options & TypeEmitOptions.Name) == TypeEmitOptions.Name)
                 {
                     writer.Write(signature.Name);
                 }
                 return;
             }
 
-            var alias = options.HasFlag(TypeRenderingOptions.Aliases) 
-                ? CSharpAliasProvider.GetTypeAlias(signature)
-                : null;
 
             // Write type namespace?
-            if (options.HasFlag(TypeRenderingOptions.Namespace))
+            if (options.HasFlag(TypeEmitOptions.Namespace))
             {
-                if (options.HasFlag(TypeRenderingOptions.Name))
+                if (options.HasFlag(TypeEmitOptions.Name))
                 {
-                    if (alias == null)
-                    {
-                        writer.Write(signature.Namespace.Name);
-                        writer.Write(".");
-                    }
+                    writer.Write(signature.Namespace.Name);
+                    writer.Write(".");
                 }
                 else
                 {
@@ -55,12 +49,12 @@ namespace Cake.ScriptServer.Reflection
             }
 
             // Write type name?
-            if (options.HasFlag(TypeRenderingOptions.Name))
+            if (options.HasFlag(TypeEmitOptions.Name))
             {
-                writer.Write(alias ?? signature.Name);
+                writer.Write(signature.Name);
 
                 // Write generic arguments/parameters?
-                if (options.HasFlag(TypeRenderingOptions.GenericParameters))
+                if (options.HasFlag(TypeEmitOptions.GenericParameters))
                 {
                     if (signature.GenericArguments.Count != 0)
                     {

@@ -39,8 +39,7 @@ namespace Cake.ScriptServer.Reflection
             if (type.IsArray)
             {
                 isArray = true;
-                var arrayType = type as ArrayType;
-                if (arrayType != null)
+                if (type is ArrayType arrayType)
                 {
                     type = arrayType.ElementType;
                 }
