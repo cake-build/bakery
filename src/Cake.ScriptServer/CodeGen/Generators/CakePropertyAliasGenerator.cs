@@ -25,6 +25,9 @@ namespace Cake.ScriptServer.CodeGen.Generators
 
         private void Generate(IndentedTextWriter writer, CakeScriptAlias alias)
         {
+            // XML documentation
+            WriteDocs(writer, alias.Documentation);
+
             var shouldThrow = alias.Method.Obsolete != null && alias.Method.Obsolete.IsError;
 
             if (alias.Cached && !shouldThrow)
