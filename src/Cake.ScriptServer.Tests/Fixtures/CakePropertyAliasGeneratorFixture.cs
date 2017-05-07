@@ -1,6 +1,4 @@
-﻿using System;
-using Cake.ScriptServer.CodeGen;
-using Cake.ScriptServer.CodeGen.Generators;
+﻿using Cake.ScriptServer.CodeGen.Generators;
 using Cake.ScriptServer.Reflection.Emitters;
 
 namespace Cake.ScriptServer.Tests.Fixtures

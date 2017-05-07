@@ -17,6 +17,11 @@ namespace Cake.ScriptServer.CodeGen.Generators
 
         public override void Generate(TextWriter writer, CakeScriptAlias alias)
         {
+            Generate(new IndentedTextWriter(writer), alias);
+        }
+
+        private void Generate(IndentedTextWriter writer, CakeScriptAlias alias)
+        {
             // XML documentation
             WriteDocs(writer, alias.Documentation);
 
@@ -55,47 +60,47 @@ namespace Cake.ScriptServer.CodeGen.Generators
 
             // Block start
             writer.WriteLine();
-            writer.WriteLine("{");
-
-            // Method is obsolete?
-            var performInvocation = true;
-            if (alias.Method.Obsolete != null)
+            writer.Write("{");
+            using (writer.BeginScope())
             {
-                var message = GetObsoleteMessage(alias);
-
-                if (alias.Method.Obsolete.IsError)
-                {
-                    // Error
-                    performInvocation = false;
-                    writer.Write("    ");
-                    writer.WriteLine($"throw new Cake.ScriptServer.CakeException(\"{message}\");");
-                }
-                else
-                {
-                    // Warning
-                    writer.Write("    ");
-                    writer.WriteLine($"Context.Log.Warning(\"Warning: {message}\");");
-                }
-            }
-
-            // Render the method invocation?
-            if (performInvocation)
-            {
+                // Method is obsolete?
+                var performInvocation = true;
                 if (alias.Method.Obsolete != null)
                 {
-                    writer.WriteLine("#pragma warning disable 0618");
+                    var message = GetObsoleteMessage(alias);
+
+                    if (alias.Method.Obsolete.IsError)
+                    {
+                        // Error
+                        performInvocation = false;
+                        writer.Write($"throw new Cake.ScriptServer.CakeException(\"{message}\");");
+                    }
+                    else
+                    {
+                        // Warning
+                        writer.Write($"Context.Log.Warning(\"Warning: {message}\");");
+                    }
                 }
 
-                writer.Write("    ");
-                WriteInvokation(writer, alias);
-
-                if (alias.Method.Obsolete != null)
+                // Render the method invocation?
+                if (performInvocation)
                 {
-                    writer.WriteLine("#pragma warning restore 0618");
+                    if (alias.Method.Obsolete != null)
+                    {
+                        writer.WriteLine();
+                        writer.Write("#pragma warning disable 0618");
+                        writer.WriteLine();
+                    }
+
+                    WriteInvokation(writer, alias);
+
+                    if (alias.Method.Obsolete != null)
+                    {
+                        writer.WriteLine();
+                        writer.Write("#pragma warning restore 0618");
+                    }
                 }
             }
-
-            // Block end
             writer.Write("}");
         }
 
@@ -124,7 +129,7 @@ namespace Cake.ScriptServer.CodeGen.Generators
             // Arguments
             writer.Write("(");
             WriteMethodParameters(writer, alias, invocation: true);
-            writer.WriteLine(");");
+            writer.Write(");");
         }
 
         private void WriteMethodParameters(TextWriter writer, CakeScriptAlias alias, bool invocation)

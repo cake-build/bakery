@@ -32,6 +32,7 @@ namespace Cake.ScriptServer.Tests.Fixtures
             _aliases = finder.FindAliases(new[] { new FilePath(_assembly.Location) });
 
             // Create the generator.
+            // ReSharper disable once VirtualMemberCallInConstructor
             _generator = CreateGenerator();
         }
 

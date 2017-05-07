@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Cake.Core;
-using Cake.Core.Scripting.CodeGen;
-using Cake.ScriptServer.CodeGen;
-using Cake.ScriptServer.Reflection.Emitters;
-using Cake.ScriptServer.Tests.Fixtures;
+﻿using Cake.ScriptServer.Tests.Fixtures;
 using Xunit;
 
 namespace Cake.ScriptServer.Tests.Unit.CodeGen

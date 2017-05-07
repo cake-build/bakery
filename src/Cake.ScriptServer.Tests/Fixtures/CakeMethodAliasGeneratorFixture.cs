@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using Cake.ScriptServer.CodeGen;
 using Cake.ScriptServer.CodeGen.Generators;
 using Cake.ScriptServer.Reflection.Emitters;
 
