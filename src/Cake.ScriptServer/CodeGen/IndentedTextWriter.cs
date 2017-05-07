@@ -47,7 +47,7 @@ namespace Cake.ScriptServer.CodeGen
             if (_performIndentation)
             {
                 _performIndentation = false;
-                for (var ix = 0; ix < _level; ++ix)
+                for (var index = 0; index < _level; ++index)
                 {
                     _writer.Write("    ");
                 }
