@@ -113,6 +113,7 @@ namespace Cake.ScriptServer.CodeGen
                         var alias = new CakeScriptAlias()
                         {
                             Method = MethodSignature.Create(method),
+                            Obsolete = method.GetObsoleteAttribute(),
                             Type = isPropertyAlias ? ScriptAliasType.Property : ScriptAliasType.Method,
                             Name = method.Name,
                             Namespaces = new HashSet<string>(StringComparer.Ordinal)

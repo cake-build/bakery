@@ -28,7 +28,7 @@ namespace Cake.ScriptServer.CodeGen.Generators
             // XML documentation
             WriteDocs(writer, alias.Documentation);
 
-            var shouldThrow = alias.Method.Obsolete != null && alias.Method.Obsolete.IsError;
+            var shouldThrow = alias.Obsolete?.IsError ?? false;
 
             if (alias.Cached && !shouldThrow)
             {
@@ -56,10 +56,10 @@ namespace Cake.ScriptServer.CodeGen.Generators
                 using (writer.BeginScope())
                 {
                     // Obsolete warning?
-                    if (alias.Method.Obsolete != null)
+                    if (alias.Obsolete != null)
                     {
                         var message = GetObsoleteMessage(alias);
-                        if (!alias.Method.Obsolete.IsError)
+                        if (!alias.Obsolete.IsError)
                         {
                             writer.Write($"Context.Log.Warning(\"Warning: {message}\");");
                             writer.WriteLine();

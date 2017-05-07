@@ -23,7 +23,7 @@ namespace Cake.ScriptServer.CodeGen.Generators
 
         protected static string GetObsoleteMessage(CakeScriptAlias alias)
         {
-            var message = string.Concat(" ", alias.Method.Obsolete.Message ?? string.Empty).TrimEnd();
+            var message = string.Concat(" ", alias.Obsolete.Message ?? string.Empty).TrimEnd();
             if (string.IsNullOrWhiteSpace(message))
             {
                 message = string.Empty;

@@ -10,7 +10,6 @@ namespace Cake.ScriptServer.Reflection
     {
         public string CRef { get; }
         public string Name { get; set; }
-        public ObsoleteAttribute Obsolete { get; set; }
         public TypeSignature ReturnType { get; }
         public TypeSignature DeclaringType { get; }
         public List<string> GenericParameters { get; }
@@ -18,7 +17,6 @@ namespace Cake.ScriptServer.Reflection
 
         private MethodSignature(
             string cref, string name,
-            ObsoleteAttribute obsolete,
             TypeSignature declaringType,
             TypeSignature returnType,
             IEnumerable<string> genericParameters,
@@ -26,7 +24,6 @@ namespace Cake.ScriptServer.Reflection
         {
             CRef = cref;
             Name = name;
-            Obsolete = obsolete;
             ReturnType = returnType;
             DeclaringType = declaringType;
             GenericParameters = new List<string>(genericParameters);
@@ -58,8 +55,7 @@ namespace Cake.ScriptServer.Reflection
 
             // Return the method signature.
             return new MethodSignature(
-                cref, name, 
-                method.GetObsoleteAttribute(), 
+                cref, name,
                 declaringType, returnType, 
                 genericParameters, parameters);
         }

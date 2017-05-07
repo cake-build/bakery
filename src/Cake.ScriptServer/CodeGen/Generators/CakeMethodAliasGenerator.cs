@@ -65,11 +65,11 @@ namespace Cake.ScriptServer.CodeGen.Generators
             {
                 // Method is obsolete?
                 var performInvocation = true;
-                if (alias.Method.Obsolete != null)
+                if (alias.Obsolete != null)
                 {
                     var message = GetObsoleteMessage(alias);
 
-                    if (alias.Method.Obsolete.IsError)
+                    if (alias.Obsolete.IsError)
                     {
                         // Error
                         performInvocation = false;
@@ -85,7 +85,7 @@ namespace Cake.ScriptServer.CodeGen.Generators
                 // Render the method invocation?
                 if (performInvocation)
                 {
-                    if (alias.Method.Obsolete != null)
+                    if (alias.Obsolete != null)
                     {
                         writer.WriteLine();
                         writer.Write("#pragma warning disable 0618");
@@ -94,7 +94,7 @@ namespace Cake.ScriptServer.CodeGen.Generators
 
                     WriteInvokation(writer, alias);
 
-                    if (alias.Method.Obsolete != null)
+                    if (alias.Obsolete != null)
                     {
                         writer.WriteLine();
                         writer.Write("#pragma warning restore 0618");
