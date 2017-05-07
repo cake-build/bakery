@@ -102,8 +102,13 @@ namespace Cake.ScriptServer.CodeGen
             {
                 foreach (var method in type.Methods)
                 {
-                    if (method.IsCakeAlias(out bool isPropertyAlias))
+                    if (IsCakeAlias(method, out bool isPropertyAlias))
                     {
+                        if (!IsValidCakeAlias(method, isPropertyAlias))
+                        {
+                            continue;
+                        }
+
                         // Create the alias.
                         var alias = new CakeScriptAlias()
                         {
@@ -112,6 +117,12 @@ namespace Cake.ScriptServer.CodeGen
                             Name = method.Name,
                             Namespaces = new HashSet<string>(StringComparer.Ordinal)
                         };
+
+                        // Cached property alias?
+                        if (alias.Type == ScriptAliasType.Property)
+                        {
+                            alias.Cached = IsCakePropertyAliasCached(method);
+                        }
 
                         // Get documentation.
                         if (documentation.TryGetValue(alias.Method.CRef, out XElement element))
@@ -130,5 +141,71 @@ namespace Cake.ScriptServer.CodeGen
                 }
             }
         }
+
+        public static bool IsCakeAlias(MethodDefinition method, out bool isPropertyAlias)
+        {
+            foreach (var attribute in method.CustomAttributes)
+            {
+                if (attribute.AttributeType != null && (
+                        attribute.AttributeType.FullName == "Cake.Core.Annotations.CakeMethodAliasAttribute" ||
+                        attribute.AttributeType.FullName == "Cake.Core.Annotations.CakePropertyAliasAttribute"))
+                {
+                    isPropertyAlias = attribute.AttributeType.FullName == "Cake.Core.Annotations.CakePropertyAliasAttribute";
+                    return true;
+                }
+            }
+            isPropertyAlias = false;
+            return false;
+        }
+
+        public static bool IsValidCakeAlias(MethodDefinition method, bool isPropertyAlias)
+        {
+            if (!method.IsExtensionMethod())
+            {
+                return false;
+            }
+            if (method.Parameters.Count == 0)
+            {
+                return false;
+            }
+            if (method.Parameters[0].ParameterType.FullName != "Cake.Core.ICakeContext")
+            {
+                return false;
+            }
+
+            if (isPropertyAlias)
+            {
+                if (method.HasGenericParameters)
+                {
+                    return false;
+                }
+                if (method.ReturnType.FullName == "System.Void")
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public static bool IsCakePropertyAliasCached(MethodDefinition method)
+        {
+            foreach (var attribute in method.CustomAttributes)
+            {
+                if (attribute.AttributeType != null && attribute.AttributeType.FullName == "Cake.Core.Annotations.CakePropertyAliasAttribute")
+                {
+                    if (attribute.HasProperties)
+                    {
+                        var property = attribute.Properties.FirstOrDefault(p => p.Name == "Cache");
+                        if (property.Argument.Type != null)
+                        {
+                            return (bool)property.Argument.Value;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
     }
 }

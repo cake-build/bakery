@@ -2,6 +2,6 @@
 {
     Context.Log.Warning("Warning: The alias Obsolete_ExplicitWarning_WithMessage has been made obsolete. Please use Foo.Bar instead.");
 #pragma warning disable 0618
-    Cake.ScriptServer.Tests.Data.MethodAliasGeneratorData.Obsolete_ExplicitWarning_WithMessage(Context);
+    Cake.ScriptServer.Tests.Data.CakeMethodAliasGeneratorData.Obsolete_ExplicitWarning_WithMessage(Context);
 #pragma warning restore 0618
 }

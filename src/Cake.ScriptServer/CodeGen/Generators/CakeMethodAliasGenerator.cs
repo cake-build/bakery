@@ -1,12 +1,10 @@
 ﻿using System.IO;
 using System.Linq;
-using System.Text;
-using System.Xml.Linq;
 using Cake.ScriptServer.Reflection.Emitters;
 
-namespace Cake.ScriptServer.CodeGen
+namespace Cake.ScriptServer.CodeGen.Generators
 {
-    public sealed class CakeMethodAliasGenerator
+    public sealed class CakeMethodAliasGenerator : CakeAliasGenerator
     {
         private readonly TypeEmitter _typeEmitter;
         private readonly ParameterEmitter _parameterEmitter;
@@ -17,10 +15,12 @@ namespace Cake.ScriptServer.CodeGen
             _parameterEmitter = parameterEmitter;
         }
 
-        public void Generate(TextWriter writer, CakeScriptAlias alias)
+        public override void Generate(TextWriter writer, CakeScriptAlias alias)
         {
+            // XML documentation
             WriteDocs(writer, alias.Documentation);
 
+            // Access modifier
             writer.Write("public ");
 
             // Return type
@@ -53,6 +53,7 @@ namespace Cake.ScriptServer.CodeGen
             WriteMethodParameters(writer, alias, invocation: false);
             writer.Write(")");
 
+            // Block start
             writer.WriteLine();
             writer.WriteLine("{");
 
@@ -94,6 +95,7 @@ namespace Cake.ScriptServer.CodeGen
                 }
             }
 
+            // Block end
             writer.Write("}");
         }
 
@@ -146,30 +148,6 @@ namespace Cake.ScriptServer.CodeGen
                 }
                 writer.Write(string.Join(", ", parameterResult));
             }
-        }
-
-        private void WriteDocs(TextWriter writer, XElement element)
-        {
-            if (element != null)
-            {
-                var builder = new StringBuilder();
-                foreach (var xmlDoc in element.Elements())
-                {
-                    builder.AppendLine($"/// {xmlDoc.ToString().Replace("\r\n", "\r\n///")}");
-                }
-                writer.Write(builder.ToString());
-            }
-        }
-
-        private static string GetObsoleteMessage(CakeScriptAlias alias)
-        {
-            var message = string.Concat(" ", alias.Method.Obsolete.Message ?? string.Empty).TrimEnd();
-            if (string.IsNullOrWhiteSpace(message))
-            {
-                message = string.Empty;
-            }
-            message = $"The alias {alias.Method.Name} has been made obsolete.{message}";
-            return message;
         }
     }
 }

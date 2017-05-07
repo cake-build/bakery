@@ -1,4 +1,4 @@
 ﻿public void NonGeneric_ExtensionMethodWithParameterArray(params System.Int32[] values)
 {
-    Cake.ScriptServer.Tests.Data.MethodAliasGeneratorData.NonGeneric_ExtensionMethodWithParameterArray(Context, values);
+    Cake.ScriptServer.Tests.Data.CakeMethodAliasGeneratorData.NonGeneric_ExtensionMethodWithParameterArray(Context, values);
 }

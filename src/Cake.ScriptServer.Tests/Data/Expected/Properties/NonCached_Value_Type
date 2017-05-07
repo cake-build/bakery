@@ -2,6 +2,6 @@
 {
     get
     {
-        return Cake.ScriptServer.Tests.Data.PropertyAliasGeneratorData.NonCached_Value_Type(Context);
+        return Cake.ScriptServer.Tests.Data.CakePropertyAliasGeneratorData.NonCached_Value_Type(Context);
     }
 }

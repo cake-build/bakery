@@ -5,7 +5,7 @@ public System.String Cached_Reference_Type
     {
         if (_Cached_Reference_Type==null)
         {
-            _Cached_Reference_Type = Cake.ScriptServer.Tests.Data.PropertyAliasGeneratorData.Cached_Reference_Type(Context);
+            _Cached_Reference_Type = Cake.ScriptServer.Tests.Data.CakePropertyAliasGeneratorData.Cached_Reference_Type(Context);
         }
         return _Cached_Reference_Type;
     }

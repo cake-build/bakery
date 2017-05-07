@@ -5,7 +5,7 @@ public System.Boolean Cached_Value_Type
     {
         if (_Cached_Value_Type==null)
         {
-            _Cached_Value_Type = Cake.ScriptServer.Tests.Data.PropertyAliasGeneratorData.Cached_Value_Type(Context);
+            _Cached_Value_Type = Cake.ScriptServer.Tests.Data.CakePropertyAliasGeneratorData.Cached_Value_Type(Context);
         }
         return _Cached_Value_Type.Value;
     }

@@ -7,19 +7,19 @@ namespace Cake.ScriptServer
 {
     internal static class MethodDefinitionExtensions
     {
-        public static bool IsCakeAlias(this MethodDefinition method, out bool isPropertyAlias)
+        public static bool IsExtensionMethod(this MethodDefinition method)
         {
-            foreach (var attribute in method.CustomAttributes)
+            if (method.IsStatic)
             {
-                if (attribute.AttributeType != null && (
-                        attribute.AttributeType.FullName == "Cake.Core.Annotations.CakeMethodAliasAttribute" ||
-                        attribute.AttributeType.FullName == "Cake.Core.Annotations.CakePropertyAliasAttribute"))
+                foreach (var attribute in method.CustomAttributes)
                 {
-                    isPropertyAlias = attribute.AttributeType.FullName == "Cake.Core.Annotations.CakePropertyAliasAttribute";
-                    return true;
+                    if (attribute.AttributeType != null &&
+                        attribute.AttributeType.FullName == "System.Runtime.CompilerServices.ExtensionAttribute")
+                    {
+                        return true;
+                    }
                 }
             }
-            isPropertyAlias = false;
             return false;
         }
 

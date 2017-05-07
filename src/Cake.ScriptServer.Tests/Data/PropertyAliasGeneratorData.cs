@@ -8,7 +8,7 @@ using Cake.Core.Annotations;
 
 namespace Cake.ScriptServer.Tests.Data
 {
-    internal static class PropertyAliasGeneratorData
+    internal static class CakePropertyAliasGeneratorData
     {
         public static void NotAnExtensionMethod()
         {

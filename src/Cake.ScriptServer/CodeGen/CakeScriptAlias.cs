@@ -15,6 +15,8 @@ namespace Cake.ScriptServer.CodeGen
 
         public ScriptAliasType Type { get; set; }
 
+        public bool Cached { get; set; }
+
         public ISet<string> Namespaces { get; set; }
     }
 }

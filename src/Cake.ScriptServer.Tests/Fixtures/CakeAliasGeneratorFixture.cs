@@ -1,46 +1,44 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using Cake.Core.IO;
 using Cake.ScriptServer.CodeGen;
-using Cake.ScriptServer.Reflection.Emitters;
+using Cake.ScriptServer.CodeGen.Generators;
 
 namespace Cake.ScriptServer.Tests.Fixtures
 {
-    public sealed class MethodAliasGeneratorFixture
+    public abstract class CakeAliasGeneratorFixture<T>
+        where T : CakeAliasGenerator
     {
         private readonly Assembly _assembly;
-        private readonly CakeMethodAliasGenerator _generator;
-        private readonly CakeScriptAliasFinder _finder;
+        private readonly T _generator;
         private readonly IReadOnlyList<CakeScriptAlias> _aliases;
 
-        public MethodAliasGeneratorFixture()
+        protected abstract string ResourcePath { get; }
+
+        protected abstract T CreateGenerator();
+
+        protected CakeAliasGeneratorFixture()
         {
             // Get all aliases in the current assembly.
-            _assembly = typeof(MethodAliasGeneratorFixture).GetTypeInfo().Assembly;
-            _finder = new CakeScriptAliasFinder(new FileSystem());
+            _assembly = typeof(CakeAliasGeneratorFixture<T>).GetTypeInfo().Assembly;
 
             // Load all Cake aliases.
             // TODO: Not ideal with IO-access here, but we need to load the assembly.
             // See if we can load the information by providing the assembly directly.
-            _aliases = _finder.FindAliases(new[] { new FilePath(_assembly.Location) });
+            var finder = new CakeScriptAliasFinder(new FileSystem());
+            _aliases = finder.FindAliases(new[] { new FilePath(_assembly.Location) });
 
             // Create the generator.
-            var typeEmitter = new TypeEmitter();
-            var parameterEmitter = new ParameterEmitter(typeEmitter);
-            _generator = new CakeMethodAliasGenerator(typeEmitter, parameterEmitter);
+            _generator = CreateGenerator();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
         public string GetExpectedCode(string name)
         {
-            var resource = string.Concat("Cake.ScriptServer.Tests.Data.Expected.Methods.", name);
+            var resource = string.Concat($"{ResourcePath}.", name);
             using (var stream = _assembly.GetManifestResourceStream(resource))
             {
                 if (stream == null)

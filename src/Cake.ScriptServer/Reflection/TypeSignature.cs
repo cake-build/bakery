@@ -12,13 +12,14 @@ namespace Cake.ScriptServer.Reflection
         public bool IsGenericArgumentType { get; set; }
         public bool IsArray { get; set; }
         public bool IsEnum { get; }
+        public bool IsValueType { get; set; }
         public NamespaceSignature Namespace { get; }
         public IReadOnlyList<string> GenericArguments { get; }
         public IReadOnlyList<TypeSignature> GenericParameters { get; }
 
         private TypeSignature(
             string cref, string name,
-            bool isArray, bool isEnum,
+            bool isArray, bool isEnum, bool isValueType,
             NamespaceSignature @namespace,
             IEnumerable<string> genericArguments,
             IEnumerable<TypeSignature> genericParameters)
@@ -27,6 +28,7 @@ namespace Cake.ScriptServer.Reflection
             Name = name;
             IsArray = isArray;
             IsEnum = isEnum;
+            IsValueType = isValueType;
             Namespace = @namespace;
             IsGenericArgumentType = string.IsNullOrWhiteSpace(Namespace.Name);
             GenericArguments = new List<string>(genericArguments);
@@ -91,7 +93,7 @@ namespace Cake.ScriptServer.Reflection
             }
 
             // Return the type description.
-            return new TypeSignature(cref, name, isArray, isEnum, @namespace, genericParameters, genericArguments);
+            return new TypeSignature(cref, name, isArray, isEnum, type.IsValueType, @namespace, genericParameters, genericArguments);
         }
     }
 }

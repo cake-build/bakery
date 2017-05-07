@@ -6,7 +6,7 @@ public System.Int32 Cached_Obsolete_ImplicitWarning_WithMessage
         Context.Log.Warning("Warning: The alias Cached_Obsolete_ImplicitWarning_WithMessage has been made obsolete. Please use Foo.Bar instead.");
         if (_Cached_Obsolete_ImplicitWarning_WithMessage==null)
         {
-            _Cached_Obsolete_ImplicitWarning_WithMessage = Cake.ScriptServer.Tests.Data.PropertyAliasGeneratorData.Cached_Obsolete_ImplicitWarning_WithMessage(Context);
+            _Cached_Obsolete_ImplicitWarning_WithMessage = Cake.ScriptServer.Tests.Data.CakePropertyAliasGeneratorData.Cached_Obsolete_ImplicitWarning_WithMessage(Context);
         }
         return _Cached_Obsolete_ImplicitWarning_WithMessage.Value;
     }

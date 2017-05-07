@@ -7,13 +7,13 @@ using Xunit;
 
 namespace Cake.ScriptServer.Tests.Unit.CodeGen
 {
-    public sealed class MethodAliasGeneratorTests
+    public sealed class CakeMethodAliasGeneratorTests
     {
-        public sealed class TheGeneratorMethod : IClassFixture<MethodAliasGeneratorFixture>
+        public sealed class TheGeneratorMethod : IClassFixture<CakeMethodAliasGeneratorFixture>
         {
-            private readonly MethodAliasGeneratorFixture _fixture;
+            private readonly CakeMethodAliasGeneratorFixture _fixture;
 
-            public TheGeneratorMethod(MethodAliasGeneratorFixture fixture)
+            public TheGeneratorMethod(CakeMethodAliasGeneratorFixture fixture)
             {
                 _fixture = fixture;
             }

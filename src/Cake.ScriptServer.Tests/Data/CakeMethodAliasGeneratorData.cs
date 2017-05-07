@@ -10,7 +10,7 @@ using Cake.Core.Annotations;
 
 namespace Cake.ScriptServer.Tests.Data
 {
-    internal static class MethodAliasGeneratorData
+    internal static class CakeMethodAliasGeneratorData
     {
         public static void NotAnExtensionMethod()
         {
