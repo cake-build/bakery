@@ -9,14 +9,14 @@ using Cake.Scripting.Core.Reflection.Emitters;
 
 namespace Cake.Scripting.Core.CodeGen
 {
-    public sealed class CakeScriptGenerator
+    public sealed class CakeScriptAliasGenerator
     {
         private readonly IFileSystem _fileSystem;
         private readonly CakeScriptAliasFinder _aliasFinder;
         private readonly CakeMethodAliasGenerator _methodGenerator;
         private readonly CakePropertyAliasGenerator _propertyGenerator;
 
-        public CakeScriptGenerator(IFileSystem fileSystem)
+        public CakeScriptAliasGenerator(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
             _aliasFinder = new CakeScriptAliasFinder(fileSystem);

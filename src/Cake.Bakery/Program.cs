@@ -20,7 +20,7 @@ namespace Cake.Bakery
 
             // Init dependencies
             var fileSystem = new FileSystem();
-            var scriptGenerator = new CakeScriptGenerator(fileSystem);
+            var scriptGenerator = new CakeScriptAliasGenerator(fileSystem);
 
             if (args.ContainsKey(Constants.CommandLine.Assembly))
             {
