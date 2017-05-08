@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Cake.ScriptServer": {
-      "commandName": "Project",
-      "commandLineArgs": "\"--assembly=C:\\Users\\mb\\src\\cake-vscode-debug-example\\tools\\Cake\\Cake.Common.dll\""
-    }
-  }
-}

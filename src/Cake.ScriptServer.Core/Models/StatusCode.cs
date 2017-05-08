@@ -3,7 +3,7 @@
 namespace Cake.ScriptServer.Core.Models
 {
     [DataContract]
-    public enum StatusCode : int
+    public enum StatusCode
     {
         [EnumMember]
         Error = -1,

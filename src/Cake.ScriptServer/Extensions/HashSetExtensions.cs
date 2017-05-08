@@ -9,7 +9,7 @@ namespace Cake.ScriptServer.Extensions
 {
     internal static class HashSetExtensions
     {
-        public static void AddRange<T>(this HashSet<T> set, IEnumerable<T> items)
+        public static void AddRange<T>(this ISet<T> set, IEnumerable<T> items)
         {
             if (items != null)
             {

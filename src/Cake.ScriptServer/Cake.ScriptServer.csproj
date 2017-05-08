@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Cake.Core" Version="0.19.4" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" />
   </ItemGroup>
 
   <ItemGroup>

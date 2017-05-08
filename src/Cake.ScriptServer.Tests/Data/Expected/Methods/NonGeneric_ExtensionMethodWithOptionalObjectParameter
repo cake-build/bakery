@@ -1,0 +1,4 @@
+﻿public void NonGeneric_ExtensionMethodWithOptionalObjectParameter(System.Int32 value, System.Object option = null)
+{
+    Cake.ScriptServer.Tests.Data.CakeMethodAliasGeneratorData.NonGeneric_ExtensionMethodWithOptionalObjectParameter(Context, value, option);
+}
