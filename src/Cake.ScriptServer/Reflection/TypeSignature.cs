@@ -7,12 +7,12 @@ namespace Cake.ScriptServer.Reflection
 {
     public sealed class TypeSignature
     {
-        public string CRef { get; set; }
-        public string Name { get; set; }
-        public bool IsGenericArgumentType { get; set; }
-        public bool IsArray { get; set; }
+        public string CRef { get; }
+        public string Name { get; }
+        public bool IsGenericArgumentType { get; }
+        public bool IsArray { get; }
         public bool IsEnum { get; }
-        public bool IsValueType { get; set; }
+        public bool IsValueType { get; }
         public NamespaceSignature Namespace { get; }
         public IReadOnlyList<string> GenericArguments { get; }
         public IReadOnlyList<TypeSignature> GenericParameters { get; }

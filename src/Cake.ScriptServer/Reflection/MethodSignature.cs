@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Cake.ScriptServer.Documentation;
 using Mono.Cecil;
@@ -9,7 +8,7 @@ namespace Cake.ScriptServer.Reflection
     public sealed class MethodSignature
     {
         public string CRef { get; }
-        public string Name { get; set; }
+        public string Name { get; }
         public TypeSignature ReturnType { get; }
         public TypeSignature DeclaringType { get; }
         public List<string> GenericParameters { get; }

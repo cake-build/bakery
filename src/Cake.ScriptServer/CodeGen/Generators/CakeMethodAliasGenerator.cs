@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using Cake.ScriptServer.Reflection.Emitters;
 
@@ -11,8 +12,8 @@ namespace Cake.ScriptServer.CodeGen.Generators
 
         public CakeMethodAliasGenerator(TypeEmitter typeEmitter, ParameterEmitter parameterEmitter)
         {
-            _typeEmitter = typeEmitter;
-            _parameterEmitter = parameterEmitter;
+            _typeEmitter = typeEmitter ?? throw new ArgumentNullException(nameof(typeEmitter));
+            _parameterEmitter = parameterEmitter ?? throw new ArgumentNullException(nameof(parameterEmitter));
         }
 
         public override void Generate(TextWriter writer, CakeScriptAlias alias)
@@ -92,7 +93,7 @@ namespace Cake.ScriptServer.CodeGen.Generators
                         writer.WriteLine();
                     }
 
-                    WriteInvokation(writer, alias);
+                    WriteInvocation(writer, alias);
 
                     if (alias.Obsolete != null)
                     {
@@ -104,7 +105,7 @@ namespace Cake.ScriptServer.CodeGen.Generators
             writer.Write("}");
         }
 
-        private void WriteInvokation(TextWriter writer, CakeScriptAlias alias)
+        private void WriteInvocation(TextWriter writer, CakeScriptAlias alias)
         {
             // Has return type?
             var hasReturnValue = !(alias.Method.ReturnType.Namespace.Name == "System" && alias.Method.ReturnType.Name == "Void");

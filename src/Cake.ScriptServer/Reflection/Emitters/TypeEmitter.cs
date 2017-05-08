@@ -33,7 +33,6 @@ namespace Cake.ScriptServer.Reflection.Emitters
                 return;
             }
 
-
             // Write type namespace?
             if (options.HasFlag(TypeEmitOptions.Namespace))
             {

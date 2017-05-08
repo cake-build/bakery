@@ -20,7 +20,7 @@ namespace Cake.ScriptServer.CodeGen
 
         public CakeScriptGenerator(IFileSystem fileSystem)
         {
-            _fileSystem = fileSystem;
+            _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
             _aliasFinder = new CakeScriptAliasFinder(fileSystem);
 
             var typeEmitter = new TypeEmitter();
