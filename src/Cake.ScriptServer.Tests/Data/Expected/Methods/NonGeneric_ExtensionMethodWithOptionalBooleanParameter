@@ -1,4 +1,0 @@
-﻿public void NonGeneric_ExtensionMethodWithOptionalBooleanParameter(System.Int32 value, System.Boolean flag = false)
-{
-    Cake.ScriptServer.Tests.Data.CakeMethodAliasGeneratorData.NonGeneric_ExtensionMethodWithOptionalBooleanParameter(Context, value, flag);
-}

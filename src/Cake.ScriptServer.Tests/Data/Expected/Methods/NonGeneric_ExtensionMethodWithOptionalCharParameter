@@ -1,4 +1,0 @@
-﻿public void NonGeneric_ExtensionMethodWithOptionalCharParameter(System.String s, System.Char c = 's')
-{
-    Cake.ScriptServer.Tests.Data.CakeMethodAliasGeneratorData.NonGeneric_ExtensionMethodWithOptionalCharParameter(Context, s, c);
-}

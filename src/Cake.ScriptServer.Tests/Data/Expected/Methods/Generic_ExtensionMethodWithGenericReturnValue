@@ -1,4 +1,0 @@
-﻿public TTest Generic_ExtensionMethodWithGenericReturnValue<TTest>(TTest value)
-{
-    return Cake.ScriptServer.Tests.Data.CakeMethodAliasGeneratorData.Generic_ExtensionMethodWithGenericReturnValue<TTest>(Context, value);
-}

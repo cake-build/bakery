@@ -1,0 +1,4 @@
+﻿public void NonGeneric_ExtensionMethodWithGenericExpressionArrayParameter(System.Linq.Expressions.Expression<System.Func<System.String, System.String>>[] expression)
+{
+    Cake.Scripting.Core.Tests.Data.CakeMethodAliasGeneratorData.NonGeneric_ExtensionMethodWithGenericExpressionArrayParameter(Context, expression);
+}

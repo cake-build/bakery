@@ -1,0 +1,4 @@
+﻿public void NonGeneric_ExtensionMethodWithNoParameters()
+{
+    Cake.Scripting.Core.Tests.Data.CakeMethodAliasGeneratorData.NonGeneric_ExtensionMethodWithNoParameters(Context);
+}

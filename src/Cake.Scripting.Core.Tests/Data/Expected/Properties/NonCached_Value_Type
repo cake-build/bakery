@@ -1,0 +1,7 @@
+﻿public System.Int32 NonCached_Value_Type
+{
+    get
+    {
+        return Cake.Scripting.Core.Tests.Data.CakePropertyAliasGeneratorData.NonCached_Value_Type(Context);
+    }
+}
