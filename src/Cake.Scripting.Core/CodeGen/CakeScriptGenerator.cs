@@ -11,6 +11,7 @@ using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using Cake.Core.Scripting;
 using Cake.Core.Scripting.Analysis;
+using Cake.Core.Scripting.Processors.Loading;
 using Cake.Scripting.Core.CodeGen.Generators;
 using Cake.Scripting.Core.Reflection.Emitters;
 
@@ -27,20 +28,25 @@ namespace Cake.Scripting.Core.CodeGen
         private readonly CakeScriptAliasFinder _aliasFinder;
         private readonly CakeMethodAliasGenerator _methodGenerator;
         private readonly CakePropertyAliasGenerator _propertyGenerator;
+        private readonly IScriptProcessor _processor;
 
         public CakeScriptGenerator(
             IFileSystem fileSystem,
             ICakeEnvironment environment,
+            IGlobber globber,
             ICakeConfiguration configuration,
-            ICakeLog log)
+            IScriptProcessor processor,
+            ICakeLog log,
+            IEnumerable<ILoadDirectiveProvider> loadDirectiveProviders = null)
         {
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
+            _globber = globber ?? throw new ArgumentNullException(nameof(globber));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _log = log ?? throw new ArgumentNullException(nameof(log));
+            _processor = processor ?? throw new ArgumentNullException(nameof(processor));
 
-            _globber = new Globber(_fileSystem, _environment);
-            _analyzer = new ScriptAnalyzer(_fileSystem, _environment, _log, null);
+            _analyzer = new ScriptAnalyzer(_fileSystem, _environment, _log, loadDirectiveProviders);
             _aliasFinder = new CakeScriptAliasFinder(_fileSystem);
 
             var typeEmitter = new TypeEmitter();
@@ -52,6 +58,7 @@ namespace Cake.Scripting.Core.CodeGen
 
         public CakeScript Generate(FilePath scriptPath)
         {
+            // ReSharper disable once JoinNullCheckWithUsage
             if (scriptPath == null)
             {
                 throw new ArgumentNullException(nameof(scriptPath));
@@ -67,25 +74,39 @@ namespace Cake.Scripting.Core.CodeGen
             _log.Verbose("Analyzing build script...");
             var result = _analyzer.Analyze(scriptPath.GetFilename());
 
-            // Install tools.
+            // Install tools. This will callback to client
             _log.Verbose("Processing build script...");
             var toolsPath = GetToolPath(scriptPath.GetDirectory());
-            // TODO: Should we install tools?
-            // _processor.InstallTools(result, toolsPath);
+            try
+            {
+                _processor.InstallTools(result, toolsPath);
+            }
+            catch (Exception e)
+            {
+                // Log and continue if it fails
+                _log.Error(e);
+            }
 
-            // Install addins.
+
+            // Install addins. This will callback to client
             var cakeRoot = GetCakePath(toolsPath);
-            // TODO: Should we install addins?
-            // var addinRoot = GetAddinPath(cakeRoot);
-            // var addinReferences = _processor.InstallAddins(result, addinRoot);
-            // foreach (var addinReference in addinReferences)
-            // {
-            //     result.References.Add(addinReference.FullPath);
-            // }
+            var addinRoot = GetAddinPath(cakeRoot);
+            try
+            {
+                var addinReferences = _processor.InstallAddins(result, addinRoot);
+                foreach (var addinReference in addinReferences)
+                {
+                    result.References.Add(addinReference.FullPath);
+                }
+            }
+            catch (Exception e)
+            {
+                // Log and continue if it fails
+                _log.Error(e);
+            }
 
             // Load all references.
-            var references = new HashSet<FilePath>();
-            references.AddRange(GetDefaultReferences(cakeRoot));
+            var references = new HashSet<FilePath>(GetDefaultReferences(cakeRoot));
             references.AddRange(result.References.Select(r => new FilePath(r)));
 
             // Find aliases
@@ -94,13 +115,12 @@ namespace Cake.Scripting.Core.CodeGen
             //// Import all namespaces.
             var namespaces = new HashSet<string>(result.Namespaces, StringComparer.Ordinal);
             namespaces.AddRange(GetDefaultNamespaces());
-            namespaces.AddRange(result.Namespaces);
             namespaces.AddRange(aliases.SelectMany(alias => alias.Namespaces));
 
             // Create the response.
             // ReSharper disable once UseObjectOrCollectionInitializer
             var response = new CakeScript();
-            response.Source = GenerateSource(aliases) + string.Join("\n", result.Lines); ;
+            response.Source = GenerateSource(aliases) + string.Join("\n", result.Lines);
             response.Usings.AddRange(namespaces);
             response.References.AddRange(references.Select(r => r.FullPath));
 
