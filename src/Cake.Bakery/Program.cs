@@ -11,7 +11,7 @@ using Cake.Core.Packaging;
 using Cake.Core.Scripting;
 using Cake.Core.Text;
 using Cake.Core.Tooling;
-using Cake.Scripting.Core.CodeGen;
+using Cake.Scripting.CodeGen;
 
 namespace Cake.Bakery
 {

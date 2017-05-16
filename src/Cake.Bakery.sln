@@ -5,15 +5,19 @@ VisualStudioVersion = 15.0.26228.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cake.Bakery", "Cake.Bakery\Cake.Bakery.csproj", "{121DB3A6-CF66-4A9C-8CBE-0D77C9F43BA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cake.Scripting.Core", "Cake.Scripting.Core\Cake.Scripting.Core.csproj", "{449B5DB5-6772-4601-9976-9BD4CBDBAC8F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cake.Scripting", "Cake.Scripting\Cake.Scripting.csproj", "{449B5DB5-6772-4601-9976-9BD4CBDBAC8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Scripting.Core.Tests", "Cake.Scripting.Core.Tests\Cake.Scripting.Core.Tests.csproj", "{0C65770C-8A9D-4BEF-B42E-B75F3F1521BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Scripting.Tests", "Cake.Scripting.Tests\Cake.Scripting.Tests.csproj", "{0C65770C-8A9D-4BEF-B42E-B75F3F1521BE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A0CAC73D-2BF4-4C58-A9C4-8B943FA0E785}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{775E536B-2E05-43CF-9917-9864C7E099A1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Bakery.Tests", "Cake.Bakery.Tests\Cake.Bakery.Tests.csproj", "{46980627-657B-4075-928F-1143A20DEC6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Scripting.Abstractions", "Cake.Scripting.Abstractions\Cake.Scripting.Abstractions.csproj", "{55A9E6D5-3420-4641-8B27-2CA80A74F813}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Scripting.Transport", "Cake.Scripting.Transport\Cake.Scripting.Transport.csproj", "{20EE22C2-6C99-4896-BCE5-2840218C5AAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +77,30 @@ Global
 		{46980627-657B-4075-928F-1143A20DEC6C}.Release|x64.Build.0 = Release|Any CPU
 		{46980627-657B-4075-928F-1143A20DEC6C}.Release|x86.ActiveCfg = Release|Any CPU
 		{46980627-657B-4075-928F-1143A20DEC6C}.Release|x86.Build.0 = Release|Any CPU
+		{55A9E6D5-3420-4641-8B27-2CA80A74F813}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55A9E6D5-3420-4641-8B27-2CA80A74F813}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55A9E6D5-3420-4641-8B27-2CA80A74F813}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{55A9E6D5-3420-4641-8B27-2CA80A74F813}.Debug|x64.Build.0 = Debug|Any CPU
+		{55A9E6D5-3420-4641-8B27-2CA80A74F813}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{55A9E6D5-3420-4641-8B27-2CA80A74F813}.Debug|x86.Build.0 = Debug|Any CPU
+		{55A9E6D5-3420-4641-8B27-2CA80A74F813}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55A9E6D5-3420-4641-8B27-2CA80A74F813}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55A9E6D5-3420-4641-8B27-2CA80A74F813}.Release|x64.ActiveCfg = Release|Any CPU
+		{55A9E6D5-3420-4641-8B27-2CA80A74F813}.Release|x64.Build.0 = Release|Any CPU
+		{55A9E6D5-3420-4641-8B27-2CA80A74F813}.Release|x86.ActiveCfg = Release|Any CPU
+		{55A9E6D5-3420-4641-8B27-2CA80A74F813}.Release|x86.Build.0 = Release|Any CPU
+		{20EE22C2-6C99-4896-BCE5-2840218C5AAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20EE22C2-6C99-4896-BCE5-2840218C5AAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20EE22C2-6C99-4896-BCE5-2840218C5AAB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{20EE22C2-6C99-4896-BCE5-2840218C5AAB}.Debug|x64.Build.0 = Debug|Any CPU
+		{20EE22C2-6C99-4896-BCE5-2840218C5AAB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{20EE22C2-6C99-4896-BCE5-2840218C5AAB}.Debug|x86.Build.0 = Debug|Any CPU
+		{20EE22C2-6C99-4896-BCE5-2840218C5AAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20EE22C2-6C99-4896-BCE5-2840218C5AAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20EE22C2-6C99-4896-BCE5-2840218C5AAB}.Release|x64.ActiveCfg = Release|Any CPU
+		{20EE22C2-6C99-4896-BCE5-2840218C5AAB}.Release|x64.Build.0 = Release|Any CPU
+		{20EE22C2-6C99-4896-BCE5-2840218C5AAB}.Release|x86.ActiveCfg = Release|Any CPU
+		{20EE22C2-6C99-4896-BCE5-2840218C5AAB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,5 +110,7 @@ Global
 		{449B5DB5-6772-4601-9976-9BD4CBDBAC8F} = {A0CAC73D-2BF4-4C58-A9C4-8B943FA0E785}
 		{0C65770C-8A9D-4BEF-B42E-B75F3F1521BE} = {775E536B-2E05-43CF-9917-9864C7E099A1}
 		{46980627-657B-4075-928F-1143A20DEC6C} = {775E536B-2E05-43CF-9917-9864C7E099A1}
+		{55A9E6D5-3420-4641-8B27-2CA80A74F813} = {A0CAC73D-2BF4-4C58-A9C4-8B943FA0E785}
+		{20EE22C2-6C99-4896-BCE5-2840218C5AAB} = {A0CAC73D-2BF4-4C58-A9C4-8B943FA0E785}
 	EndGlobalSection
 EndGlobal

@@ -1,4 +1,0 @@
-﻿public void NonGeneric_ExtensionMethodWithReservedKeywordParameter(System.Int32 @new)
-{
-    Cake.Scripting.Core.Tests.Data.CakeMethodAliasGeneratorData.NonGeneric_ExtensionMethodWithReservedKeywordParameter(Context, @new);
-}
