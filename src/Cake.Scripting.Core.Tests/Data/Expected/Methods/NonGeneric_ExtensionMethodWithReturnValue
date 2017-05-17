@@ -1,4 +1,0 @@
-﻿public System.String NonGeneric_ExtensionMethodWithReturnValue()
-{
-    return Cake.Scripting.Core.Tests.Data.CakeMethodAliasGeneratorData.NonGeneric_ExtensionMethodWithReturnValue(Context);
-}

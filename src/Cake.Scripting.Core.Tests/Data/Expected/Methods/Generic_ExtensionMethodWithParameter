@@ -1,4 +1,0 @@
-﻿public void Generic_ExtensionMethodWithParameter<TTest>(TTest value)
-{
-    Cake.Scripting.Core.Tests.Data.CakeMethodAliasGeneratorData.Generic_ExtensionMethodWithParameter<TTest>(Context, value);
-}
