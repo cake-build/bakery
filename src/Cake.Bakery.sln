@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Scripting.Abstractions
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Scripting.Transport", "Cake.Scripting.Transport\Cake.Scripting.Transport.csproj", "{20EE22C2-6C99-4896-BCE5-2840218C5AAB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Scripting.Transport.Tests", "Cake.Scripting.Transport.Tests\Cake.Scripting.Transport.Tests.csproj", "{9F448FB9-7A89-4EAA-B748-6046CB1330A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,18 @@ Global
 		{20EE22C2-6C99-4896-BCE5-2840218C5AAB}.Release|x64.Build.0 = Release|Any CPU
 		{20EE22C2-6C99-4896-BCE5-2840218C5AAB}.Release|x86.ActiveCfg = Release|Any CPU
 		{20EE22C2-6C99-4896-BCE5-2840218C5AAB}.Release|x86.Build.0 = Release|Any CPU
+		{9F448FB9-7A89-4EAA-B748-6046CB1330A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F448FB9-7A89-4EAA-B748-6046CB1330A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F448FB9-7A89-4EAA-B748-6046CB1330A9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9F448FB9-7A89-4EAA-B748-6046CB1330A9}.Debug|x64.Build.0 = Debug|Any CPU
+		{9F448FB9-7A89-4EAA-B748-6046CB1330A9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9F448FB9-7A89-4EAA-B748-6046CB1330A9}.Debug|x86.Build.0 = Debug|Any CPU
+		{9F448FB9-7A89-4EAA-B748-6046CB1330A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F448FB9-7A89-4EAA-B748-6046CB1330A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F448FB9-7A89-4EAA-B748-6046CB1330A9}.Release|x64.ActiveCfg = Release|Any CPU
+		{9F448FB9-7A89-4EAA-B748-6046CB1330A9}.Release|x64.Build.0 = Release|Any CPU
+		{9F448FB9-7A89-4EAA-B748-6046CB1330A9}.Release|x86.ActiveCfg = Release|Any CPU
+		{9F448FB9-7A89-4EAA-B748-6046CB1330A9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -112,5 +126,6 @@ Global
 		{46980627-657B-4075-928F-1143A20DEC6C} = {775E536B-2E05-43CF-9917-9864C7E099A1}
 		{55A9E6D5-3420-4641-8B27-2CA80A74F813} = {A0CAC73D-2BF4-4C58-A9C4-8B943FA0E785}
 		{20EE22C2-6C99-4896-BCE5-2840218C5AAB} = {A0CAC73D-2BF4-4C58-A9C4-8B943FA0E785}
+		{9F448FB9-7A89-4EAA-B748-6046CB1330A9} = {775E536B-2E05-43CF-9917-9864C7E099A1}
 	EndGlobalSection
 EndGlobal
