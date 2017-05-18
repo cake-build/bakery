@@ -49,7 +49,6 @@ namespace Cake.Scripting.Transport.Serialization
             var typeAndVersion = reader.ReadInt16();
             if (typeAndVersion != Constants.CakeScript.TypeAndVersion)
             {
-                reader.BaseStream.Seek(0, SeekOrigin.End);
                 throw new InvalidOperationException("Type and version does not match");
             }
 
