@@ -18,20 +18,20 @@ namespace Cake.Scripting.Transport.Serialization
             }
 
             // Source
-            writer.Write(script.Source);
+            writer.WriteString(script.Source);
 
             // References
             writer.Write(script.References.Count);
             foreach (var reference in script.References)
             {
-                writer.Write(reference);
+                writer.WriteString(reference);
             }
 
             // Usings
             writer.Write(script.Usings.Count);
             foreach (var @using in script.Usings)
             {
-                writer.Write(@using);
+                writer.WriteString(@using);
             }
         }
 

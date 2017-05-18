@@ -1,8 +1,7 @@
 ﻿using System;
-using System.IO;
 using Cake.Scripting.Abstractions.Models;
 using Cake.Scripting.Transport.Serialization;
-using Cake.Scripting.Transport.Tests.Fixtures;
+using Cake.Scripting.Transport.Tests.Fixtures.Serialization;
 using Xunit;
 
 namespace Cake.Scripting.Transport.Tests.Unit.Serialization

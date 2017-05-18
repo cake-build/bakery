@@ -1,14 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using System.Text;
 using Cake.Scripting.Abstractions.Models;
 
-namespace Cake.Scripting.Transport.Tests.Fixtures
+namespace Cake.Scripting.Transport.Tests.Fixtures.Serialization
 {
-    public class CakeScriptSerializerFixture : IDisposable
+    public sealed class CakeScriptSerializerFixture : SerializerFixture
     {
-        private readonly MemoryStream _stream;
         private readonly Assembly _assembly;
         private readonly string _resourcePath;
 
@@ -16,24 +14,6 @@ namespace Cake.Scripting.Transport.Tests.Fixtures
         {
             _assembly = typeof(CakeScriptSerializerFixture).GetTypeInfo().Assembly;
             _resourcePath = "Cake.Scripting.Transport.Tests.Data";
-            _stream = new MemoryStream();
-
-            Writer = new BinaryWriter(_stream);
-            Reader = new BinaryReader(_stream);
-        }
-
-        public BinaryWriter Writer { get; }
-
-        public BinaryReader Reader { get; }
-
-        public void ResetStreamPosition()
-        {
-            _stream.Position = 0;
-        }
-
-        public void ResetStream()
-        {
-            _stream.SetLength(0);
         }
 
         public CakeScript CreateCakeScriptFromResource(string name, int referencesLength, int usingsLength)
@@ -69,13 +49,6 @@ namespace Cake.Scripting.Transport.Tests.Fixtures
             }
 
             return cakeScript;
-        }
-
-        public void Dispose()
-        {
-            _stream?.Dispose();
-            Writer?.Dispose();
-            Reader?.Dispose();
         }
     }
 }
