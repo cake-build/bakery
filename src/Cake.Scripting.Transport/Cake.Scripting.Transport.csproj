@@ -11,6 +11,10 @@
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
   </PropertyGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
+  </ItemGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x86'" />
