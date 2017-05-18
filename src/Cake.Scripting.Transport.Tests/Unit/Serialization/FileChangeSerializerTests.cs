@@ -22,9 +22,7 @@ namespace Cake.Scripting.Transport.Tests.Unit.Serialization
             [Fact]
             public void ShouldThrowIfWriterIsNull()
             {
-                // Given
-
-                // When
+                // Given, When
                 var exception = Record.Exception(() => FileChangeSerializer.Serialize(null, FileChange.Empty)) as ArgumentNullException;
 
                 // Then
@@ -35,9 +33,7 @@ namespace Cake.Scripting.Transport.Tests.Unit.Serialization
             [Fact]
             public void ShouldThrowIfCakeScriptIsNull()
             {
-                // Given
-
-                // When
+                // Given, When
                 var exception = Record.Exception(() => FileChangeSerializer.Serialize(_fixture.Writer, null)) as ArgumentNullException;
 
                 // Then
@@ -59,9 +55,7 @@ namespace Cake.Scripting.Transport.Tests.Unit.Serialization
             [Fact]
             public void ShouldThrowIfReaderIsNull()
             {
-                // Given
-
-                // When
+                // Given, When
                 var exception = Record.Exception(() => CakeScriptSerializer.Deserialize(null)) as ArgumentNullException;
 
                 // Then

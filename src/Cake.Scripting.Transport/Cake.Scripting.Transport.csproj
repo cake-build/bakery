@@ -19,4 +19,8 @@
     <ProjectReference Include="..\Cake.Scripting.Abstractions\Cake.Scripting.Abstractions.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Tcp\Server\" />
+  </ItemGroup>
+
 </Project>

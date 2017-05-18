@@ -17,6 +17,9 @@ namespace Cake.Scripting.Transport.Serialization
                 throw new ArgumentNullException(nameof(script));
             }
 
+            // Type and Version
+            writer.Write(Constants.CakeScript.TypeAndVersion);
+
             // Source
             writer.WriteString(script.Source);
 
@@ -40,6 +43,14 @@ namespace Cake.Scripting.Transport.Serialization
             if (reader == null)
             {
                 throw new ArgumentNullException(nameof(reader));
+            }
+
+            // TypeId and Version
+            var typeAndVersion = reader.ReadInt16();
+            if (typeAndVersion != Constants.CakeScript.TypeAndVersion)
+            {
+                reader.BaseStream.Seek(0, SeekOrigin.End);
+                throw new InvalidOperationException("Type and version does not match");
             }
 
             // Source

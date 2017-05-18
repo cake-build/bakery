@@ -1,6 +1,8 @@
-﻿namespace Cake.Scripting.Abstractions.Models
+﻿using System;
+
+namespace Cake.Scripting.Abstractions.Models
 {
-    public sealed class LineChange
+    public sealed class LineChange : IEquatable<LineChange>
     {
         public string NewText { get; set; }
 
@@ -12,9 +14,8 @@
 
         public int EndColumn { get; set; }
 
-        public override bool Equals(object obj)
+        public bool Equals(LineChange other)
         {
-            var other = obj as LineChange;
             if (other == null)
             {
                 return false;
@@ -27,13 +28,18 @@
                    && EndColumn == other.EndColumn;
         }
 
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as LineChange);
+        }
+
         public override int GetHashCode()
         {
-            return NewText.GetHashCode()
+            return unchecked (NewText.GetHashCode()
                    * (23 + StartLine)
                    * (29 + StartColumn)
                    * (31 + EndLine)
-                   * (37 + EndColumn);
+                   * (37 + EndColumn));
         }
     }
 }
