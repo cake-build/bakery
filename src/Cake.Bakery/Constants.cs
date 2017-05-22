@@ -8,9 +8,7 @@ namespace Cake.Bakery
 
         public static class CommandLine
         {
-            public static readonly string Assembly = "assembly";
-            public static readonly string File = "file";
-            public static readonly string Verify = "verify";
+            public static readonly string Port = "port";
         }
     }
 }

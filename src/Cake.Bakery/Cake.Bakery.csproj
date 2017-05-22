@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cake.Scripting.Abstractions\Cake.Scripting.Abstractions.csproj" />
+    <ProjectReference Include="..\Cake.Scripting.Transport\Cake.Scripting.Transport.csproj" />
     <ProjectReference Include="..\Cake.Scripting\Cake.Scripting.csproj" />
   </ItemGroup>
 

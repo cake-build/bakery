@@ -12,12 +12,12 @@ using Cake.Core.Scripting.Analysis;
 using Cake.Core.Scripting.Processors.Loading;
 using Cake.Scripting.Abstractions.Models;
 using Cake.Scripting.CodeGen.Generators;
-using Cake.Scripting;
+using Cake.Scripting.Abstractions;
 using Cake.Scripting.Reflection.Emitters;
 
 namespace Cake.Scripting.CodeGen
 {
-    public sealed class CakeScriptGenerator
+    public sealed class CakeScriptGenerator : IScriptGenerationService
     {
         private readonly IFileSystem _fileSystem;
         private readonly ICakeEnvironment _environment;
@@ -56,16 +56,15 @@ namespace Cake.Scripting.CodeGen
             _propertyGenerator = new CakePropertyAliasGenerator(typeEmitter);
         }
 
-        public CakeScript Generate(FilePath scriptPath)
+        public CakeScript Generate(FileChange fileChange)
         {
-            // ReSharper disable once JoinNullCheckWithUsage
-            if (scriptPath == null)
+            if (fileChange == null)
             {
-                throw new ArgumentNullException(nameof(scriptPath));
+                throw new ArgumentNullException(nameof(fileChange));
             }
 
             // Make the script path absolute.
-            scriptPath = scriptPath.MakeAbsolute(_environment);
+            var scriptPath = new FilePath(fileChange.FileName).MakeAbsolute(_environment);
 
             // Prepare the environment.
             _environment.WorkingDirectory = scriptPath.GetDirectory();
