@@ -13,12 +13,14 @@ namespace Cake.Scripting.Transport.Tcp.Client
 {
     public sealed class ScriptGenerationClient : IScriptGenerationService, IDisposable
     {
+        private readonly ManualResetEvent _initializedEvent = new ManualResetEvent(false);
         private readonly object _sendReceiveLock = new object();
         private readonly TcpListener _listener;
         private readonly Process _process;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private BinaryWriter _writer;
         private BinaryReader _reader;
+        private NetworkStream _stream;
 
         public ScriptGenerationClient(string serverExecutablePath)
         {
@@ -39,11 +41,18 @@ namespace Cake.Scripting.Transport.Tcp.Client
 
         public CakeScript Generate(FileChange fileChange)
         {
+            _initializedEvent.WaitOne();
+
             lock (_sendReceiveLock)
             {
                 // Send
                 FileChangeSerializer.Serialize(_writer, fileChange);
                 _writer.Flush();
+
+                while (!_stream.DataAvailable)
+                {
+                    Task.Delay(100).Wait();
+                }
 
                 // Receive
                 return CakeScriptSerializer.Deserialize(_reader);
@@ -54,14 +63,17 @@ namespace Cake.Scripting.Transport.Tcp.Client
         {
             using (var client = await _listener.AcceptTcpClientAsync())
             {
-                _reader = new BinaryReader(client.GetStream());
-                _writer = new BinaryWriter(client.GetStream());
+                _stream = client.GetStream();
+                _reader = new BinaryReader(_stream);
+                _writer = new BinaryWriter(_stream);
+                _initializedEvent.Set();
 
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     await Task.Delay(100, cancellationToken);
                 }
             }
+            _initializedEvent.Reset();
 
             _listener.Stop();
         }
@@ -70,6 +82,7 @@ namespace Cake.Scripting.Transport.Tcp.Client
         {
             _cancellationTokenSource.Cancel(false);
             _process?.Dispose();
+            _stream?.Dispose();
             _writer?.Dispose();
             _reader?.Dispose();
         }

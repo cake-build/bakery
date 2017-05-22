@@ -26,11 +26,17 @@ namespace Cake.Scripting.Transport.Tcp.Server
             {
                 await client.ConnectAsync(IPAddress.Loopback, port);
 
-                using (var reader = new BinaryReader(client.GetStream()))
-                using (var writer = new BinaryWriter(client.GetStream()))
+                using (var stream = client.GetStream())
+                using (var reader = new BinaryReader(stream))
+                using (var writer = new BinaryWriter(stream))
                 {
                     while (!cancellationToken.IsCancellationRequested)
                     {
+                        while (!stream.DataAvailable)
+                        {
+                            await Task.Delay(100, cancellationToken);
+                        }
+
                         // Request
                         var fileChange = FileChangeSerializer.Deserialize(reader);
                         var cakeScript = service.Generate(fileChange);
