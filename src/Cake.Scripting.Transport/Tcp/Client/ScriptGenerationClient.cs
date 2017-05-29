@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -16,27 +15,29 @@ namespace Cake.Scripting.Transport.Tcp.Client
         private readonly ManualResetEvent _initializedEvent = new ManualResetEvent(false);
         private readonly object _sendReceiveLock = new object();
         private readonly TcpListener _listener;
-        private readonly Process _process;
+        private readonly IScriptGenerationProcess _process;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private BinaryWriter _writer;
         private BinaryReader _reader;
         private NetworkStream _stream;
 
-        public ScriptGenerationClient(string serverExecutablePath)
+        public ScriptGenerationClient(string serverExecutablePath) :
+            this(new ScriptGenerationProcess(serverExecutablePath))
         {
+        }
+
+        public ScriptGenerationClient(IScriptGenerationProcess process)
+        {
+            _process = process ?? throw new ArgumentNullException(nameof(process));
             _listener = new TcpListener(IPAddress.Loopback, 0);
             _listener.Start();
             _cancellationTokenSource = new CancellationTokenSource();
+
             RunAsync(_cancellationTokenSource.Token).ConfigureAwait(false);
 
             var port = ((IPEndPoint)_listener.LocalEndpoint).Port;
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = serverExecutablePath,
-                Arguments = $"--port={port}"
-            };
 
-            _process = Process.Start(startInfo);
+            _process.Start(port);
         }
 
         public CakeScript Generate(FileChange fileChange)
@@ -81,7 +82,7 @@ namespace Cake.Scripting.Transport.Tcp.Client
         public void Dispose()
         {
             _cancellationTokenSource.Cancel(false);
-            _process?.Dispose();
+            _process.Dispose();
             _stream?.Dispose();
             _writer?.Dispose();
             _reader?.Dispose();
