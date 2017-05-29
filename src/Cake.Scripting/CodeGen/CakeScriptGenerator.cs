@@ -78,6 +78,7 @@ namespace Cake.Scripting.CodeGen
             var toolsPath = GetToolPath(scriptPath.GetDirectory());
             try
             {
+                _log.Verbose("Installing tools...");
                 _processor.InstallTools(result, toolsPath);
             }
             catch (Exception e)
@@ -89,9 +90,10 @@ namespace Cake.Scripting.CodeGen
 
             // Install addins. This will callback to client
             var cakeRoot = GetCakePath(toolsPath);
-            var addinRoot = GetAddinPath(cakeRoot);
+            var addinRoot = GetAddinPath(scriptPath.GetDirectory());
             try
             {
+                _log.Verbose("Installing addins...");
                 var addinReferences = _processor.InstallAddins(result, addinRoot);
                 foreach (var addinReference in addinReferences)
                 {
@@ -105,19 +107,23 @@ namespace Cake.Scripting.CodeGen
             }
 
             // Load all references.
+            _log.Verbose("Adding references...");
             var references = new HashSet<FilePath>(GetDefaultReferences(cakeRoot));
             references.AddRange(result.References.Select(r => new FilePath(r)));
 
             // Find aliases
+            _log.Verbose("Finding aliases...");
             var aliases = _aliasFinder.FindAliases(references);
 
-            //// Import all namespaces.
+            // Import all namespaces.
+            _log.Verbose("Importing namespaces...");
             var namespaces = new HashSet<string>(result.Namespaces, StringComparer.Ordinal);
             namespaces.AddRange(GetDefaultNamespaces());
             namespaces.AddRange(aliases.SelectMany(alias => alias.Namespaces));
 
             // Create the response.
             // ReSharper disable once UseObjectOrCollectionInitializer
+            _log.Verbose("Creating response...");
             var response = new CakeScript();
             response.Source = GenerateSource(aliases) + string.Join("\n", result.Lines);
             response.Usings.AddRange(namespaces);
@@ -183,10 +189,10 @@ namespace Cake.Scripting.CodeGen
             var pattern = string.Concat(toolPath.FullPath, "/**/Cake.Core.dll");
             var cakeCorePath = _globber.GetFiles(pattern).FirstOrDefault();
 
-            return cakeCorePath?.GetDirectory().MakeAbsolute(_environment);
+            return cakeCorePath?.GetDirectory().MakeAbsolute(_environment) ?? toolPath.Combine("Cake").Collapse();
         }
 
-        private DirectoryPath GetAddinPath(DirectoryPath cakeRoot)
+        private DirectoryPath GetAddinPath(DirectoryPath root)
         {
             var addinPath = _configuration.GetValue(Constants.Paths.Addins);
             if (!string.IsNullOrWhiteSpace(addinPath))
@@ -194,7 +200,8 @@ namespace Cake.Scripting.CodeGen
                 return new DirectoryPath(addinPath).MakeAbsolute(_environment);
             }
 
-            return cakeRoot.Combine("../Addins").Collapse();
+            var toolPath = GetToolPath(root);
+            return toolPath.Combine("Addins").Collapse();
         }
 
         private string GenerateSource(IEnumerable<CakeScriptAlias> aliases)

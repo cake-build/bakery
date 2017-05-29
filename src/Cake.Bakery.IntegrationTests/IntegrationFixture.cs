@@ -1,13 +1,27 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using Cake.Scripting.Abstractions;
 using Cake.Scripting.Abstractions.Models;
 using Cake.Scripting.Transport.Tcp.Client;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 namespace Cake.Bakery.IntegrationTests
 {
     public sealed class IntegrationFixture
     {
+        static IntegrationFixture()
+        {
+            // TODO: Just a silly step to bootstrap integration tests
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "powershell.exe",
+                Arguments = ".\\build.ps1 -Script helloworld.cake",
+                WorkingDirectory = GetWorkingDirectory()
+            };
+            Process.Start(startInfo).WaitForExit();
+        }
+
         public IntegrationFixture()
         {
             var testDirectory = GetTestDirectory();
@@ -18,7 +32,9 @@ namespace Cake.Bakery.IntegrationTests
 
         public IScriptGenerationService CreateGenerationService()
         {
-            return new ScriptGenerationClient(ServerExecutablePath);
+            var loggerFactory = new LoggerFactory()
+                .AddDebug(LogLevel.Trace);
+            return new ScriptGenerationClient(ServerExecutablePath, GetWorkingDirectory(), loggerFactory);
         }
 
         public FileChange GetFileChange(string fileName)
@@ -31,10 +47,15 @@ namespace Cake.Bakery.IntegrationTests
             };
         }
 
+        private static string GetWorkingDirectory()
+        {
+            return Path.Combine(GetTestDirectory(), "Data");
+        }
+
         private static string GetTestDirectory()
         {
             var location = typeof(IntegrationFixture).GetTypeInfo().Assembly.CodeBase;
-            return Path.GetDirectoryName(location);
+            return Path.GetDirectoryName(location).Replace("file:\\", string.Empty);
         }
     }
 }

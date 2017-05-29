@@ -12,7 +12,7 @@ namespace Cake.Scripting.Transport.Tests.Fixtures.Tcp
         {
             _service = new ScriptGenerationService();
 
-            Client = new ScriptGenerationClient(new InProcessServer(_service));
+            Client = new ScriptGenerationClient(new InProcessServer(_service, null), string.Empty, null);
         }
 
         public ScriptGenerationClient Client { get; }

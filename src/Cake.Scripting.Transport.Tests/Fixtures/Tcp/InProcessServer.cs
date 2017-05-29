@@ -1,6 +1,7 @@
 ﻿using Cake.Scripting.Abstractions;
 using Cake.Scripting.Transport.Tcp.Client;
 using Cake.Scripting.Transport.Tcp.Server;
+using Microsoft.Extensions.Logging;
 
 namespace Cake.Scripting.Transport.Tests.Fixtures.Tcp
 {
@@ -8,10 +9,12 @@ namespace Cake.Scripting.Transport.Tests.Fixtures.Tcp
     {
         private readonly IScriptGenerationService _service;
         private ScriptGenerationServer _server;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public InProcessServer(IScriptGenerationService service)
+        public InProcessServer(IScriptGenerationService service, ILoggerFactory loggerFactory)
         {
             _service = service;
+            _loggerFactory = loggerFactory;
         }
 
         public void Dispose()
@@ -23,7 +26,7 @@ namespace Cake.Scripting.Transport.Tests.Fixtures.Tcp
 
         public void Start(int port)
         {
-            _server = new ScriptGenerationServer(_service, port);
+            _server = new ScriptGenerationServer(_service, port, _loggerFactory);
         }
     }
 }

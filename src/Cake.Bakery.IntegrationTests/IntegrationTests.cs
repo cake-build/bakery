@@ -20,10 +20,10 @@ namespace Cake.Bakery.IntegrationTests
             var fileChange = _fixture.GetFileChange("helloworld.cake");
 
             // When
-            target.Generate(fileChange);
+            var response = target.Generate(fileChange);
 
             // Then
-
+            Assert.NotNull(response);
         }
     }
 }

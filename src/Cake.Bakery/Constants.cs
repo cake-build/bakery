@@ -9,6 +9,7 @@ namespace Cake.Bakery
         public static class CommandLine
         {
             public static readonly string Port = "port";
+            public static readonly string Debug = "debug";
         }
     }
 }

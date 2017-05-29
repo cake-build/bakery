@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Cake.Bakery.Arguments;
@@ -15,6 +16,7 @@ using Cake.Core.Tooling;
 using Cake.Scripting.Abstractions.Models;
 using Cake.Scripting.CodeGen;
 using Cake.Scripting.Transport.Tcp.Server;
+using Microsoft.Extensions.Logging;
 
 namespace Cake.Bakery
 {
@@ -28,11 +30,22 @@ namespace Cake.Bakery
                 .Split(EnvironmentHelper.GetCommandLine())
                 .Skip(1));
 
+            if (args.ContainsKey(Constants.CommandLine.Debug))
+            {
+                Console.WriteLine($"Attach debugger to process {Process.GetCurrentProcess().Id} to continue. ..");
+                while (!Debugger.IsAttached)
+                {
+                    Thread.Sleep(100);
+                }
+            }
+
             if (args.ContainsKey(Constants.CommandLine.Port) &&
                 int.TryParse(args[Constants.CommandLine.Port], out int port))
             {
                 // Init dependencies
-                var log = new ConsoleLogger();
+                var loggerFactory = new LoggerFactory()
+                    .AddConsole(LogLevel.Trace);
+                var log = new CakeLog(loggerFactory);
                 var fileSystem = new FileSystem();
                 var environment = new CakeEnvironment(new CakePlatform(), new CakeRuntime(), log);
                 var configuration = new CakeConfiguration();
@@ -53,18 +66,26 @@ namespace Cake.Bakery
 
                 environment.WorkingDirectory = System.IO.Directory.GetCurrentDirectory();
 
-                using (var server = new ScriptGenerationServer(scriptGenerator, port))
+                try
                 {
-                    var cancel = false;
-                    Console.CancelKeyPress += (sender, e) =>
+                    using (var server = new ScriptGenerationServer(scriptGenerator, port, loggerFactory))
                     {
-                        cancel = true;
-                    };
+                        var cancel = false;
+                        Console.CancelKeyPress += (sender, e) =>
+                        {
+                            cancel = true;
+                        };
 
-                    while (!cancel)
-                    {
-                        Thread.Sleep(300);
+                        while (!cancel)
+                        {
+                            Thread.Sleep(300);
+                        }
                     }
+                }
+                catch (Exception e)
+                {
+                    loggerFactory.CreateLogger<Program>().LogCritical(0, e, "Unhandled Exception");
+                    throw;
                 }
             }
             else

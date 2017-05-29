@@ -6,6 +6,6 @@ namespace Cake.Scripting.Transport.Tcp.Client
     {
         string ServerExecutablePath { get; set; }
 
-        void Start(int port);
+        void Start(int port, string workingDirectory);
     }
 }
