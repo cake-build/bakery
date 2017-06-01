@@ -24,7 +24,7 @@ namespace Cake.Scripting.Transport.Tests.Fixtures.Tcp
 
         public string ServerExecutablePath { get; set; }
 
-        public void Start(int port)
+        public void Start(int port, string workingDirectory)
         {
             _server = new ScriptGenerationServer(_service, port, _loggerFactory);
         }
