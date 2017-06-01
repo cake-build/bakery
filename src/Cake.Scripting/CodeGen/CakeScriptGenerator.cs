@@ -13,25 +13,26 @@ using Cake.Core.Scripting.Processors.Loading;
 using Cake.Scripting.Abstractions.Models;
 using Cake.Scripting.CodeGen.Generators;
 using Cake.Scripting.Abstractions;
+using Cake.Scripting.IO;
 using Cake.Scripting.Reflection.Emitters;
 
 namespace Cake.Scripting.CodeGen
 {
     public sealed class CakeScriptGenerator : IScriptGenerationService
     {
-        private readonly IFileSystem _fileSystem;
         private readonly ICakeEnvironment _environment;
         private readonly ICakeLog _log;
         private readonly ICakeConfiguration _configuration;
         private readonly IGlobber _globber;
         private readonly IScriptAnalyzer _analyzer;
+        private readonly IScriptProcessor _processor;
+        private readonly IBufferedFileSystem _fileSystem;
         private readonly CakeScriptAliasFinder _aliasFinder;
         private readonly CakeMethodAliasGenerator _methodGenerator;
         private readonly CakePropertyAliasGenerator _propertyGenerator;
-        private readonly IScriptProcessor _processor;
 
         public CakeScriptGenerator(
-            IFileSystem fileSystem,
+            IBufferedFileSystem fileSystem,
             ICakeEnvironment environment,
             IGlobber globber,
             ICakeConfiguration configuration,
@@ -42,8 +43,8 @@ namespace Cake.Scripting.CodeGen
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
             _globber = globber ?? throw new ArgumentNullException(nameof(globber));
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _log = log ?? throw new ArgumentNullException(nameof(log));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _processor = processor ?? throw new ArgumentNullException(nameof(processor));
 
             _analyzer = new ScriptAnalyzer(_fileSystem, _environment, _log, loadDirectiveProviders);
@@ -65,6 +66,10 @@ namespace Cake.Scripting.CodeGen
 
             // Make the script path absolute.
             var scriptPath = new FilePath(fileChange.FileName).MakeAbsolute(_environment);
+
+            // Prepare the file changes
+            _log.Verbose("Handling file change...");
+            HandleFileChange(scriptPath, fileChange);
 
             // Prepare the environment.
             _environment.WorkingDirectory = scriptPath.GetDirectory();
@@ -131,6 +136,22 @@ namespace Cake.Scripting.CodeGen
 
             // Return the response.
             return response;
+        }
+
+        private void HandleFileChange(FilePath path, FileChange fileChange)
+        {
+            if (fileChange.FromDisk)
+            {
+                _fileSystem.RemoveFileFromBuffer(path);
+                return;
+            }
+            if (fileChange.LineChanges != null && fileChange.LineChanges.Any())
+            {
+                _fileSystem.UpdateFileBuffer(path, fileChange.LineChanges);
+                return;
+            }
+
+            _fileSystem.UpdateFileBuffer(path, fileChange.Buffer);
         }
 
         // TODO: Move to conventions

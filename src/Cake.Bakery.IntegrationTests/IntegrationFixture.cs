@@ -43,7 +43,8 @@ namespace Cake.Bakery.IntegrationTests
 
             return new FileChange
             {
-                FileName = Path.Combine(testDirectory, "Data", fileName)
+                FileName = Path.Combine(testDirectory, "Data", fileName),
+                FromDisk = true
             };
         }
 
