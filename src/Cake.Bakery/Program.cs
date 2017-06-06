@@ -15,6 +15,7 @@ using Cake.Core.Text;
 using Cake.Core.Tooling;
 using Cake.Scripting.Abstractions.Models;
 using Cake.Scripting.CodeGen;
+using Cake.Scripting.IO;
 using Cake.Scripting.Transport.Tcp.Server;
 using Microsoft.Extensions.Logging;
 
@@ -46,7 +47,7 @@ namespace Cake.Bakery
                 var loggerFactory = new LoggerFactory()
                     .AddConsole(LogLevel.Trace);
                 var log = new CakeLog(loggerFactory);
-                var fileSystem = new FileSystem();
+                var fileSystem = new BufferedFileSystem(new FileSystem(), log);
                 var environment = new CakeEnvironment(new CakePlatform(), new CakeRuntime(), log);
                 var configuration = new CakeConfiguration();
                 var toolRepository = new ToolRepository(environment);
