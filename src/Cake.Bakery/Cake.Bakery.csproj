@@ -11,10 +11,13 @@
 
   <ItemGroup>
     <PackageReference Include="Cake.Core" Version="0.19.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Cake.Scripting.Abstractions\Cake.Scripting.Abstractions.csproj" />
+    <ProjectReference Include="..\Cake.Scripting.Transport\Cake.Scripting.Transport.csproj" />
     <ProjectReference Include="..\Cake.Scripting\Cake.Scripting.csproj" />
   </ItemGroup>
 

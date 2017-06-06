@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using Cake.Bakery.Arguments;
 using Cake.Bakery.Configuration;
 using Cake.Bakery.Diagnostics;
@@ -11,7 +13,10 @@ using Cake.Core.Packaging;
 using Cake.Core.Scripting;
 using Cake.Core.Text;
 using Cake.Core.Tooling;
+using Cake.Scripting.Abstractions.Models;
 using Cake.Scripting.CodeGen;
+using Cake.Scripting.Transport.Tcp.Server;
+using Microsoft.Extensions.Logging;
 
 namespace Cake.Bakery
 {
@@ -25,25 +30,23 @@ namespace Cake.Bakery
                 .Split(EnvironmentHelper.GetCommandLine())
                 .Skip(1));
 
-            // Init dependencies
-            var log = new ConsoleLogger();
-            var fileSystem = new FileSystem();
-
-            if (args.ContainsKey(Constants.CommandLine.Assembly))
+            if (args.ContainsKey(Constants.CommandLine.Debug))
             {
-                var assemblyPath = args[Constants.CommandLine.Assembly];
-                var verifyAssembly = args.ContainsKey(Constants.CommandLine.Verify);
-                var scriptGenerator = new CakeScriptAliasGenerator(fileSystem);
-
-                var cakeScript = scriptGenerator.Generate(assemblyPath, verifyAssembly);
-
-                Console.WriteLine($"Script: {cakeScript.Source}");
-                Console.WriteLine($"Usings: {string.Join(";", cakeScript.Usings)}");
-                Console.WriteLine($"References: {string.Join(";", cakeScript.References)}");
+                Console.WriteLine($"Attach debugger to process {Process.GetCurrentProcess().Id} to continue. ..");
+                while (!Debugger.IsAttached)
+                {
+                    Thread.Sleep(100);
+                }
             }
-            else if (args.ContainsKey(Constants.CommandLine.File))
+
+            if (args.ContainsKey(Constants.CommandLine.Port) &&
+                int.TryParse(args[Constants.CommandLine.Port], out int port))
             {
-                var scriptPath = args[Constants.CommandLine.File];
+                // Init dependencies
+                var loggerFactory = new LoggerFactory()
+                    .AddConsole(LogLevel.Trace);
+                var log = new CakeLog(loggerFactory);
+                var fileSystem = new FileSystem();
                 var environment = new CakeEnvironment(new CakePlatform(), new CakeRuntime(), log);
                 var configuration = new CakeConfiguration();
                 var toolRepository = new ToolRepository(environment);
@@ -51,7 +54,7 @@ namespace Cake.Bakery
                 var toolResolutionStrategy = new ToolResolutionStrategy(fileSystem, environment, globber, configuration);
                 var toolLocator = new ToolLocator(environment, toolRepository, toolResolutionStrategy);
                 var packageInstaller = new DefaultPackageInstaller(environment, fileSystem, globber, log); // <-- TODO: This should callback to client
-                var processor = new ScriptProcessor(fileSystem, environment, log, toolLocator, new []{ packageInstaller });
+                var processor = new ScriptProcessor(fileSystem, environment, log, toolLocator, new[] { packageInstaller });
                 var scriptGenerator = new CakeScriptGenerator(
                     fileSystem: fileSystem,
                     environment: environment,
@@ -63,7 +66,31 @@ namespace Cake.Bakery
 
                 environment.WorkingDirectory = System.IO.Directory.GetCurrentDirectory();
 
-                var cakeScript = scriptGenerator.Generate(scriptPath);
+                try
+                {
+                    using (var server = new ScriptGenerationServer(scriptGenerator, port, loggerFactory))
+                    {
+                        var cancel = false;
+                        Console.CancelKeyPress += (sender, e) =>
+                        {
+                            cancel = true;
+                        };
+
+                        while (!cancel)
+                        {
+                            Thread.Sleep(300);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    loggerFactory.CreateLogger<Program>().LogCritical(0, e, "Unhandled Exception");
+                    throw;
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Port not specified or invalid");
             }
             return 0;
         }
