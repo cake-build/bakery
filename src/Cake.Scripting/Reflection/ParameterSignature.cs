@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Mono.Cecil;
@@ -15,7 +19,7 @@ namespace Cake.Scripting.Reflection
         public bool IsOutParameter { get; }
         public bool IsRefParameter { get; }
 
-        private ParameterSignature(string name, TypeSignature parameterType, 
+        private ParameterSignature(string name, TypeSignature parameterType,
             bool isOptional, object defaultValue,
             bool isParams, bool isOutParameter, bool isRefParameter)
         {
@@ -69,7 +73,7 @@ namespace Cake.Scripting.Reflection
                 // Instanciate the attribute.
                 var args = attribute.ConstructorArguments;
                 var obj = new DecimalConstantAttribute(
-                    (byte)args[0].Value, (byte)args[1].Value, (uint)args[2].Value, 
+                    (byte)args[0].Value, (byte)args[1].Value, (uint)args[2].Value,
                     (uint)args[3].Value, (uint)args[4].Value);
 
                 value = obj.Value;
