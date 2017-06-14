@@ -9,7 +9,6 @@ using System.Threading;
 using Cake.Bakery.Arguments;
 using Cake.Bakery.Configuration;
 using Cake.Bakery.Diagnostics;
-using Cake.Bakery.Packaging;
 using Cake.Bakery.Polyfill;
 using Cake.Core;
 using Cake.Core.IO;
@@ -58,7 +57,7 @@ namespace Cake.Bakery
                 var globber = new Globber(fileSystem, environment);
                 var toolResolutionStrategy = new ToolResolutionStrategy(fileSystem, environment, globber, configuration);
                 var toolLocator = new ToolLocator(environment, toolRepository, toolResolutionStrategy);
-                var packageInstaller = new DefaultPackageInstaller(environment, fileSystem, globber, log); // <-- TODO: This should callback to client
+                var packageInstaller = default(IPackageInstaller);
                 var processor = new ScriptProcessor(fileSystem, environment, log, toolLocator, new[] { packageInstaller });
                 var scriptGenerator = new CakeScriptGenerator(
                     fileSystem: fileSystem,

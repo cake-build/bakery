@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Cake.Core" Version="0.20.0" />
+    <PackageReference Include="Cake.NuGet" Version="0.20.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.1.0" />
   </ItemGroup>
@@ -19,6 +20,10 @@
     <ProjectReference Include="..\Cake.Scripting.Abstractions\Cake.Scripting.Abstractions.csproj" />
     <ProjectReference Include="..\Cake.Scripting.Transport\Cake.Scripting.Transport.csproj" />
     <ProjectReference Include="..\Cake.Scripting\Cake.Scripting.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Composition\" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
