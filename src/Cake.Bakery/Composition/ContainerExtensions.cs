@@ -19,7 +19,7 @@ namespace Cake.Bakery.Composition
             return ContainerResolver.Resolve(container, type);
         }
 
-        public static void Update(this Container container, CakeServices services)
+        public static void Update(this Container container, ContainerRegistrar services)
         {
             services.Builder.Update(container);
         }

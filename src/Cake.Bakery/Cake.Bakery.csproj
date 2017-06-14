@@ -22,10 +22,6 @@
     <ProjectReference Include="..\Cake.Scripting\Cake.Scripting.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Composition\" />
-  </ItemGroup>
-
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
     <DebugType>portable</DebugType>
