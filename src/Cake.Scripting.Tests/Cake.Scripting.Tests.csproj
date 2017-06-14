@@ -93,8 +93,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cake.Core" Version="0.19.5" />
-    <PackageReference Include="Cake.Testing" Version="0.19.5" />
+    <PackageReference Include="Cake.Core" Version="0.20.0" />
+    <PackageReference Include="Cake.Testing" Version="0.20.0" />
     <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     <PackageReference Include="xunit" Version="2.2.0" />
