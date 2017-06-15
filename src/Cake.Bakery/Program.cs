@@ -8,22 +8,15 @@ using System.Linq;
 using System.Threading;
 using Cake.Bakery.Arguments;
 using Cake.Bakery.Composition;
-using Cake.Bakery.Configuration;
-using Cake.Bakery.Diagnostics;
 using Cake.Bakery.Polyfill;
 using Cake.Core;
-using Cake.Core.Configuration;
 using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using Cake.Core.Modules;
-using Cake.Core.Packaging;
-using Cake.Core.Scripting;
 using Cake.Core.Text;
-using Cake.Core.Tooling;
 using Cake.NuGet;
-using Cake.Scripting.Abstractions.Models;
-using Cake.Scripting.CodeGen;
-using Cake.Scripting.IO;
+using Cake.Scripting;
+using Cake.Scripting.Abstractions;
 using Cake.Scripting.Transport.Tcp.Server;
 using Microsoft.Extensions.Logging;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
@@ -52,42 +45,27 @@ namespace Cake.Bakery
             if (args.ContainsKey(Constants.CommandLine.Port) &&
                 int.TryParse(args[Constants.CommandLine.Port], out int port))
             {
-                var builder = new ContainerRegistrar();
-                builder.RegisterModule(new CoreModule());
-                builder.RegisterModule(new NuGetModule());
+                var loggerFactory = new LoggerFactory()
+                    .AddConsole(LogLevel.Trace);
+
+                var registrar = new ContainerRegistrar();
+                registrar.RegisterModule(new CoreModule());
+                registrar.RegisterModule(new BakeryModule(loggerFactory));
+                registrar.RegisterModule(new NuGetModule());
 
                 // Build the container.
-                using (var container = builder.Build())
+                using (var container = registrar.Build())
                 {
+                    var fileSystem = container.Resolve<IFileSystem>();
+                    var log = container.Resolve<ICakeLog>();
 
-                    // Init dependencies
-                    var loggerFactory = new LoggerFactory()
-                        .AddConsole(LogLevel.Trace);
-                    var log = new CakeLog(loggerFactory);
-                    var fileSystem = new BufferedFileSystem(new FileSystem(), log);
-                    var environment = new CakeEnvironment(new CakePlatform(), new CakeRuntime(), log);
-                    var configuration = new CakeConfiguration();
-                    var toolRepository = new ToolRepository(environment);
-                    var globber = new Globber(fileSystem, environment);
-                    var toolResolutionStrategy =
-                        new ToolResolutionStrategy(fileSystem, environment, globber, configuration);
-                    var toolLocator = new ToolLocator(environment, toolRepository, toolResolutionStrategy);
+                    // Rebuild the container.
+                    registrar = new ContainerRegistrar();
+                    registrar.RegisterModule(new ScriptingModule(fileSystem, log));
+                    registrar.Builder.Update(container);
 
-                    // TODO: Create bakery module
-                    builder.RegisterInstance((ICakeLog)log);
-                    builder.RegisterInstance((ICakeConfiguration) configuration);
-                    container.Update(builder);
-                    var packageInstaller = container.Resolve<IPackageInstaller>();
-                    var processor = new ScriptProcessor(fileSystem, environment, log, toolLocator,
-                        new[] {packageInstaller});
-                    var scriptGenerator = new CakeScriptGenerator(
-                        fileSystem: fileSystem,
-                        environment: environment,
-                        globber: globber,
-                        configuration: configuration,
-                        processor: processor,
-                        log: log,
-                        loadDirectiveProviders: null);
+                    var environment = container.Resolve<ICakeEnvironment>();
+                    var scriptGenerator = container.Resolve<IScriptGenerationService>();
 
                     environment.WorkingDirectory = System.IO.Directory.GetCurrentDirectory();
 
