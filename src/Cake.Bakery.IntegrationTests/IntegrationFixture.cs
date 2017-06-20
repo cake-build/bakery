@@ -34,7 +34,7 @@ namespace Cake.Bakery.IntegrationTests
 
         public string ServerExecutablePath { get; set; }
 
-        public IScriptGenerationService CreateGenerationService()
+        public ScriptGenerationClient CreateGenerationService()
         {
             var loggerFactory = new LoggerFactory()
                 .AddDebug(LogLevel.Trace);

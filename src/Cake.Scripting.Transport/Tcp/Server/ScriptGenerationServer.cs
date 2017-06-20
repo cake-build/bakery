@@ -9,6 +9,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Cake.Scripting.Abstractions;
+using Cake.Scripting.Transport.Extensions;
 using Cake.Scripting.Transport.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -17,25 +18,37 @@ namespace Cake.Scripting.Transport.Tcp.Server
 {
     public class ScriptGenerationServer : IDisposable
     {
+        public event EventHandler OnDisconnected;
+
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly ILogger _logger;
         private readonly IScriptGenerationService _service;
+        private readonly int _port;
 
         public ScriptGenerationServer(IScriptGenerationService service, int port, ILoggerFactory loggerFactory)
         {
             _logger = loggerFactory?.CreateLogger(typeof(ScriptGenerationServer)) ?? NullLogger.Instance;
             _cancellationTokenSource = new CancellationTokenSource();
             _service = service ?? throw new ArgumentNullException(nameof(service));
-
-            RunAsync(port, _cancellationTokenSource.Token).ConfigureAwait(false);
+            _port = port;
         }
 
-        private async Task RunAsync(int port, CancellationToken cancellationToken)
+        public void Start()
+        {
+            RunAsync(_cancellationTokenSource.Token).ConfigureAwait(false);
+        }
+
+        public void Stop()
+        {
+            _cancellationTokenSource.Cancel(false);
+        }
+
+        private async Task RunAsync(CancellationToken cancellationToken)
         {
             using (var client = new TcpClient())
             {
-                _logger.LogDebug("Connecting to tcp server on port {port}", port);
-                await client.ConnectAsync(IPAddress.Loopback, port);
+                _logger.LogDebug("Connecting to tcp server on port {port}", _port);
+                await client.ConnectAsync(IPAddress.Loopback, _port);
                 _logger.LogDebug("Connected");
 
                 using (var stream = client.GetStream())
@@ -46,7 +59,12 @@ namespace Cake.Scripting.Transport.Tcp.Server
                     {
                         while (!stream.DataAvailable)
                         {
-                            await Task.Delay(100, cancellationToken);
+                            if (!client.Client.IsConnected())
+                            {
+                                OnDisconnected?.Invoke(this, EventArgs.Empty);
+                                return;
+                            }
+                            await Task.Delay(10, cancellationToken);
                         }
 
                         // Request
@@ -65,7 +83,7 @@ namespace Cake.Scripting.Transport.Tcp.Server
 
         public void Dispose()
         {
-            _cancellationTokenSource.Cancel(false);
+            Stop();
         }
     }
 }

@@ -30,6 +30,9 @@ namespace Cake.Bakery.IntegrationTests
             // Then
             // TODO: Better assertion
             Assert.NotNull(response);
+
+            // Cleanup
+            target.Dispose();
         }
 
         [Fact]
@@ -59,6 +62,9 @@ RunTarget(target);";
             // Then
             // TODO: Better assertion
             Assert.NotNull(response);
+
+            // Cleanup
+            target.Dispose();
         }
 
         [Fact]
@@ -121,6 +127,9 @@ RunTarget(target);";
             // Then
             // TODO: Better assertion
             Assert.NotNull(response);
+
+            // Cleanup
+            target.Dispose();
         }
     }
 }

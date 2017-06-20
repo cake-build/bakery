@@ -74,15 +74,15 @@ namespace Cake.Bakery
                         using (var server = new ScriptGenerationServer(scriptGenerator, port, loggerFactory))
                         {
                             var cancel = false;
-                            Console.CancelKeyPress += (sender, e) =>
-                            {
-                                cancel = true;
-                            };
+                            server.Start();
+                            server.OnDisconnected += (sender, e) => { cancel = true; };
+                            Console.CancelKeyPress += (sender, e) => { cancel = true; };
 
                             while (!cancel)
                             {
-                                Thread.Sleep(300);
+                                Thread.Sleep(50);
                             }
+                            server.Stop();
                         }
                     }
                     catch (Exception e)

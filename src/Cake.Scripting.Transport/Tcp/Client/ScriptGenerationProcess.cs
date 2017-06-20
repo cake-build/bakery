@@ -21,6 +21,8 @@ namespace Cake.Scripting.Transport.Tcp.Client
 
         public void Dispose()
         {
+            _process?.Kill();
+            _process?.WaitForExit();
             _process?.Dispose();
         }
 
