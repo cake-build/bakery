@@ -61,7 +61,7 @@ namespace Cake.Scripting.Transport.Tcp.Client
 
                 while (!_stream.DataAvailable)
                 {
-                    Task.Delay(100).Wait();
+                    Task.Delay(10).Wait();
                 }
 
                 // Receive
