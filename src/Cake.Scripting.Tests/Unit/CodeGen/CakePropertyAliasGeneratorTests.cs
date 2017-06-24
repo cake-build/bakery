@@ -18,7 +18,11 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
                 _fixture = fixture;
             }
 
+#if NETCORE
+            [Theory(Skip = "Assembly resolver not implemented for .NET Core")]
+#else
             [Theory]
+#endif
             [InlineData("NonCached_Value_Type")]
             public void Should_Return_Correct_Generated_Code_For_Non_Cached_Properties(string name)
             {
@@ -32,7 +36,11 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
                 Assert.Equal(expected, result);
             }
 
+#if NETCORE
+            [Theory(Skip = "Assembly resolver not implemented for .NET Core")]
+#else
             [Theory]
+#endif
             [InlineData("Cached_Reference_Type")]
             [InlineData("Cached_Value_Type")]
             public void Should_Return_Correct_Generated_Code_For_Cached_Properties(string name)
@@ -47,7 +55,11 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
                 Assert.Equal(expected, result);
             }
 
+#if NETCORE
+            [Theory(Skip = "Assembly resolver not implemented for .NET Core")]
+#else
             [Theory]
+#endif
             [InlineData("NonCached_Obsolete_ImplicitWarning_NoMessage")]
             [InlineData("NonCached_Obsolete_ImplicitWarning_WithMessage")]
             [InlineData("NonCached_Obsolete_ExplicitWarning_WithMessage")]
@@ -64,7 +76,11 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
                 Assert.Equal(expected, result);
             }
 
+#if NETCORE
+            [Theory(Skip = "Assembly resolver not implemented for .NET Core")]
+#else
             [Theory]
+#endif
             [InlineData("Cached_Obsolete_ImplicitWarning_NoMessage")]
             [InlineData("Cached_Obsolete_ImplicitWarning_WithMessage")]
             [InlineData("Cached_Obsolete_ExplicitWarning_WithMessage")]

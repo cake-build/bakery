@@ -31,6 +31,7 @@ namespace Cake.Scripting.Transport.Tests.Fixtures.Tcp
         public void Start(int port, string workingDirectory)
         {
             _server = new ScriptGenerationServer(_service, port, _loggerFactory);
+            _server.Start();
         }
     }
 }
