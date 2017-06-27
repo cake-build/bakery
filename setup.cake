@@ -10,7 +10,8 @@ BuildParameters.SetParameters(context: Context,
                             repositoryName: "bakery",
                             appVeyorAccountName: "cakebuild",
                             shouldRunDotNetCorePack: true,
-                            shouldRunDupFinder: false);
+                            shouldRunDupFinder: false,
+                            shouldRunCodecov: false);
 
 BuildParameters.PrintParameters(Context);
 
