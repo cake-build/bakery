@@ -25,7 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "unit", "unit", "{8B759B98-7
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "integration", "integration", "{849182C0-8196-4480-AC2F-50F07B084E73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Bakery.IntegrationTests", "Cake.Bakery.IntegrationTests\Cake.Bakery.IntegrationTests.csproj", "{95325BEE-AEA5-42CD-9E06-CEB8C7D7614A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Bakery.IntegrationTests", "..\tests\integration\Cake.Bakery.IntegrationTests\Cake.Bakery.IntegrationTests.csproj", "{95325BEE-AEA5-42CD-9E06-CEB8C7D7614A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

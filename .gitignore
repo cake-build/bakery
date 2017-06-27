@@ -253,3 +253,8 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# Cake - Uncomment if you are using it
+tools/**
+!tools/packages.config
+BuildArtifacts/

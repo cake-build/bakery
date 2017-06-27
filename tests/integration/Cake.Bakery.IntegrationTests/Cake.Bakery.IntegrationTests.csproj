@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cake.Bakery\Cake.Bakery.csproj" />
-    <ProjectReference Include="..\Cake.Scripting.Transport\Cake.Scripting.Transport.csproj" />
+    <ProjectReference Include="..\..\..\src\Cake.Bakery\Cake.Bakery.csproj" />
+    <ProjectReference Include="..\..\..\src\Cake.Scripting.Transport\Cake.Scripting.Transport.csproj" />
   </ItemGroup>
 
   <ItemGroup>
