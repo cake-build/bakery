@@ -1,4 +1,11 @@
 #---------------------------------#
+#    environment configuration    #
+#---------------------------------#
+
+# Build worker image (VM template)
+image: Visual Studio 2017
+
+#---------------------------------#
 #  Build Script                   #
 #---------------------------------#
 build_script:
