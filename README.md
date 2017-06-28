@@ -1,4 +1,6 @@
-# cake-server
+# Bakery
+[![MyGet](https://img.shields.io/myget/cake/vpre/Cake.Bakery.svg?label=myget)](https://www.myget.org/gallery/cake)
+
 Cake server for code generation and script analysis
 
 ## Build Status
