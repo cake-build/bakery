@@ -1,6 +1,12 @@
 # cake-server
 Cake server for code generation and script analysis
 
+## Build Status
+
+|Develop|Master|
+|:--:|:--:|
+|[![Build status](https://ci.appveyor.com/api/projects/status/ayjo26v8rbhp2eqt/branch/develop?svg=true)](https://ci.appveyor.com/project/cakebuild/bakery/branch/develop)|[![Build status](https://ci.appveyor.com/api/projects/status/ayjo26v8rbhp2eqt/branch/develop?svg=true)](https://ci.appveyor.com/project/cakebuild/bakery/branch/master)|
+
 ## Code of Conduct
 
 This project has adopted the code of conduct defined by the [Contributor Covenant](http://contributor-covenant.org/)
