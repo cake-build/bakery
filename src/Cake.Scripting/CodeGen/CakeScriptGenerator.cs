@@ -130,10 +130,16 @@ namespace Cake.Scripting.CodeGen
             namespaces.AddRange(GetDefaultNamespaces());
             namespaces.AddRange(aliases.SelectMany(alias => alias.Namespaces));
 
+            // Set Host object
+            _log.Verbose("Setting host object...");
+            var hostObject = GetHostObject(cakeRoot);
+
             // Create the response.
             // ReSharper disable once UseObjectOrCollectionInitializer
             _log.Verbose("Creating response...");
             var response = new CakeScript();
+            response.Host.TypeName = hostObject.TypeName;
+            response.Host.AssemblyPath = hostObject.AssemblyPath;
             response.Source = GenerateSource(aliases) + string.Join("\n", result.Lines);
             response.Usings.AddRange(namespaces);
             response.References.AddRange(references.Select(r => r.FullPath));
@@ -196,6 +202,15 @@ namespace Cake.Scripting.CodeGen
 
             // Return the assemblies.
             return references;
+        }
+
+        private static Abstractions.Models.ScriptHost GetHostObject(DirectoryPath root)
+        {
+            return new Abstractions.Models.ScriptHost
+            {
+                AssemblyPath = root.CombineWithFilePath("Cake.Core.dll").FullPath,
+                TypeName = typeof(IScriptHost).AssemblyQualifiedName
+            };
         }
 
         private DirectoryPath GetToolPath(DirectoryPath root)

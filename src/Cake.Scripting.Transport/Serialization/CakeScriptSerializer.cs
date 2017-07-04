@@ -24,6 +24,10 @@ namespace Cake.Scripting.Transport.Serialization
             // Type and Version
             writer.Write(Constants.CakeScript.TypeAndVersion);
 
+            // Host object
+            writer.WriteString(script.Host.TypeName);
+            writer.WriteString(script.Host.AssemblyPath);
+
             // Source
             writer.WriteString(script.Source);
 
@@ -56,11 +60,14 @@ namespace Cake.Scripting.Transport.Serialization
                 throw new InvalidOperationException("Type and version does not match");
             }
 
+            var cakeScript = new CakeScript();
+
+            // Host object
+            cakeScript.Host.TypeName = reader.ReadString();
+            cakeScript.Host.AssemblyPath = reader.ReadString();
+
             // Source
-            var cakeScript = new CakeScript
-            {
-                Source = reader.ReadString()
-            };
+            cakeScript.Source = reader.ReadString();
 
             // References
             var referencesLength = reader.ReadInt32();

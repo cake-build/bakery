@@ -10,8 +10,11 @@ namespace Cake.Scripting.Abstractions.Models
     {
         private HashSet<string> _references;
         private HashSet<string> _usings;
+        private ScriptHost _host;
 
         public static CakeScript Empty = new CakeScript();
+
+        public ScriptHost Host => _host ?? (_host = new ScriptHost());
 
         public string Source { get; set; }
 
