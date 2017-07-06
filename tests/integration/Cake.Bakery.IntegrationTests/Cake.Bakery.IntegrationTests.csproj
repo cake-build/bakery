@@ -24,6 +24,9 @@
     <None Update="Data\build.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Data\cake.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Data\helloworld.cake">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

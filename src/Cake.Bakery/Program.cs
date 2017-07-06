@@ -10,6 +10,7 @@ using Cake.Bakery.Arguments;
 using Cake.Bakery.Composition;
 using Cake.Bakery.Polyfill;
 using Cake.Core;
+using Cake.Core.Configuration;
 using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using Cake.Core.Modules;
@@ -58,16 +59,21 @@ namespace Cake.Bakery
                 {
                     var fileSystem = container.Resolve<IFileSystem>();
                     var log = container.Resolve<ICakeLog>();
+                    var configurationProvider = container.Resolve<CakeConfigurationProvider>();
+                    var workingDirectory = new DirectoryPath(System.IO.Directory.GetCurrentDirectory());
+
+                    var configuration = configurationProvider.CreateConfiguration(workingDirectory, args);
 
                     // Rebuild the container.
                     registrar = new ContainerRegistrar();
+                    registrar.RegisterInstance(configuration);
                     registrar.RegisterModule(new ScriptingModule(fileSystem, log));
                     registrar.Builder.Update(container);
 
                     var environment = container.Resolve<ICakeEnvironment>();
                     var scriptGenerator = container.Resolve<IScriptGenerationService>();
 
-                    environment.WorkingDirectory = System.IO.Directory.GetCurrentDirectory();
+                    environment.WorkingDirectory = workingDirectory;
 
                     try
                     {
