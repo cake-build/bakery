@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using Cake.Bakery.Configuration;
 using Cake.Bakery.Diagnostics;
 using Cake.Core.Composition;
 using Cake.Core.Configuration;
@@ -28,12 +27,12 @@ namespace Cake.Bakery
                 throw new ArgumentNullException(nameof(registrar));
             }
 
+            // Configuration
+            registrar.RegisterType<CakeConfigurationProvider>().Singleton();
+
             // Logging
             registrar.RegisterInstance(_loggerFactory).As<ILoggerFactory>();
             registrar.RegisterType<CakeLog>().As<ICakeLog>().Singleton();
-
-            // Configuration
-            registrar.RegisterType<CakeConfiguration>().As<ICakeConfiguration>().Singleton();
         }
     }
 }

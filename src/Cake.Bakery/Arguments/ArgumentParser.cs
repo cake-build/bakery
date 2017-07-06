@@ -11,7 +11,7 @@ namespace Cake.Bakery.Arguments
 {
     internal static class ArgumentParser
     {
-        public static IReadOnlyDictionary<string, string> Parse(IEnumerable<string> arguments)
+        public static IDictionary<string, string> Parse(IEnumerable<string> arguments)
         {
             return arguments.Select(arg =>
             {
