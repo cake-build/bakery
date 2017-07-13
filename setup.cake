@@ -41,6 +41,14 @@ BuildParameters.Tasks.DotNetCorePackTask
     .IsDependentOn("Copy-License")
     .Does(() =>
 {
+    // Dirty workaraound to get correct version for project dependencies
+    StartProcess("dotnet", new ProcessSettings {
+        Arguments = string.Format("msbuild {0} /t:Restore /p:Version={1} /p:Configuration={2}",
+                    BuildParameters.SolutionFilePath,
+                    BuildParameters.Version.SemVersion,
+                    BuildParameters.Configuration)
+    });
+
     var projects = GetFiles(BuildParameters.SourceDirectoryPath + "/**/*.csproj");
     foreach(var project in projects)
     {
