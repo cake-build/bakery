@@ -45,7 +45,7 @@ namespace Cake.Bakery
 
             // Validate the port argument.
             if (!args.ContainsKey(Constants.CommandLine.Port) ||
-                int.TryParse(args[Constants.CommandLine.Port], out int port))
+                !int.TryParse(args[Constants.CommandLine.Port], out int port))
             {
                 throw new ArgumentException("Port not specified or invalid.");
             }
