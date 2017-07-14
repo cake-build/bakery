@@ -43,65 +43,68 @@ namespace Cake.Bakery
                 }
             }
 
-            if (args.ContainsKey(Constants.CommandLine.Port) &&
+            // Validate the port argument.
+            if (!args.ContainsKey(Constants.CommandLine.Port) ||
                 int.TryParse(args[Constants.CommandLine.Port], out int port))
             {
-                var loggerFactory = new LoggerFactory()
+                throw new ArgumentException("Port not specified or invalid.");
+            }
+
+            var loggerFactory = new LoggerFactory()
                     .AddConsole(LogLevel.Trace);
 
-                var registrar = new ContainerRegistrar();
-                registrar.RegisterModule(new CoreModule());
-                registrar.RegisterModule(new BakeryModule(loggerFactory));
-                registrar.RegisterModule(new NuGetModule());
+            var registrar = new ContainerRegistrar();
+            registrar.RegisterModule(new CoreModule());
+            registrar.RegisterModule(new BakeryModule(loggerFactory));
+            registrar.RegisterModule(new NuGetModule());
 
-                // Build the container.
-                using (var container = registrar.Build())
+            // Build the container.
+            using (var container = registrar.Build())
+            {
+                var fileSystem = container.Resolve<IFileSystem>();
+                var log = container.Resolve<ICakeLog>();
+                var configurationProvider = container.Resolve<CakeConfigurationProvider>();
+                var workingDirectory = new DirectoryPath(System.IO.Directory.GetCurrentDirectory());
+
+                var configuration = configurationProvider.CreateConfiguration(workingDirectory, args);
+
+                // Rebuild the container.
+                registrar = new ContainerRegistrar();
+                registrar.RegisterInstance(configuration);
+                registrar.RegisterModule(new ScriptingModule(fileSystem, log));
+                registrar.Builder.Update(container);
+
+                var environment = container.Resolve<ICakeEnvironment>();
+                var scriptGenerator = container.Resolve<IScriptGenerationService>();
+
+                environment.WorkingDirectory = workingDirectory;
+
+                try
                 {
-                    var fileSystem = container.Resolve<IFileSystem>();
-                    var log = container.Resolve<ICakeLog>();
-                    var configurationProvider = container.Resolve<CakeConfigurationProvider>();
-                    var workingDirectory = new DirectoryPath(System.IO.Directory.GetCurrentDirectory());
-
-                    var configuration = configurationProvider.CreateConfiguration(workingDirectory, args);
-
-                    // Rebuild the container.
-                    registrar = new ContainerRegistrar();
-                    registrar.RegisterInstance(configuration);
-                    registrar.RegisterModule(new ScriptingModule(fileSystem, log));
-                    registrar.Builder.Update(container);
-
-                    var environment = container.Resolve<ICakeEnvironment>();
-                    var scriptGenerator = container.Resolve<IScriptGenerationService>();
-
-                    environment.WorkingDirectory = workingDirectory;
-
-                    try
+                    using (var server = new ScriptGenerationServer(scriptGenerator, port, loggerFactory))
                     {
-                        using (var server = new ScriptGenerationServer(scriptGenerator, port, loggerFactory))
+                        server.Start();
+
+                        var cancel = new ManualResetEvent(false);
+
+                        server.OnDisconnected += (sender, e) => { cancel.Set(); };
+                        Console.CancelKeyPress += (sender, e) =>
                         {
-                            var cancel = false;
-                            server.Start();
-                            server.OnDisconnected += (sender, e) => { cancel = true; };
-                            Console.CancelKeyPress += (sender, e) => { cancel = true; };
+                            cancel.Set();
+                            e.Cancel = true;
+                        };
 
-                            while (!cancel)
-                            {
-                                Thread.Sleep(50);
-                            }
-                            server.Stop();
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        loggerFactory.CreateLogger<Program>().LogCritical(0, e, "Unhandled Exception");
-                        throw;
+                        cancel.WaitOne();
+                        server.Stop();
                     }
                 }
+                catch (Exception e)
+                {
+                    loggerFactory.CreateLogger<Program>().LogCritical(0, e, "Unhandled Exception");
+                    throw;
+                }
             }
-            else
-            {
-                throw new ArgumentException("Port not specified or invalid");
-            }
+
             return 0;
         }
     }
