@@ -14,10 +14,17 @@ namespace Cake.Scripting
         {
             if (!type.IsDefinition && !type.IsGenericParameter)
             {
-                var resolved = type.Resolve();
-                if (resolved != null)
+                try
                 {
-                    return resolved;
+                    var resolved = type.Resolve();
+                    if (resolved != null)
+                    {
+                        return resolved;
+                    }
+                }
+                catch (Exception e)
+                {
+                    return null;
                 }
             }
             return null;

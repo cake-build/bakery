@@ -18,6 +18,7 @@ namespace Cake.Bakery.IntegrationTests
         }
 
         [Fact]
+        [Trait("Category", "Integration")]
         public void ShouldGenerateFromFile()
         {
             // Given
@@ -36,6 +37,7 @@ namespace Cake.Bakery.IntegrationTests
         }
 
         [Fact]
+        [Trait("Category", "Integration")]
         public void ShouldGenerateFromBuffer()
         {
             // Given
@@ -68,6 +70,7 @@ RunTarget(target);";
         }
 
         [Fact]
+        [Trait("Category", "Integration")]
         public void ShouldGenerateWitLineChanges()
         {
             // Given
