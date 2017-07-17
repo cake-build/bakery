@@ -51,12 +51,20 @@ namespace Cake.Scripting.Reflection
                     type = arrayType.ElementType;
                 }
             }
-
+ 
             var isEnum = false;
             var definition = type.TryResolve();
             if (definition != null)
             {
                 isEnum = definition.IsEnum;
+            }
+
+            if (type.IsByReference)
+            {
+                if (type is ByReferenceType byReferenceType)
+                {
+                    type = byReferenceType.ElementType;
+                }
             }
 
             var cref = CRefGenerator.GetTypeCRef(type);
