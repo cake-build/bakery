@@ -46,6 +46,7 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
             [InlineData("NonGeneric_ExtensionMethodWithOptionalNullableLongParameter")]
             [InlineData("NonGeneric_ExtensionMethodWithOptionalNullableDoubleParameter")]
             [InlineData("NonGeneric_ExtensionMethodWithReservedKeywordParameter")]
+            [InlineData("NonGeneric_ExtensionMethodWithGenericOutParameter")]
             public void Should_Return_Correct_Generated_Code_For_Non_Generic_Methods(string name)
             {
                 // Given
@@ -66,6 +67,7 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
             [InlineData("Generic_ExtensionMethod")]
             [InlineData("Generic_ExtensionMethodWithParameter")]
             [InlineData("Generic_ExtensionMethodWithGenericReturnValue")]
+            [InlineData("Generic_ExtensionMethodWithGenericOutParameter")]
             public void Should_Return_Correct_Generated_Code_For_Generic_Methods(string name)
             {
                 // Given
