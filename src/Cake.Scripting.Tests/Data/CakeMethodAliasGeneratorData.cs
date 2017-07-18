@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using Cake.Core;
@@ -203,6 +204,18 @@ namespace Cake.Scripting.Tests.Data
 
         [CakeMethodAlias]
         public static void NonGeneric_ExtensionMethodWithReservedKeywordParameter(this ICakeContext context, int @new)
+        {
+            throw new NotImplementedException();
+        }
+
+        [CakeMethodAlias]
+        public static void NonGeneric_ExtensionMethodWithGenericOutParameter(this ICakeContext context, out IEnumerable<string> content)
+        {
+            throw new NotImplementedException();
+        }
+
+        [CakeMethodAlias]
+        public static void Generic_ExtensionMethodWithGenericOutParameter<T>(this ICakeContext context, out IEnumerable<T> content)
         {
             throw new NotImplementedException();
         }

@@ -6,12 +6,14 @@
 
   <ItemGroup>
     <None Remove="Data\Expected\Methods\Generic_ExtensionMethod" />
+    <None Remove="Data\Expected\Methods\Generic_ExtensionMethodWithGenericOutParameter" />
     <None Remove="Data\Expected\Methods\Generic_ExtensionMethodWithGenericReturnValue" />
     <None Remove="Data\Expected\Methods\Generic_ExtensionMethodWithParameter" />
     <None Remove="Data\Expected\Methods\NonGeneric_ExtensionMethodWithArrayParameter" />
     <None Remove="Data\Expected\Methods\NonGeneric_ExtensionMethodWithGenericExpressionArrayParameter" />
     <None Remove="Data\Expected\Methods\NonGeneric_ExtensionMethodWithGenericExpressionParameter" />
     <None Remove="Data\Expected\Methods\NonGeneric_ExtensionMethodWithGenericExpressionParamsArrayParameter" />
+    <None Remove="Data\Expected\Methods\NonGeneric_ExtensionMethodWithGenericOutParameter" />
     <None Remove="Data\Expected\Methods\NonGeneric_ExtensionMethodWithGenericParameter" />
     <None Remove="Data\Expected\Methods\NonGeneric_ExtensionMethodWithNoParameters" />
     <None Remove="Data\Expected\Methods\NonGeneric_ExtensionMethodWithOptionalBooleanParameter" />
@@ -50,12 +52,14 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Data\Expected\Methods\Generic_ExtensionMethod" />
+    <EmbeddedResource Include="Data\Expected\Methods\Generic_ExtensionMethodWithGenericOutParameter" />
     <EmbeddedResource Include="Data\Expected\Methods\Generic_ExtensionMethodWithGenericReturnValue" />
     <EmbeddedResource Include="Data\Expected\Methods\Generic_ExtensionMethodWithParameter" />
     <EmbeddedResource Include="Data\Expected\Methods\NonGeneric_ExtensionMethodWithArrayParameter" />
     <EmbeddedResource Include="Data\Expected\Methods\NonGeneric_ExtensionMethodWithGenericExpressionArrayParameter" />
     <EmbeddedResource Include="Data\Expected\Methods\NonGeneric_ExtensionMethodWithGenericExpressionParameter" />
     <EmbeddedResource Include="Data\Expected\Methods\NonGeneric_ExtensionMethodWithGenericExpressionParamsArrayParameter" />
+    <EmbeddedResource Include="Data\Expected\Methods\NonGeneric_ExtensionMethodWithGenericOutParameter" />
     <EmbeddedResource Include="Data\Expected\Methods\NonGeneric_ExtensionMethodWithGenericParameter" />
     <EmbeddedResource Include="Data\Expected\Methods\NonGeneric_ExtensionMethodWithNoParameters" />
     <EmbeddedResource Include="Data\Expected\Methods\NonGeneric_ExtensionMethodWithOptionalBooleanParameter" />
