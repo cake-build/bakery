@@ -22,7 +22,7 @@ namespace Cake.Scripting
                         return resolved;
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return null;
                 }
