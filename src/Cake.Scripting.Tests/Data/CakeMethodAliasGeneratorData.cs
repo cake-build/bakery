@@ -9,8 +9,11 @@ using System.Linq.Expressions;
 using Cake.Core;
 using Cake.Core.Annotations;
 
+[assembly: CakeNamespaceImport("Foo.Bar.Assembly")]
+
 namespace Cake.Scripting.Tests.Data
 {
+    [CakeNamespaceImport("Foo.Bar.Type")]
     internal static class CakeMethodAliasGeneratorData
     {
         public static void NotAnExtensionMethod()
@@ -24,6 +27,7 @@ namespace Cake.Scripting.Tests.Data
         }
 
         [CakeMethodAlias]
+        [CakeNamespaceImport("Foo.Bar.Method")]
         public static void NonGeneric_ExtensionMethodWithNoParameters(this ICakeContext context)
         {
             throw new NotImplementedException();

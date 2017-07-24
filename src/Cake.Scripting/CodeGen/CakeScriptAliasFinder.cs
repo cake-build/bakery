@@ -136,6 +136,7 @@ namespace Cake.Scripting.CodeGen
                         }
 
                         // Get namespaces.
+                        alias.Namespaces.Add(type.Namespace);
                         alias.Namespaces.AddRange(assembly.GetCakeNamespaces());
                         alias.Namespaces.AddRange(type.GetCakeNamespaces());
                         alias.Namespaces.AddRange(method.GetCakeNamespaces());
