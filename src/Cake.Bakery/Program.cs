@@ -18,6 +18,7 @@ using Cake.Core.Text;
 using Cake.NuGet;
 using Cake.Scripting;
 using Cake.Scripting.Abstractions;
+using Cake.Scripting.CodeGen;
 using Cake.Scripting.Transport.Tcp.Server;
 using Microsoft.Extensions.Logging;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
@@ -68,13 +69,21 @@ namespace Cake.Bakery
 
                 var configuration = configurationProvider.CreateConfiguration(workingDirectory, args);
 
-                // Rebuild the container.
+                // Rebuild the container for Buffered File System.
                 registrar = new ContainerRegistrar();
                 registrar.RegisterInstance(configuration);
                 registrar.RegisterModule(new ScriptingModule(fileSystem, log));
                 registrar.Builder.Update(container);
 
                 var environment = container.Resolve<ICakeEnvironment>();
+                var aliasFinder = container.Resolve<IScriptAliasFinder>();
+
+                // Rebuild the container for Cached Alias Finder.
+                registrar = new ContainerRegistrar();
+                registrar.RegisterModule(new CacheModule(aliasFinder, environment));
+                registrar.Builder.Update(container);
+
+                // Get Script generator.
                 var scriptGenerator = container.Resolve<IScriptGenerationService>();
 
                 environment.WorkingDirectory = workingDirectory;
