@@ -21,10 +21,7 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
             var finder = new CakeScriptAliasFinder(fileSystem);
 
             // When
-            var aliases = finder.FindAliases(new List<FilePath>
-            {
-                new FilePath(typeof(CakeScriptAliasFinderTests).GetTypeInfo().Assembly.Location)
-            });
+            var aliases = finder.FindAliases(new FilePath(typeof(CakeScriptAliasFinderTests).GetTypeInfo().Assembly.Location));
 
             // Then
             var alias = aliases.Single(a => a.Name == "NonGeneric_ExtensionMethodWithNoParameters");
