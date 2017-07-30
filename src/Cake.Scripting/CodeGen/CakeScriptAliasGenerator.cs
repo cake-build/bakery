@@ -10,7 +10,6 @@ using Cake.Core.IO;
 using Cake.Core.Scripting;
 using Cake.Scripting.Abstractions.Models;
 using Cake.Scripting.CodeGen.Generators;
-using Cake.Scripting;
 using Cake.Scripting.Reflection.Emitters;
 
 namespace Cake.Scripting.CodeGen
@@ -18,14 +17,14 @@ namespace Cake.Scripting.CodeGen
     public sealed class CakeScriptAliasGenerator
     {
         private readonly IFileSystem _fileSystem;
-        private readonly CakeScriptAliasFinder _aliasFinder;
+        private readonly IScriptAliasFinder _aliasFinder;
         private readonly CakeMethodAliasGenerator _methodGenerator;
         private readonly CakePropertyAliasGenerator _propertyGenerator;
 
-        public CakeScriptAliasGenerator(IFileSystem fileSystem)
+        public CakeScriptAliasGenerator(IFileSystem fileSystem, IScriptAliasFinder aliasFinder)
         {
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-            _aliasFinder = new CakeScriptAliasFinder(fileSystem);
+            _aliasFinder = aliasFinder ?? throw new ArgumentNullException(nameof(aliasFinder));
 
             var typeEmitter = new TypeEmitter();
             var parameterEmitter = new ParameterEmitter(typeEmitter);
@@ -47,7 +46,7 @@ namespace Cake.Scripting.CodeGen
             }
 
             // Find aliases.
-            var aliases = _aliasFinder.FindAliases(new[] { assembly });
+            var aliases = _aliasFinder.FindAliases(assembly);
 
             // Create the response.
             // ReSharper disable once UseObjectOrCollectionInitializer

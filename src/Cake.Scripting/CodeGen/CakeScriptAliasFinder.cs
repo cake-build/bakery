@@ -8,14 +8,13 @@ using System.Linq;
 using System.Xml.Linq;
 using Cake.Core.IO;
 using Cake.Core.Scripting;
-using Cake.Scripting;
 using Cake.Scripting.Documentation;
 using Cake.Scripting.Reflection;
 using Mono.Cecil;
 
 namespace Cake.Scripting.CodeGen
 {
-    public sealed class CakeScriptAliasFinder
+    public sealed class CakeScriptAliasFinder : IScriptAliasFinder
     {
         private readonly DocumentationProvider _documentation;
 
@@ -24,50 +23,30 @@ namespace Cake.Scripting.CodeGen
             _documentation = new DocumentationProvider(fileSystem);
         }
 
-        public IReadOnlyList<CakeScriptAlias> FindAliases(ICollection<FilePath> paths)
+        public IReadOnlyCollection<CakeScriptAlias> FindAliases(FilePath path)
         {
             var parameters = new ReaderParameters
             {
-                AssemblyResolver = GetResolver(paths),
+                AssemblyResolver = GetResolver(path),
             };
 
-            // Load all assembly definitions.
-            var assemblies = paths
-                .Select(path => Tuple.Create(AssemblyDefinition.ReadAssembly(path.FullPath, parameters), path))
-                .ToList();
-
-            return FindAliases(assemblies);
+            return InspectAssembly(AssemblyDefinition.ReadAssembly(path.FullPath, parameters), path);
         }
 
-        private static IAssemblyResolver GetResolver(IEnumerable<FilePath> paths)
+        private static IAssemblyResolver GetResolver(FilePath path)
         {
 #if NETCORE
             throw new NotImplementedException("Assembly resolver not implemented for .NET Core");
 #else
             var resolver = new DefaultAssemblyResolver();
-            foreach (var path in paths)
-            {
-                resolver.AddSearchDirectory(path.GetDirectory().FullPath);
-            }
+            resolver.AddSearchDirectory(path.GetDirectory().FullPath);
             return resolver;
 #endif
         }
 
-        private IReadOnlyList<CakeScriptAlias> FindAliases(IEnumerable<Tuple<AssemblyDefinition, FilePath>> assemblies)
+        private IReadOnlyCollection<CakeScriptAlias> InspectAssembly(AssemblyDefinition assembly, FilePath path)
         {
-            // Find all aliases in the loaded assembly definitions.
             var result = new List<CakeScriptAlias>();
-            foreach (var assembly in assemblies)
-            {
-                InspectAssembly(assembly.Item1, assembly.Item2, result);
-            }
-
-            // Return the result.
-            return result;
-        }
-
-        private void InspectAssembly(AssemblyDefinition assembly, FilePath path, ICollection<CakeScriptAlias> result)
-        {
             var documentation = _documentation.Load(path.ChangeExtension("xml"));
 
             foreach (var module in assembly.Modules)
@@ -94,9 +73,11 @@ namespace Cake.Scripting.CodeGen
                     InspectType(assembly, type, documentation, result);
                 }
             }
+
+            return result;
         }
 
-        private void InspectType(
+        private static void InspectType(
             AssemblyDefinition assembly,
             TypeDefinition type,
             IDictionary<string, XElement> documentation,
@@ -164,7 +145,7 @@ namespace Cake.Scripting.CodeGen
             return false;
         }
 
-        public static bool IsValidCakeAlias(MethodDefinition method, bool isPropertyAlias)
+        private static bool IsValidCakeAlias(MethodDefinition method, bool isPropertyAlias)
         {
             if (!method.IsExtensionMethod())
             {
@@ -194,7 +175,7 @@ namespace Cake.Scripting.CodeGen
             return true;
         }
 
-        public static bool IsCakePropertyAliasCached(MethodDefinition method)
+        private static bool IsCakePropertyAliasCached(MethodDefinition method)
         {
             foreach (var attribute in method.CustomAttributes)
             {
@@ -212,6 +193,5 @@ namespace Cake.Scripting.CodeGen
             }
             return false;
         }
-
     }
 }

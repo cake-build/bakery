@@ -19,7 +19,7 @@ namespace Cake.Scripting.Tests.Fixtures
     {
         private readonly Assembly _assembly;
         private readonly T _generator;
-        private readonly IReadOnlyList<CakeScriptAlias> _aliases;
+        private readonly IReadOnlyCollection<CakeScriptAlias> _aliases;
 
         protected abstract string ResourcePath { get; }
 
@@ -34,7 +34,7 @@ namespace Cake.Scripting.Tests.Fixtures
             // TODO: Not ideal with IO-access here, but we need to load the assembly.
             // See if we can load the information by providing the assembly directly.
             var finder = new CakeScriptAliasFinder(new FileSystem());
-            _aliases = finder.FindAliases(new[] { new FilePath(_assembly.Location) });
+            _aliases = finder.FindAliases(new FilePath(_assembly.Location));
 
             // Create the generator.
             // ReSharper disable once VirtualMemberCallInConstructor

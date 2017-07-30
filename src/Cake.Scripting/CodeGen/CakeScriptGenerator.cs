@@ -31,7 +31,7 @@ namespace Cake.Scripting.CodeGen
         private readonly IScriptAnalyzer _analyzer;
         private readonly IScriptProcessor _processor;
         private readonly IBufferedFileSystem _fileSystem;
-        private readonly CakeScriptAliasFinder _aliasFinder;
+        private readonly IScriptAliasFinder _aliasFinder;
         private readonly CakeMethodAliasGenerator _methodGenerator;
         private readonly CakePropertyAliasGenerator _propertyGenerator;
 
@@ -41,6 +41,7 @@ namespace Cake.Scripting.CodeGen
             IGlobber globber,
             ICakeConfiguration configuration,
             IScriptProcessor processor,
+            IScriptAliasFinder aliasFinder,
             ICakeLog log,
             IEnumerable<ILoadDirectiveProvider> loadDirectiveProviders = null)
         {
@@ -50,9 +51,9 @@ namespace Cake.Scripting.CodeGen
             _log = log ?? throw new ArgumentNullException(nameof(log));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _processor = processor ?? throw new ArgumentNullException(nameof(processor));
+            _aliasFinder = aliasFinder ?? throw new ArgumentNullException(nameof(fileSystem));
 
             _analyzer = new ScriptAnalyzer(_fileSystem, _environment, _log, loadDirectiveProviders);
-            _aliasFinder = new CakeScriptAliasFinder(_fileSystem);
 
             var typeEmitter = new TypeEmitter();
             var parameterEmitter = new ParameterEmitter(typeEmitter);
@@ -122,7 +123,11 @@ namespace Cake.Scripting.CodeGen
 
             // Find aliases
             _log.Verbose("Finding aliases...");
-            var aliases = _aliasFinder.FindAliases(references);
+            var aliases = new List<CakeScriptAlias>();
+            foreach (var reference in references)
+            {
+                aliases.AddRange(_aliasFinder.FindAliases(reference));
+            }
 
             // Import all namespaces.
             _log.Verbose("Importing namespaces...");

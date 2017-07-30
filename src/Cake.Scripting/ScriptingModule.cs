@@ -37,6 +37,7 @@ namespace Cake.Scripting
                 .As<IBufferedFileSystem>();
 
             // Scripting
+            registrar.RegisterType<CakeScriptAliasFinder>().As<IScriptAliasFinder>().Singleton();
             registrar.RegisterType<CakeScriptGenerator>().As<IScriptGenerationService>().Singleton();
         }
     }
