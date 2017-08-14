@@ -33,6 +33,26 @@ Task("Copy-License")
     CopyFileToDirectory("./LICENSE", net46ArtifactPath);
 });
 
+// Override default Restore task
+BuildParameters.Tasks.RestoreTask.Task.Actions.Clear();
+BuildParameters.Tasks.RestoreTask
+    .Does(() =>
+{
+    Information("Restoring {0}...", BuildParameters.SolutionFilePath);
+
+    NuGetRestore(
+        BuildParameters.SolutionFilePath,
+        new NuGetRestoreSettings
+        {
+            Source = new List<string>
+            {
+                "https://www.nuget.org/api/v2",
+                "https://www.myget.org/F/cake-contrib/api/v2",
+                "https://www.myget.org/F/cake/api/v3/index.json"
+            }
+        });
+});
+
 // Override default Pack task
 BuildParameters.Tasks.DotNetCorePackTask.Task.Actions.Clear();
 BuildParameters.Tasks.DotNetCorePackTask
