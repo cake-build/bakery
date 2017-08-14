@@ -9,11 +9,7 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
 {
     public sealed class CakeScriptAliasFinderTests
     {
-#if NETCORE
-        [Fact(Skip = "Assembly resolver not implemented for .NET Core")]
-#else
         [Fact]
-#endif
         public void Should_Include_Namespaces_For_Alias()
         {
             // Given

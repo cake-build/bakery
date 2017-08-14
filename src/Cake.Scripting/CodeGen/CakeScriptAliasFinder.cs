@@ -35,13 +35,9 @@ namespace Cake.Scripting.CodeGen
 
         private static IAssemblyResolver GetResolver(FilePath path)
         {
-#if NETCORE
-            throw new NotImplementedException("Assembly resolver not implemented for .NET Core");
-#else
             var resolver = new DefaultAssemblyResolver();
             resolver.AddSearchDirectory(path.GetDirectory().FullPath);
             return resolver;
-#endif
         }
 
         private IReadOnlyCollection<CakeScriptAlias> InspectAssembly(AssemblyDefinition assembly, FilePath path)

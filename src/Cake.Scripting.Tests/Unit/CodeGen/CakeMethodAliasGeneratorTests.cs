@@ -18,11 +18,8 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
                 _fixture = fixture;
             }
 
-#if NETCORE
-            [Theory(Skip = "Assembly resolver not implemented for .NET Core")]
-#else
+
             [Theory]
-#endif
             [InlineData("NonGeneric_ExtensionMethodWithNoParameters")]
             [InlineData("NonGeneric_ExtensionMethodWithParameter")]
             [InlineData("NonGeneric_ExtensionMethodWithArrayParameter")]
@@ -59,11 +56,8 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
                 Assert.Equal(expected, result);
             }
 
-#if NETCORE
-            [Theory(Skip = "Assembly resolver not implemented for .NET Core")]
-#else
+
             [Theory]
-#endif
             [InlineData("Generic_ExtensionMethod")]
             [InlineData("Generic_ExtensionMethodWithParameter")]
             [InlineData("Generic_ExtensionMethodWithGenericReturnValue")]
@@ -80,11 +74,8 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
                 Assert.Equal(expected, result);
             }
 
-#if NETCORE
-            [Theory(Skip = "Assembly resolver not implemented for .NET Core")]
-#else
+
             [Theory]
-#endif
             [InlineData("Obsolete_ImplicitWarning_NoMessage")]
             [InlineData("Obsolete_ImplicitWarning_WithMessage")]
             [InlineData("Obsolete_ExplicitWarning_WithMessage")]

@@ -10,11 +10,7 @@ namespace Cake.Bakery.Polyfill
     {
         public static string GetCommandLine()
         {
-#if NETCORE
-            return string.Join(" ", Environment.GetCommandLineArgs());
-#else
             return Environment.CommandLine;
-#endif
         }
     }
 }

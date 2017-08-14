@@ -200,12 +200,10 @@ namespace Cake.Scripting.CodeGen
             references.Add(root.CombineWithFilePath("Cake.Core.dll").FullPath);
             references.Add(root.CombineWithFilePath("Cake.Common.dll").FullPath);
 
-#if !NETCORE
             references.Add(typeof(Uri).GetTypeInfo().Assembly.Location); // System
             references.Add(typeof(System.Xml.XmlReader).GetTypeInfo().Assembly.Location); // System.Xml
             references.Add(typeof(System.Xml.Linq.XDocument).GetTypeInfo().Assembly.Location); // System.Xml.Linq
             references.Add(typeof(System.Data.DataTable).GetTypeInfo().Assembly.Location); // System.Data
-#endif
 
             // Return the assemblies.
             return references;
