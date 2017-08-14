@@ -76,44 +76,46 @@ namespace Cake.Scripting.CodeGen
             _log.Verbose("Handling file change...");
             HandleFileChange(scriptPath, fileChange);
 
-            // Prepare the environment.
-            _environment.WorkingDirectory = scriptPath.GetDirectory();
-
             // Analyze the script file.
             _log.Verbose("Analyzing build script...");
             var result = _analyzer.Analyze(scriptPath.GetFilename());
 
-            // Install tools. This will callback to client
+            // Install tools.
             _log.Verbose("Processing build script...");
             var toolsPath = GetToolPath(scriptPath.GetDirectory());
-            try
+            foreach (var tool in result.Tools)
             {
-                _log.Verbose("Installing tools...");
-                _processor.InstallTools(result, toolsPath);
-            }
-            catch (Exception e)
-            {
-                // Log and continue if it fails
-                _log.Error(e);
-            }
-
-
-            // Install addins. This will callback to client
-            var cakeRoot = GetCakePath(toolsPath);
-            var addinRoot = GetAddinPath(scriptPath.GetDirectory());
-            try
-            {
-                _log.Verbose("Installing addins...");
-                var addinReferences = _processor.InstallAddins(result, addinRoot);
-                foreach (var addinReference in addinReferences)
+                try
                 {
-                    result.References.Add(addinReference.FullPath);
+                    _log.Verbose("Installing tools...");
+                    _processor.InstallTools(new []{ tool }, toolsPath);
+                }
+                catch (Exception e)
+                {
+                    // Log and continue if it fails
+                    _log.Error(e);
                 }
             }
-            catch (Exception e)
+
+            // Install addins.
+            var cakeRoot = GetCakePath(toolsPath);
+            var addinRoot = GetAddinPath(scriptPath.GetDirectory());
+            foreach (var addin in result.Addins)
             {
-                // Log and continue if it fails
-                _log.Error(e);
+                try
+                {
+                    _log.Verbose("Installing addins...");
+                    var addinReferences = _processor.InstallAddins(new []{ addin }, addinRoot);
+                    foreach (var addinReference in addinReferences)
+                    {
+                        result.References.Add(addinReference.FullPath);
+                    }
+                }
+                catch (Exception e)
+                {
+                    // Log and continue if it fails
+                    _log.Error(e);
+                }
             }
 
             // Load all references.

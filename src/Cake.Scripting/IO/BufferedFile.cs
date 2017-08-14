@@ -22,6 +22,18 @@ namespace Cake.Scripting.IO
 
         public long Length => _content.Length;
 
+        public FileAttributes Attributes
+        {
+            get
+            {
+                return FileAttributes.Normal;
+            }
+            set
+            {
+                // noop
+            }
+        }
+
         public bool Exists => true;
 
         public bool Hidden => false;
