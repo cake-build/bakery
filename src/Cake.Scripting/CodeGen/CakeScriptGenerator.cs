@@ -82,7 +82,7 @@ namespace Cake.Scripting.CodeGen
 
             // Install tools.
             _log.Verbose("Processing build script...");
-            var toolsPath = GetToolPath(scriptPath.GetDirectory());
+            var toolsPath = GetToolPath(_environment.WorkingDirectory);
             foreach (var tool in result.Tools)
             {
                 try
@@ -99,7 +99,7 @@ namespace Cake.Scripting.CodeGen
 
             // Install addins.
             var cakeRoot = GetCakePath(toolsPath);
-            var addinRoot = GetAddinPath(scriptPath.GetDirectory());
+            var addinRoot = GetAddinPath(_environment.WorkingDirectory);
             foreach (var addin in result.Addins)
             {
                 try
