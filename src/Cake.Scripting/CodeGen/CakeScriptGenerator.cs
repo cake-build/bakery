@@ -80,25 +80,7 @@ namespace Cake.Scripting.CodeGen
             _log.Verbose("Analyzing build script...");
             var result = _analyzer.Analyze(scriptPath.GetFilename());
 
-            // Install tools.
-            _log.Verbose("Processing build script...");
-            var toolsPath = GetToolPath(_environment.WorkingDirectory);
-            foreach (var tool in result.Tools)
-            {
-                try
-                {
-                    _log.Verbose("Installing tools...");
-                    _processor.InstallTools(new []{ tool }, toolsPath);
-                }
-                catch (Exception e)
-                {
-                    // Log and continue if it fails
-                    _log.Error(e);
-                }
-            }
-
             // Install addins.
-            var cakeRoot = GetCakePath(toolsPath);
             var addinRoot = GetAddinPath(_environment.WorkingDirectory);
             foreach (var addin in result.Addins)
             {
@@ -120,6 +102,7 @@ namespace Cake.Scripting.CodeGen
 
             // Load all references.
             _log.Verbose("Adding references...");
+            var cakeRoot = GetCakePath(GetToolPath(_environment.WorkingDirectory));
             var references = new HashSet<FilePath>(GetDefaultReferences(cakeRoot));
             references.AddRange(result.References.Select(r => new FilePath(r)));
 
