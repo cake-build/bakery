@@ -214,7 +214,7 @@ namespace Cake.Scripting.CodeGen
 
         private DirectoryPath GetCakePath(DirectoryPath toolPath)
         {
-            var pattern = string.Concat(toolPath.FullPath, "/**/Cake.Core.dll");
+            var pattern = string.Concat(toolPath.FullPath, "/**/Cake.exe");
             var cakeCorePath = _globber.GetFiles(pattern).FirstOrDefault();
 
             return cakeCorePath?.GetDirectory().MakeAbsolute(_environment) ?? toolPath.Combine("Cake").Collapse();
