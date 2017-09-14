@@ -9,6 +9,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Cake.Scripting.Abstractions;
+using Cake.Scripting.Abstractions.Models;
 using Cake.Scripting.Transport.Extensions;
 using Cake.Scripting.Transport.Serialization;
 using Microsoft.Extensions.Logging;
@@ -70,7 +71,16 @@ namespace Cake.Scripting.Transport.Tcp.Server
                         // Request
                         _logger.LogDebug("Received reqeust from client");
                         var fileChange = FileChangeSerializer.Deserialize(reader);
-                        var cakeScript = _service.Generate(fileChange);
+                        var cakeScript = CakeScript.Empty;
+
+                        try
+                        {
+                            cakeScript = _service.Generate(fileChange);
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogError(0, e, "Unhandled Exception while processing request.");
+                        }
 
                         // Response
                         _logger.LogDebug("Sending response to client");
