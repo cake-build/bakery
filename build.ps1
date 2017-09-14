@@ -160,7 +160,7 @@ if(-Not $SkipToolPackageRestore.IsPresent) {
     }
 
     Write-Verbose -Message "Restoring tools from NuGet..."
-    $NuGetOutput = Invoke-Expression "&`"$NUGET_EXE`" install -ExcludeVersion -PreRelease -OutputDirectory `"$TOOLS_DIR`" -Source https://www.myget.org/F/cake/api/v3/index.json"
+    $NuGetOutput = Invoke-Expression "&`"$NUGET_EXE`" install -ExcludeVersion -PreRelease -OutputDirectory `"$TOOLS_DIR`""
 
     if ($LASTEXITCODE -ne 0) {
         Throw "An error occured while restoring NuGet tools."
