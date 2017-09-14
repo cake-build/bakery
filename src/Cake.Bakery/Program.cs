@@ -57,7 +57,6 @@ namespace Cake.Bakery
             var registrar = new ContainerRegistrar();
             registrar.RegisterModule(new CoreModule());
             registrar.RegisterModule(new BakeryModule(loggerFactory));
-            registrar.RegisterModule(new NuGetModule());
 
             // Build the container.
             using (var container = registrar.Build())
@@ -69,9 +68,10 @@ namespace Cake.Bakery
 
                 var configuration = configurationProvider.CreateConfiguration(workingDirectory, args);
 
-                // Rebuild the container for Buffered File System.
+                // Rebuild the container for NuGet and Buffered File System.
                 registrar = new ContainerRegistrar();
                 registrar.RegisterInstance(configuration);
+                registrar.RegisterModule(new NuGetModule(configuration));
                 registrar.RegisterModule(new ScriptingModule(fileSystem, log));
                 registrar.Builder.Update(container);
 
