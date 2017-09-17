@@ -81,5 +81,34 @@ BuildParameters.Tasks.DotNetCorePackTask
     });
 });
 
+Task("Init-Integration-Tests")
+    .IsDependentOn("Package")
+    .Does(() =>
+{
+    CleanDirectories(new [] {
+        "./tests/integration/packages",
+        "./tests/integration/tools"
+    });
+
+    CopyFiles(MakeAbsolute(BuildParameters.Paths.Directories.NuGetPackages).FullPath + "/*.nupkg",
+        "./tests/integration/packages");
+});
+
+Task("Run-Integration-Tests")
+    .IsDependentOn("Init-Integration-Tests")
+    .Does(() =>
+{
+    CakeExecuteScript("./tests/integration/tests.cake", new CakeSettings {
+        Verbosity = Context.Log.Verbosity,
+        WorkingDirectory = "./tests/integration/",
+        Arguments = new Dictionary<string, string> {
+            { "NuGet_Source", MakeAbsolute(new DirectoryPath("./tests/integration/packages")).FullPath }
+        }
+    });
+});
+
+// Hook up integration tests to default and appveyor tasks
+BuildParameters.Tasks.DefaultTask.IsDependentOn("Run-Integration-Tests");
+BuildParameters.Tasks.AppVeyorTask.IsDependentOn("Run-Integration-Tests");
 
 Build.RunDotNetCore();

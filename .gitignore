@@ -260,3 +260,4 @@ paket-files/
 tools/**
 !tools/packages.config
 BuildArtifacts/
+tests/integration/tools/
