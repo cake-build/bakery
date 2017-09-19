@@ -54,7 +54,7 @@ namespace Cake.Scripting.CodeGen.Generators
             if (alias.Method.GenericParameters.Count > 0)
             {
                 writer.Write("<");
-                writer.Write(string.Join(",", alias.Method.GenericParameters));
+                writer.Write(string.Join(",", alias.Method.GenericParameters.Select(p => p.Name)));
                 writer.Write(">");
             }
 
@@ -62,6 +62,21 @@ namespace Cake.Scripting.CodeGen.Generators
             writer.Write("(");
             WriteMethodParameters(writer, alias, invocation: false);
             writer.Write(")");
+
+            // Generic constraints
+            if (alias.Method.GenericParameters.Count > 0)
+            {
+                foreach (var genericParameter in alias.Method.GenericParameters)
+                {
+                    if (genericParameter.Constraints.Count > 0)
+                    {
+                        writer.Write(" where ");
+                        writer.Write(genericParameter.Name);
+                        writer.Write(" : ");
+                        writer.Write(string.Join(",", genericParameter.Constraints));
+                    }
+                }
+            }
 
             // Block start
             writer.WriteLine();
@@ -127,7 +142,7 @@ namespace Cake.Scripting.CodeGen.Generators
             if (alias.Method.GenericParameters.Count > 0)
             {
                 writer.Write("<");
-                writer.Write(string.Join(",", alias.Method.GenericParameters));
+                writer.Write(string.Join(",", alias.Method.GenericParameters.Select(p => p.Name)));
                 writer.Write(">");
             }
 
