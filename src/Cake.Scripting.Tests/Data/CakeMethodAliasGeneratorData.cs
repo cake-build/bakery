@@ -95,9 +95,11 @@ namespace Cake.Scripting.Tests.Data
         }
 
         [CakeMethodAlias]
-        public static TOut Generic_ExtensionMethodWithGenericReturnValueAndTypeParamConstraints<TIn, TOut>(
-            this ICakeContext context, TIn arg)
+        public static TOut Generic_ExtensionMethodWithGenericReturnValueAndTypeParamConstraints<TIn, TEnumerable, TStruct, TOut>(
+            this ICakeContext context, TIn arg, TEnumerable expression, TStruct @struct)
             where TIn : class, new()
+            where TEnumerable : IEnumerable<TIn>
+            where TStruct : struct, IConvertible
             where TOut : System.Collections.ArrayList, IDisposable
         {
             throw new NotImplementedException();

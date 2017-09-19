@@ -1,4 +1,4 @@
-﻿public TOut Generic_ExtensionMethodWithGenericReturnValueAndTypeParamConstraints<TIn,TOut>(TIn arg) where TIn : class,new() where TOut : System.Collections.ArrayList,System.IDisposable
+﻿public TOut Generic_ExtensionMethodWithGenericReturnValueAndTypeParamConstraints<TIn,TEnumerable,TStruct,TOut>(TIn arg, TEnumerable expression, TStruct @struct) where TIn : class,new() where TEnumerable : System.Collections.Generic.IEnumerable<TIn> where TStruct : struct,System.IConvertible where TOut : System.Collections.ArrayList,System.IDisposable
 {
-    return Cake.Scripting.Tests.Data.CakeMethodAliasGeneratorData.Generic_ExtensionMethodWithGenericReturnValueAndTypeParamConstraints<TIn,TOut>(Context, arg);
+    return Cake.Scripting.Tests.Data.CakeMethodAliasGeneratorData.Generic_ExtensionMethodWithGenericReturnValueAndTypeParamConstraints<TIn,TEnumerable,TStruct,TOut>(Context, arg, expression, @struct);
 }

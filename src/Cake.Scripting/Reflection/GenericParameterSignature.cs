@@ -28,21 +28,33 @@ namespace Cake.Scripting.Reflection
             if (parameter.HasNotNullableValueTypeConstraint)
             {
                 constraints.Add("struct");
+
+                if (parameter.HasConstraints)
+                {
+                    var emitter = new TypeEmitter();
+                    var parameterConstraints = parameter.Constraints.Select(
+                        constraint => emitter.GetString(TypeSignature.Create(constraint)));
+                    constraints.AddRange(
+                        parameterConstraints.Where(constraint => !constraint.Equals("System.ValueType")));
+                }
             }
-            if (parameter.HasReferenceTypeConstraint)
+            else
             {
-                constraints.Add("class");
-            }
-            if (parameter.HasConstraints)
-            {
-                var emitter = new TypeEmitter();
-                constraints.AddRange(
-                    parameter.Constraints.Select(
-                        constraint => emitter.GetString(TypeSignature.Create(constraint))));
-            }
-            if (parameter.HasDefaultConstructorConstraint)
-            {
-                constraints.Add("new()");
+                if (parameter.HasReferenceTypeConstraint)
+                {
+                    constraints.Add("class");
+                }
+                if (parameter.HasConstraints)
+                {
+                    var emitter = new TypeEmitter();
+                    constraints.AddRange(
+                        parameter.Constraints.Select(
+                            constraint => emitter.GetString(TypeSignature.Create(constraint))));
+                }
+                if (parameter.HasDefaultConstructorConstraint)
+                {
+                    constraints.Add("new()");
+                }
             }
 
             return new GenericParameterSignature(name, constraints);
