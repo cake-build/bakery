@@ -62,6 +62,7 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
             [InlineData("Generic_ExtensionMethodWithParameter")]
             [InlineData("Generic_ExtensionMethodWithGenericReturnValue")]
             [InlineData("Generic_ExtensionMethodWithGenericOutParameter")]
+            [InlineData("Generic_ExtensionMethodWithGenericReturnValueAndTypeParamConstraints")]
             public void Should_Return_Correct_Generated_Code_For_Generic_Methods(string name)
             {
                 // Given

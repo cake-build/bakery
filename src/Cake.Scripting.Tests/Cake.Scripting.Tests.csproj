@@ -8,6 +8,7 @@
     <None Remove="Data\Expected\Methods\Generic_ExtensionMethod" />
     <None Remove="Data\Expected\Methods\Generic_ExtensionMethodWithGenericOutParameter" />
     <None Remove="Data\Expected\Methods\Generic_ExtensionMethodWithGenericReturnValue" />
+    <None Remove="Data\Expected\Methods\Generic_ExtensionMethodWithGenericReturnValueAndTypeParamConstraints" />
     <None Remove="Data\Expected\Methods\Generic_ExtensionMethodWithParameter" />
     <None Remove="Data\Expected\Methods\NonGeneric_ExtensionMethodWithArrayParameter" />
     <None Remove="Data\Expected\Methods\NonGeneric_ExtensionMethodWithGenericExpressionArrayParameter" />
@@ -54,6 +55,7 @@
     <EmbeddedResource Include="Data\Expected\Methods\Generic_ExtensionMethod" />
     <EmbeddedResource Include="Data\Expected\Methods\Generic_ExtensionMethodWithGenericOutParameter" />
     <EmbeddedResource Include="Data\Expected\Methods\Generic_ExtensionMethodWithGenericReturnValue" />
+    <EmbeddedResource Include="Data\Expected\Methods\Generic_ExtensionMethodWithGenericReturnValueAndTypeParamConstraints" />
     <EmbeddedResource Include="Data\Expected\Methods\Generic_ExtensionMethodWithParameter" />
     <EmbeddedResource Include="Data\Expected\Methods\NonGeneric_ExtensionMethodWithArrayParameter" />
     <EmbeddedResource Include="Data\Expected\Methods\NonGeneric_ExtensionMethodWithGenericExpressionArrayParameter" />

@@ -15,21 +15,21 @@ namespace Cake.Scripting.Reflection
         public string Name { get; }
         public TypeSignature ReturnType { get; }
         public TypeSignature DeclaringType { get; }
-        public List<string> GenericParameters { get; }
+        public List<GenericParameterSignature> GenericParameters { get; }
         public IReadOnlyList<ParameterSignature> Parameters { get; }
 
         private MethodSignature(
             string cref, string name,
             TypeSignature declaringType,
             TypeSignature returnType,
-            IEnumerable<string> genericParameters,
+            IEnumerable<GenericParameterSignature> genericParameters,
             IEnumerable<ParameterSignature> parameters)
         {
             CRef = cref;
             Name = name;
             ReturnType = returnType;
             DeclaringType = declaringType;
-            GenericParameters = new List<string>(genericParameters);
+            GenericParameters = new List<GenericParameterSignature>(genericParameters);
             Parameters = new List<ParameterSignature>(parameters);
         }
 
@@ -44,13 +44,13 @@ namespace Cake.Scripting.Reflection
             var returnType = TypeSignature.Create(method.ReturnType);
 
             // Get generic parameters and arguments.
-            var genericParameters = new List<string>();
+            var genericParameters = new List<GenericParameterSignature>();
             if (method.HasGenericParameters)
             {
                 // Generic parameters
                 genericParameters.AddRange(
                     method.GenericParameters.Select(
-                        genericParameter => genericParameter.Name));
+                        GenericParameterSignature.Create));
             }
 
             // Get all parameters.
