@@ -1,4 +1,5 @@
 #load nuget:https://www.myget.org/F/cake-contrib/api/v2?package=Cake.Recipe&version=0.3.0-unstable0276&prerelease
+#tool nuget:https://www.nuget.org/api/v2?package=SignClient&version=0.9.0
 
 Environment.SetVariableNames();
 
@@ -82,7 +83,7 @@ BuildParameters.Tasks.DotNetCorePackTask
 });
 
 Task("Init-Integration-Tests")
-    .IsDependentOn("Package")
+    .IsDependentOn("Sign-Binaries")
     .Does(() =>
 {
     CleanDirectories(new [] {
@@ -107,8 +108,69 @@ Task("Run-Integration-Tests")
     });
 });
 
+Task("Sign-Binaries")
+    .IsDependentOn("Package")
+    .WithCriteria(() => BuildParameters.ShouldPublishNuGet || BuildParameters.ShouldPublishMyGet)
+    .Does(() =>
+{
+    // Get the secret.
+    var secret = EnvironmentVariable("SIGNING_SECRET");
+    if(string.IsNullOrWhiteSpace(secret)) {
+        throw new InvalidOperationException("Could not resolve signing secret.");
+    }
+
+    // Resolve dotnet and version
+    var dotnetPath = Context.Tools.Resolve("dotnet.exe");
+    if(dotnetPath == null) {
+        throw new InvalidOperationException("Could not resolve dotnet.");
+    }
+
+    // Resolve dotnet version
+    StartProcess(dotnetPath, new ProcessSettings {
+        Arguments = "--version",
+        RedirectStandardOutput = true
+    }, out var versionOutput);
+    var dotnetVersion = versionOutput.First().Substring(0,3);
+
+    var client = File($"./tools/SignClient.0.9.0/tools/netcoreapp{dotnetVersion}/SignClient.dll");
+    var settings = File("./signclient.json");
+    var filter = File("./signclient.filter");
+
+    // Get the files to sign.
+    var files = GetFiles(string.Concat(BuildParameters.Paths.Directories.NuGetPackages, "/", "*.nupkg"));
+
+    foreach(var file in files)
+    {
+        Information("Signing {0}...", file.FullPath);
+
+        // Build the argument list.
+        var arguments = new ProcessArgumentBuilder()
+            .AppendQuoted(MakeAbsolute(client.Path).FullPath)
+            .Append("sign")
+            .AppendSwitchQuoted("-c", MakeAbsolute(settings.Path).FullPath)
+            .AppendSwitchQuoted("-i", MakeAbsolute(file).FullPath)
+            .AppendSwitchQuoted("-f", MakeAbsolute(filter).FullPath)
+            .AppendSwitchQuotedSecret("-s", secret)
+            .AppendSwitchQuoted("-h", "dual")
+            .AppendSwitchQuoted("-n", "Cake")
+            .AppendSwitchQuoted("-d", "Cake (C# Make) is a cross platform build automation system.")
+            .AppendSwitchQuoted("-u", "https://cakebuild.net");
+
+        // Sign the binary.
+        var result = StartProcess(dotnetPath, new ProcessSettings {  Arguments = arguments });
+        if(result != 0)
+        {
+            // We should not recover from this.
+            throw new InvalidOperationException("Signing failed!");
+        }
+    }
+});
+
 // Hook up integration tests to default and appveyor tasks
 BuildParameters.Tasks.DefaultTask.IsDependentOn("Run-Integration-Tests");
 BuildParameters.Tasks.AppVeyorTask.IsDependentOn("Run-Integration-Tests");
+
+// Hook up signing task to publish tasks
+BuildParameters.Tasks.PublishNuGetPackagesTask.IsDependentOn("Sign-Binaries");
 
 Build.RunDotNetCore();
