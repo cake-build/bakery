@@ -172,6 +172,7 @@ BuildParameters.Tasks.AppVeyorTask.IsDependentOn("Run-Integration-Tests");
 
 // Hook up signing task to publish tasks
 BuildParameters.Tasks.PublishNuGetPackagesTask.IsDependentOn("Sign-Binaries");
-BuildParameters.Tasks.UploadAppVeyorArtifactsTask.IsDependentOn("Sign-Binaries");
+BuildParameters.Tasks.UploadAppVeyorArtifactsTask.IsDependentOn("Run-Integration-Tests")
+                                                 .IsDependentOn("Sign-Binaries");
 
 Build.RunDotNetCore();
