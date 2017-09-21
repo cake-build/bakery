@@ -110,7 +110,7 @@ Task("Run-Integration-Tests")
 
 Task("Sign-Binaries")
     .IsDependentOn("Package")
-    .WithCriteria(() => BuildParameters.ShouldPublishNuGet || BuildParameters.ShouldPublishMyGet)
+    .WithCriteria(() => BuildParameters.ShouldPublishNuGet)
     .Does(() =>
 {
     // Get the secret.
@@ -172,5 +172,6 @@ BuildParameters.Tasks.AppVeyorTask.IsDependentOn("Run-Integration-Tests");
 
 // Hook up signing task to publish tasks
 BuildParameters.Tasks.PublishNuGetPackagesTask.IsDependentOn("Sign-Binaries");
+BuildParameters.Tasks.UploadAppVeyorArtifactsTask.IsDependentOn("Sign-Binaries");
 
 Build.RunDotNetCore();
