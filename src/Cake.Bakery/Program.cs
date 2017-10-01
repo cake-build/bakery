@@ -21,6 +21,7 @@ using Cake.Scripting.Abstractions;
 using Cake.Scripting.CodeGen;
 using Cake.Scripting.Transport.Tcp.Server;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace Cake.Bakery
@@ -51,8 +52,7 @@ namespace Cake.Bakery
                 throw new ArgumentException("Port not specified or invalid.");
             }
 
-            var loggerFactory = new LoggerFactory()
-                    .AddConsole(LogLevel.Trace);
+            var loggerFactory = new LoggerFactory();
 
             var registrar = new ContainerRegistrar();
             registrar.RegisterModule(new CoreModule());
@@ -77,10 +77,11 @@ namespace Cake.Bakery
 
                 var environment = container.Resolve<ICakeEnvironment>();
                 var aliasFinder = container.Resolve<IScriptAliasFinder>();
+                var processor = container.Resolve<Core.Scripting.IScriptProcessor>();
 
                 // Rebuild the container for Cached Alias Finder.
                 registrar = new ContainerRegistrar();
-                registrar.RegisterModule(new CacheModule(aliasFinder, environment));
+                registrar.RegisterModule(new CacheModule(aliasFinder, processor, environment));
                 registrar.Builder.Update(container);
 
                 // Get Script generator.
