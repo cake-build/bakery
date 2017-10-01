@@ -1,5 +1,5 @@
-#load nuget:https://www.myget.org/F/cake-contrib/api/v2?package=Cake.Recipe&version=0.3.0-unstable0276&prerelease
-#tool nuget:https://www.nuget.org/api/v2?package=SignClient&version=0.9.0
+#load nuget:https://www.myget.org/F/cake-contrib/api/v3/index.json?package=Cake.Recipe&version=0.3.0-unstable0280&prerelease
+#tool nuget:https://api.nuget.org/v3/index.json?package=SignClient&version=0.9.0
 
 Environment.SetVariableNames();
 
@@ -95,7 +95,7 @@ Task("Init-Integration-Tests")
         "./tests/integration/packages");
 });
 
-Task("Run-Integration-Tests")
+Task("Run-Bakery-Integration-Tests")
     .IsDependentOn("Init-Integration-Tests")
     .Does(() =>
 {
@@ -167,12 +167,12 @@ Task("Sign-Binaries")
 });
 
 // Hook up integration tests to default and appveyor tasks
-BuildParameters.Tasks.DefaultTask.IsDependentOn("Run-Integration-Tests");
-BuildParameters.Tasks.AppVeyorTask.IsDependentOn("Run-Integration-Tests");
+BuildParameters.Tasks.DefaultTask.IsDependentOn("Run-Bakery-Integration-Tests");
+BuildParameters.Tasks.AppVeyorTask.IsDependentOn("Run-Bakery-Integration-Tests");
 
 // Hook up signing task to publish tasks
 BuildParameters.Tasks.PublishNuGetPackagesTask.IsDependentOn("Sign-Binaries");
-BuildParameters.Tasks.UploadAppVeyorArtifactsTask.IsDependentOn("Run-Integration-Tests")
+BuildParameters.Tasks.UploadAppVeyorArtifactsTask.IsDependentOn("Run-Bakery-Integration-Tests")
                                                  .IsDependentOn("Sign-Binaries");
 
 Build.RunDotNetCore();

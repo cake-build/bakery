@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cake.Core" Version="0.22.0" />
-    <PackageReference Include="Cake.NuGet" Version="0.22.0" />
+    <PackageReference Include="Cake.Core" Version="0.23.0-alpha0059" />
+    <PackageReference Include="Cake.NuGet" Version="0.23.0-alpha0059" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.1.0" />
   </ItemGroup>
