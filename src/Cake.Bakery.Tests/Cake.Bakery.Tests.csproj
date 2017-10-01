@@ -4,6 +4,12 @@
     <TargetFrameworks>net46</TargetFrameworks>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <Description>The Cake script analyzer and code generator.</Description>
+  </PropertyGroup>
+
+  <Import Project="..\Shared.props" />
+
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     <PackageReference Include="xunit" Version="2.2.0" />
