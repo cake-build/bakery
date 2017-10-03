@@ -24,7 +24,7 @@ ToolSettings.SetToolSettings(context: Context,
                             testCoverageExcludeByAttribute: "*.ExcludeFromCodeCoverage*",
                             testCoverageExcludeByFile: "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs");
 
-var net46ArtifactPath = BuildParameters.Paths.Directories.PublishedApplications.Combine("Cake.Bakery/net46");
+var binArtifactPath = BuildParameters.Paths.Directories.PublishedApplications.Combine("Cake.Bakery/net461");
 
 Task("Copy-License")
     .IsDependentOn("DotNetCore-Build")
@@ -32,7 +32,7 @@ Task("Copy-License")
     .Does(() =>
 {
     // Copy license
-    CopyFileToDirectory("./LICENSE", net46ArtifactPath);
+    CopyFileToDirectory("./LICENSE", binArtifactPath);
 });
 
 // Override default Pack task
@@ -62,19 +62,19 @@ BuildParameters.Tasks.DotNetCorePackTask
         });
     }
 
-    var net46FullArtifactPath = MakeAbsolute(net46ArtifactPath).FullPath;
-    var net46FullArtifactPathLength = net46FullArtifactPath.Length+1;
+    var binFullArtifactPath = MakeAbsolute(binArtifactPath).FullPath;
+    var binFullArtifactPathLength = binFullArtifactPath.Length+1;
 
     // Cake.Bakery - .NET 4.6
     NuGetPack("./nuspec/Cake.Bakery.nuspec", new NuGetPackSettings {
         Version = BuildParameters.Version.SemVersion,
         //ReleaseNotes = TODO,
-        BasePath = net46ArtifactPath,
+        BasePath = binArtifactPath,
         OutputDirectory = BuildParameters.Paths.Directories.NuGetPackages,
         Symbols = false,
         NoPackageAnalysis = true,
-        Files = GetFiles(net46FullArtifactPath + "/**/*")
-                                .Select(file=>file.FullPath.Substring(net46FullArtifactPathLength))
+        Files = GetFiles(binFullArtifactPath + "/**/*")
+                                .Select(file=>file.FullPath.Substring(binFullArtifactPathLength))
                                 .Select(file=> !file.Equals("LICENSE") ? 
                                     new NuSpecContent { Source = file, Target = "tools/" + file } :
                                     new NuSpecContent { Source = file, Target = file })
