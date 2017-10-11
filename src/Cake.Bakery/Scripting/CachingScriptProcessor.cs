@@ -22,6 +22,11 @@ namespace Cake.Bakery.Scripting
             var filePaths = new List<FilePath>();
             foreach (var addin in addins)
             {
+                if (addin.Package.Equals("Cake"))
+                {
+                    continue;
+                }
+
                 if (!_cache.TryGetValue(addin, out IReadOnlyList<FilePath> result))
                 {
                     result = _processor.InstallAddins(new[] {addin}, installPath);
