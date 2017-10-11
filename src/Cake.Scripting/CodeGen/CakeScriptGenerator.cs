@@ -130,7 +130,11 @@ namespace Cake.Scripting.CodeGen
             var response = new CakeScript();
             response.Host.TypeName = hostObject.TypeName;
             response.Host.AssemblyPath = hostObject.AssemblyPath;
-            response.Source = GenerateSource(aliases) + string.Join("\n", result.Lines);
+            response.Source = string.Join("\n", result.Defines) +
+                              string.Join("\n", result.UsingAliases) +
+                              string.Join("\n", result.UsingStaticDirectives) +
+                              GenerateSource(aliases) +
+                              string.Join("\n", result.Lines);
             response.Usings.AddRange(namespaces);
             response.References.AddRange(references.Select(r => r.FullPath));
 

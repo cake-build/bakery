@@ -13,7 +13,7 @@
   <Import Project="..\Shared.props" />
 
   <ItemGroup>
-    <PackageReference Include="Cake.Core" Version="0.23.0-alpha0059" />
+    <PackageReference Include="Cake.Core" Version="0.23.0" />
     <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" />
   </ItemGroup>
 
