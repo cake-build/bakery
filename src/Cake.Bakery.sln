@@ -10,6 +10,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cake.Scripting.Tests", "Cake.Scripting.Tests\Cake.Scripting.Tests.csproj", "{0C65770C-8A9D-4BEF-B42E-B75F3F1521BE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A0CAC73D-2BF4-4C58-A9C4-8B943FA0E785}"
+ProjectSection(SolutionItems) = preProject
+	Shared.props = Shared.props
+EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{775E536B-2E05-43CF-9917-9864C7E099A1}"
 EndProject

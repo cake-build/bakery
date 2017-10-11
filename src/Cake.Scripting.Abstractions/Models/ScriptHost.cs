@@ -7,6 +7,7 @@ namespace Cake.Scripting.Abstractions.Models
     public sealed class ScriptHost
     {
         public string TypeName { get; set; }
+
         public string AssemblyPath { get; set; }
     }
 }

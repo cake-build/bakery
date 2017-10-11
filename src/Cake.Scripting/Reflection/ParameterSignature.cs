@@ -12,11 +12,17 @@ namespace Cake.Scripting.Reflection
     public sealed class ParameterSignature
     {
         public string Name { get; }
+
         public TypeSignature ParameterType { get; }
+
         public bool IsOptional { get; }
+
         public object DefaultValue { get; }
+
         public bool IsParams { get; set; }
+
         public bool IsOutParameter { get; }
+
         public bool IsRefParameter { get; }
 
         private ParameterSignature(string name, TypeSignature parameterType,

@@ -12,8 +12,8 @@ namespace Cake.Scripting.Transport.Tests.Fixtures.Tcp
     internal sealed class InProcessServer : IScriptGenerationProcess
     {
         private readonly IScriptGenerationService _service;
-        private ScriptGenerationServer _server;
         private readonly ILoggerFactory _loggerFactory;
+        private ScriptGenerationServer _server;
 
         public InProcessServer(IScriptGenerationService service, ILoggerFactory loggerFactory)
         {

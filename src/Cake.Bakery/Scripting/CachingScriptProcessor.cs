@@ -10,7 +10,7 @@ namespace Cake.Bakery.Scripting
     {
         private readonly IScriptProcessor _processor;
         private readonly IDictionary<PackageReference, IReadOnlyList<FilePath>> _cache;
-        
+
         public CachingScriptProcessor(IScriptProcessor processor)
         {
             _processor = processor ?? throw new ArgumentNullException(nameof(processor));
@@ -29,7 +29,7 @@ namespace Cake.Bakery.Scripting
 
                 if (!_cache.TryGetValue(addin, out IReadOnlyList<FilePath> result))
                 {
-                    result = _processor.InstallAddins(new[] {addin}, installPath);
+                    result = _processor.InstallAddins(new[] { addin }, installPath);
                     _cache.Add(addin, result);
                 }
 

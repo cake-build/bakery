@@ -24,14 +24,8 @@ namespace Cake.Scripting.IO
 
         public FileAttributes Attributes
         {
-            get
-            {
-                return FileAttributes.Normal;
-            }
-            set
-            {
-                // noop
-            }
+            get { return FileAttributes.Normal; }
+            set { }
         }
 
         public bool Exists => true;

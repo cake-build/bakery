@@ -23,13 +23,13 @@ namespace Cake.Scripting.Transport.Tcp.Client
         private readonly TcpListener _listener;
         private readonly IScriptGenerationProcess _process;
         private readonly CancellationTokenSource _cancellationTokenSource;
+        private readonly ILogger _logger;
         private BinaryWriter _writer;
         private BinaryReader _reader;
         private NetworkStream _stream;
-        private readonly ILogger _logger;
 
-        public ScriptGenerationClient(string serverExecutablePath, string workingDirectory, ILoggerFactory loggerFactory) :
-            this(new ScriptGenerationProcess(serverExecutablePath, loggerFactory), workingDirectory, loggerFactory)
+        public ScriptGenerationClient(string serverExecutablePath, string workingDirectory, ILoggerFactory loggerFactory)
+            : this(new ScriptGenerationProcess(serverExecutablePath, loggerFactory), workingDirectory, loggerFactory)
         {
         }
 

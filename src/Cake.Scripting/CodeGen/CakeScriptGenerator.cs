@@ -14,9 +14,9 @@ using Cake.Core.IO;
 using Cake.Core.Scripting;
 using Cake.Core.Scripting.Analysis;
 using Cake.Core.Scripting.Processors.Loading;
+using Cake.Scripting.Abstractions;
 using Cake.Scripting.Abstractions.Models;
 using Cake.Scripting.CodeGen.Generators;
-using Cake.Scripting.Abstractions;
 using Cake.Scripting.IO;
 using Cake.Scripting.Reflection.Emitters;
 
@@ -87,7 +87,7 @@ namespace Cake.Scripting.CodeGen
                 try
                 {
                     _log.Verbose("Installing addins...");
-                    var addinReferences = _processor.InstallAddins(new []{ addin }, addinRoot);
+                    var addinReferences = _processor.InstallAddins(new[] { addin }, addinRoot);
                     foreach (var addinReference in addinReferences)
                     {
                         result.References.Add(addinReference.FullPath);

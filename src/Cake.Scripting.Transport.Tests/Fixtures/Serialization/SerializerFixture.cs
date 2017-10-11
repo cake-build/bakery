@@ -10,7 +10,9 @@ namespace Cake.Scripting.Transport.Tests.Fixtures.Serialization
     public abstract class SerializerFixture : IDisposable
     {
         private readonly MemoryStream _stream;
+
         public BinaryWriter Writer { get; }
+
         public BinaryReader Reader { get; }
 
         protected SerializerFixture()

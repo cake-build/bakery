@@ -17,12 +17,12 @@ namespace Cake.Bakery.Diagnostics
 
         private static readonly Dictionary<LogLevel, MSLogLevel> ToLogLevel = new Dictionary<LogLevel, MSLogLevel>
         {
-            {LogLevel.Fatal, MSLogLevel.Critical},
-            {LogLevel.Error, MSLogLevel.Error },
-            {LogLevel.Warning, MSLogLevel.Warning },
-            {LogLevel.Information, MSLogLevel.Information },
-            {LogLevel.Verbose, MSLogLevel.Debug },
-            {LogLevel.Debug, MSLogLevel.Debug }
+            { LogLevel.Fatal, MSLogLevel.Critical },
+            { LogLevel.Error, MSLogLevel.Error },
+            { LogLevel.Warning, MSLogLevel.Warning },
+            { LogLevel.Information, MSLogLevel.Information },
+            { LogLevel.Verbose, MSLogLevel.Debug },
+            { LogLevel.Debug, MSLogLevel.Debug }
         };
 
         private static string FormatLogValues(LogValues values, Exception ex)
@@ -39,7 +39,7 @@ namespace Cake.Bakery.Diagnostics
 
         public void Write(Verbosity verbosity, LogLevel level, string format, params object[] args)
         {
-            //TODO: Check verbosity
+            // TODO: Check verbosity
             _logger.Log(ToLogLevel[level], 0, new LogValues(format, args), null, FormatLogValues);
         }
 
