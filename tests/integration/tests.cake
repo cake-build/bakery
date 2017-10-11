@@ -5,12 +5,12 @@
 // Addins
 #addin "nuget:https://api.nuget.org/v3/index.json?package=xunit.assert&version=2.2.0"
 #addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Logging&version=1.1.0"
+#addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Logging.Console&version=1.1.0"
 #addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Logging.Abstractions&version=1.1.0"
+#addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Configuration.Abstractions&version=1.1.0"
+#addin "nuget:https://api.nuget.org/v3/index.json?package=System.Runtime.InteropServices.RuntimeInformation&version=4.0.0"
 #addin "nuget:?package=Cake.Scripting.Abstractions&prerelease"
 #addin "nuget:?package=Cake.Scripting.Transport&prerelease"
-
-// References
-#r "System.Runtime.InteropServices.RuntimeInformation"
 
 // Usings
 using System.Diagnostics;
@@ -19,6 +19,14 @@ using Cake.Scripting.Abstractions.Models;
 using Cake.Scripting.Transport.Tcp.Client;
 using Microsoft.Extensions.Logging;
 using Xunit;
+
+AppDomain.CurrentDomain.AssemblyResolve += (sender, args) => {
+    if (args.Name.StartsWith("System.Runtime.InteropServices.RuntimeInformation"))
+    {
+        return System.Reflection.Assembly.Load(new System.Reflection.AssemblyName("System.Runtime.InteropServices.RuntimeInformation, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"));
+    }
+    return null;
+};
 
 // Globals
 IScriptGenerationService service;
@@ -43,10 +51,12 @@ Task(""Foobar"")
 });
 
 RunTarget(target);";
+const string CakeAddinDirectiveFile = "addin.cake";
 
 // Setup
 Setup((context) => {
-    var loggerFactory = new LoggerFactory();
+    var loggerFactory = new LoggerFactory()
+        .AddConsole(Microsoft.Extensions.Logging.LogLevel.Information);
 
     service = new ScriptGenerationClient(
         MakeAbsolute(context.Tools.Resolve("Cake.Bakery.exe")).FullPath,
@@ -186,9 +196,29 @@ Task("Should-Generate-With-Line-Changes")
     }
 });
 
+Task("Should-Install-Addins")
+    .Does(() =>
+{
+    // Given
+    var fileChange = new FileChange
+    {
+        FileName = CakeAddinDirectiveFile,
+        FromDisk = true
+    };
+
+    // When
+    var response = service.Generate(fileChange);
+
+    // Then
+    var addin = new FilePath("./tools/Addins/Cake.Wyam.0.18.6/lib/net45/Cake.Wyam.dll");
+
+    Assert.Contains(MakeAbsolute(addin).FullPath, response.References);
+});
+
 Task("Default")
     .IsDependentOn("Should-Generate-From-File")
     .IsDependentOn("Should-Generate-From-Buffer")
-    .IsDependentOn("Should-Generate-With-Line-Changes");
+    .IsDependentOn("Should-Generate-With-Line-Changes")
+    .IsDependentOn("Should-Install-Addins");
 
 RunTarget("Default");
