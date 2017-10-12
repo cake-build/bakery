@@ -13,13 +13,21 @@ namespace Cake.Scripting.Reflection
     public sealed class TypeSignature
     {
         public string CRef { get; }
+
         public string Name { get; }
+
         public bool IsGenericArgumentType { get; }
+
         public bool IsArray { get; }
+
         public bool IsEnum { get; }
+
         public bool IsValueType { get; }
+
         public NamespaceSignature Namespace { get; }
+
         public IReadOnlyList<string> GenericArguments { get; }
+
         public IReadOnlyList<TypeSignature> GenericParameters { get; }
 
         private TypeSignature(
@@ -51,7 +59,7 @@ namespace Cake.Scripting.Reflection
                     type = arrayType.ElementType;
                 }
             }
- 
+
             var isEnum = false;
             var definition = type.TryResolve();
             if (definition != null)

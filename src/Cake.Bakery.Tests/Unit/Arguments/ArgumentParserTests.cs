@@ -26,12 +26,12 @@ namespace Cake.Bakery.Tests.Unit.Arguments
                 // Given
                 var expected = new Dictionary<string, string>
                 {
-                    { "file" , "/path/to/foo"},
+                    { "file", "/path/to/foo" },
                     { "verify", string.Empty }
                 };
 
                 // When
-                var actual = ArgumentParser.Parse(new[] {arg1, arg2});
+                var actual = ArgumentParser.Parse(new[] { arg1, arg2 });
 
                 // Then
                 Assert.Equal(expected, actual);

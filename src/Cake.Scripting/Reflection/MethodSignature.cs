@@ -12,10 +12,15 @@ namespace Cake.Scripting.Reflection
     public sealed class MethodSignature
     {
         public string CRef { get; }
+
         public string Name { get; }
+
         public TypeSignature ReturnType { get; }
+
         public TypeSignature DeclaringType { get; }
+
         public List<GenericParameterSignature> GenericParameters { get; }
+
         public IReadOnlyList<ParameterSignature> Parameters { get; }
 
         private MethodSignature(

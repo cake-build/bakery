@@ -59,7 +59,7 @@ namespace Cake.Scripting.Tests.Unit.IO
                     StartColumn = 0,
                     EndLine = 0,
                     EndColumn = 6,
-                    NewText = ""
+                    NewText = string.Empty
                 };
                 target.UpdateFileBuffer(path, new[] { change });
 
@@ -121,4 +121,3 @@ namespace Cake.Scripting.Tests.Unit.IO
         }
     }
 }
-

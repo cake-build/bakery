@@ -18,7 +18,6 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
                 _fixture = fixture;
             }
 
-
             [Theory]
             [InlineData("NonGeneric_ExtensionMethodWithNoParameters")]
             [InlineData("NonGeneric_ExtensionMethodWithParameter")]
@@ -56,7 +55,6 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
                 Assert.Equal(expected, result);
             }
 
-
             [Theory]
             [InlineData("Generic_ExtensionMethod")]
             [InlineData("Generic_ExtensionMethodWithParameter")]
@@ -74,7 +72,6 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
                 // Then
                 Assert.Equal(expected, result);
             }
-
 
             [Theory]
             [InlineData("Obsolete_ImplicitWarning_NoMessage")]

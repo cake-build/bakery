@@ -97,7 +97,6 @@ namespace Cake.Scripting.Transport.Tests.Unit.Serialization
                     NewText = "5"
                 });
 
-
                 // When
                 FileChangeSerializer.Serialize(_fixture.Writer, expected);
                 _fixture.ResetStreamPosition();
@@ -133,7 +132,6 @@ namespace Cake.Scripting.Transport.Tests.Unit.Serialization
                     EndLine = 9,
                     NewText = "10"
                 });
-
 
                 // When
                 FileChangeSerializer.Serialize(_fixture.Writer, expected);

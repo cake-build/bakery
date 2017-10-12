@@ -39,7 +39,7 @@ namespace Cake.Scripting.Abstractions.Models
 
         public override int GetHashCode()
         {
-            return unchecked (NewText.GetHashCode()
+            return unchecked(NewText.GetHashCode()
                    * (23 + StartLine)
                    * (29 + StartColumn)
                    * (31 + EndLine)

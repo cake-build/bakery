@@ -10,8 +10,8 @@ namespace Cake.Scripting.Transport.Tcp.Client
 {
     internal class ScriptGenerationProcess : IScriptGenerationProcess
     {
-        private Process _process;
         private readonly ILogger _logger;
+        private Process _process;
 
         public ScriptGenerationProcess(string serverExecutablePath, ILoggerFactory loggerFactory)
         {

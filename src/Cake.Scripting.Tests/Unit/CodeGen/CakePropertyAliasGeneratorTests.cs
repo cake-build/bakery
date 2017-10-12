@@ -18,7 +18,6 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
                 _fixture = fixture;
             }
 
-
             [Theory]
             [InlineData("NonCached_Value_Type")]
             public void Should_Return_Correct_Generated_Code_For_Non_Cached_Properties(string name)
@@ -32,7 +31,6 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
                 // Then
                 Assert.Equal(expected, result);
             }
-
 
             [Theory]
             [InlineData("Cached_Reference_Type")]
@@ -48,7 +46,6 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
                 // Then
                 Assert.Equal(expected, result);
             }
-
 
             [Theory]
             [InlineData("NonCached_Obsolete_ImplicitWarning_NoMessage")]
@@ -66,7 +63,6 @@ namespace Cake.Scripting.Tests.Unit.CodeGen
                 // Then
                 Assert.Equal(expected, result);
             }
-
 
             [Theory]
             [InlineData("Cached_Obsolete_ImplicitWarning_NoMessage")]

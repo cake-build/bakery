@@ -14,7 +14,7 @@ namespace Cake.Scripting.Transport.Tests.Unit.Serialization
     {
         public sealed class TheSerializeMethod : IClassFixture<CakeScriptSerializerFixture>
         {
-            private readonly  CakeScriptSerializerFixture _fixture;
+            private readonly CakeScriptSerializerFixture _fixture;
 
             public TheSerializeMethod(CakeScriptSerializerFixture fixture)
             {
