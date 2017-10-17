@@ -14,6 +14,7 @@ namespace Cake.Bakery
         {
             public static readonly string Port = "port";
             public static readonly string Debug = "debug";
+            public static readonly string Verbose = "verbose";
         }
     }
 }
