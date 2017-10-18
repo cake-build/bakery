@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using Cake.Bakery.Arguments;
 using Cake.Bakery.Composition;
+using Cake.Bakery.Diagnostics;
 using Cake.Bakery.Polyfill;
 using Cake.Core;
 using Cake.Core.Configuration;
@@ -53,6 +54,10 @@ namespace Cake.Bakery
             }
 
             var loggerFactory = new LoggerFactory();
+            if (args.ContainsKey(Constants.CommandLine.Verbose))
+            {
+                loggerFactory.AddProvider(new LoggerProvider());
+            }
 
             var registrar = new ContainerRegistrar();
             registrar.RegisterModule(new CoreModule());

@@ -28,10 +28,16 @@ namespace Cake.Scripting.Transport.Tcp.Client
 
         public void Start(int port, string workingDirectory)
         {
+            var arguments = $"--port={port}";
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                arguments += " --verbose";
+            }
+
             var startInfo = new ProcessStartInfo
             {
                 FileName = ServerExecutablePath,
-                Arguments = $"--port={port}",
+                Arguments = arguments,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -44,7 +50,7 @@ namespace Cake.Scripting.Transport.Tcp.Client
             {
                 if (e.Data != null)
                 {
-                    _logger.LogDebug(e.Data);
+                    _logger.LogError(e.Data);
                 }
             };
             _process.BeginErrorReadLine();

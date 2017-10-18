@@ -56,7 +56,7 @@ const string CakeAddinDirectiveFile = "addin.cake";
 // Setup
 Setup((context) => {
     var loggerFactory = new LoggerFactory()
-        .AddConsole(Microsoft.Extensions.Logging.LogLevel.Information);
+        .AddConsole(Microsoft.Extensions.Logging.LogLevel.Debug);
 
     service = new ScriptGenerationClient(
         MakeAbsolute(context.Tools.Resolve("Cake.Bakery.exe")).FullPath,
