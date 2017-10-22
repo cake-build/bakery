@@ -1,0 +1,4 @@
+﻿public void NonGeneric_ExtensionMethodWithGenericOutParameter(out System.Collections.Generic.IEnumerable<System.String> content)
+{
+    Cake.Scripting.Tests.Data.CakeMethodAliasGeneratorData.NonGeneric_ExtensionMethodWithGenericOutParameter(Context, out content);
+}

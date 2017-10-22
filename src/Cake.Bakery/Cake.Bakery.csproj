@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup>
+    <TargetFrameworks>net461</TargetFrameworks>
+    <WarningsAsErrors>true</WarningsAsErrors>
+    <PreserveCompilationContext>false</PreserveCompilationContext>
+    <OutputType>Exe</OutputType>
+    <RuntimeIdentifiers>win7-x64;win7-x86;osx.10.11-x64;ubuntu.14.04-x64;ubuntu.16.04-x64;centos.7-x64;rhel.7.2-x64;debian.8-x64;fedora.23-x64;opensuse.13.2-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <Description>The Cake script analyzer and code generator.</Description>
+  </PropertyGroup>
+  
+  <Import Project="..\Shared.props" />
+  
+  <ItemGroup>
+    <PackageReference Include="Cake.Core" Version="0.23.0" />
+    <PackageReference Include="Cake.NuGet" Version="0.23.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Cake.Scripting.Abstractions\Cake.Scripting.Abstractions.csproj" />
+    <ProjectReference Include="..\Cake.Scripting.Transport\Cake.Scripting.Transport.csproj" />
+    <ProjectReference Include="..\Cake.Scripting\Cake.Scripting.csproj" />
+  </ItemGroup>
+  
+</Project>

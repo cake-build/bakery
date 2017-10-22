@@ -1,0 +1,1 @@
+#addin nuget:?package=Cake.Wyam&version=0.18.6

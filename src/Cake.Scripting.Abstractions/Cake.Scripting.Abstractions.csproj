@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net46</TargetFrameworks>
+    <WarningsAsErrors>true</WarningsAsErrors>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Description>The Cake script analyzer and code generator.</Description>
+  </PropertyGroup>
+
+  <Import Project="..\Shared.props" />
+
+</Project>

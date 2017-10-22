@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net46</TargetFrameworks>
+    <WarningsAsErrors>true</WarningsAsErrors>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Description>The Cake script analyzer and code generator.</Description>
+  </PropertyGroup>
+
+  <Import Project="..\Shared.props" />
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cake.Scripting.Abstractions\Cake.Scripting.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

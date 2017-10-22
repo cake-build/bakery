@@ -22,6 +22,9 @@ bld/
 [Oo]bj/
 [Ll]og/
 
+# Visual Studio 2017
+**/Properties/launchSettings.json
+
 # Visual Studio 2015 cache/options directory
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
@@ -113,6 +116,8 @@ _TeamCity*
 _NCrunch_*
 .*crunch*.local.xml
 nCrunchTemp_*
+*.ncrunchproject
+*.ncrunchsolution
 
 # MightyMoose
 *.mm.*
@@ -250,3 +255,9 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# Cake - Uncomment if you are using it
+tools/**
+!tools/packages.config
+BuildArtifacts/
+tests/integration/tools/
