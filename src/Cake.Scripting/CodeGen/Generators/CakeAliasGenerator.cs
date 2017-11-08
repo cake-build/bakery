@@ -19,7 +19,7 @@ namespace Cake.Scripting.CodeGen.Generators
                 var builder = new StringBuilder();
                 foreach (var xmlDoc in element.Elements())
                 {
-                    builder.AppendLine($"/// {xmlDoc.ToString().Replace("\r\n", "\r\n///")}");
+                    builder.AppendLine($"/// {xmlDoc.ToString().Replace("\n", "\n///")}");
                 }
                 writer.Write(builder.ToString());
             }
