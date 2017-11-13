@@ -19,6 +19,7 @@ using Cake.Scripting.Abstractions.Models;
 using Cake.Scripting.CodeGen.Generators;
 using Cake.Scripting.IO;
 using Cake.Scripting.Reflection.Emitters;
+using ScriptHost = Cake.Scripting.Abstractions.Models.ScriptHost;
 
 namespace Cake.Scripting.CodeGen
 {
@@ -34,6 +35,9 @@ namespace Cake.Scripting.CodeGen
         private readonly IScriptAliasFinder _aliasFinder;
         private readonly CakeMethodAliasGenerator _methodGenerator;
         private readonly CakePropertyAliasGenerator _propertyGenerator;
+        private readonly DirectoryPath _addinRoot;
+        private readonly DirectoryPath _cakeRoot;
+        private readonly ScriptHost _hostObject;
 
         public CakeScriptGenerator(
             IBufferedFileSystem fileSystem,
@@ -60,6 +64,9 @@ namespace Cake.Scripting.CodeGen
 
             _methodGenerator = new CakeMethodAliasGenerator(typeEmitter, parameterEmitter);
             _propertyGenerator = new CakePropertyAliasGenerator(typeEmitter);
+            _addinRoot = GetAddinPath(_environment.WorkingDirectory);
+            _cakeRoot = GetCakePath(GetToolPath(_environment.WorkingDirectory));
+            _hostObject = GetHostObject(_cakeRoot);
         }
 
         public CakeScript Generate(FileChange fileChange)
@@ -81,13 +88,12 @@ namespace Cake.Scripting.CodeGen
             var result = _analyzer.Analyze(scriptPath);
 
             // Install addins.
-            var addinRoot = GetAddinPath(_environment.WorkingDirectory);
             foreach (var addin in result.Addins)
             {
                 try
                 {
                     _log.Verbose("Installing addins...");
-                    var addinReferences = _processor.InstallAddins(new[] { addin }, addinRoot);
+                    var addinReferences = _processor.InstallAddins(new[] { addin }, _addinRoot);
                     foreach (var addinReference in addinReferences)
                     {
                         result.References.Add(addinReference.FullPath);
@@ -102,8 +108,7 @@ namespace Cake.Scripting.CodeGen
 
             // Load all references.
             _log.Verbose("Adding references...");
-            var cakeRoot = GetCakePath(GetToolPath(_environment.WorkingDirectory));
-            var references = new HashSet<FilePath>(GetDefaultReferences(cakeRoot));
+            var references = new HashSet<FilePath>(GetDefaultReferences(_cakeRoot));
             references.AddRange(result.References.Select(r => new FilePath(r)));
 
             // Find aliases
@@ -120,16 +125,12 @@ namespace Cake.Scripting.CodeGen
             namespaces.AddRange(GetDefaultNamespaces());
             namespaces.AddRange(aliases.SelectMany(alias => alias.Namespaces));
 
-            // Set Host object
-            _log.Verbose("Setting host object...");
-            var hostObject = GetHostObject(cakeRoot);
-
             // Create the response.
             // ReSharper disable once UseObjectOrCollectionInitializer
             _log.Verbose("Creating response...");
             var response = new CakeScript();
-            response.Host.TypeName = hostObject.TypeName;
-            response.Host.AssemblyPath = hostObject.AssemblyPath;
+            response.Host.TypeName = _hostObject.TypeName;
+            response.Host.AssemblyPath = _hostObject.AssemblyPath;
             response.Source = string.Join("\n", result.Defines) +
                               string.Join("\n", result.UsingAliases) +
                               string.Join("\n", result.UsingStaticDirectives) +
