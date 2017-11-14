@@ -5,10 +5,11 @@
 using System;
 using System.IO;
 using Cake.Scripting.Reflection.Emitters;
+using static Cake.Scripting.CodeGen.Generators.CakeAliasGenerationHelper;
 
 namespace Cake.Scripting.CodeGen.Generators
 {
-    public sealed class CakePropertyAliasGenerator : CakeAliasGenerator
+    public sealed class CakePropertyAliasGenerator : ICakeAliasGenerator
     {
         private readonly TypeEmitter _typeEmitter;
 
@@ -17,7 +18,7 @@ namespace Cake.Scripting.CodeGen.Generators
             _typeEmitter = typeEmitter;
         }
 
-        public override void Generate(TextWriter writer, CakeScriptAlias alias)
+        public void Generate(TextWriter writer, CakeScriptAlias alias)
         {
             if (alias == null)
             {

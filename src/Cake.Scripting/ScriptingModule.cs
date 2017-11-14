@@ -8,6 +8,7 @@ using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using Cake.Scripting.Abstractions;
 using Cake.Scripting.CodeGen;
+using Cake.Scripting.CodeGen.Generators;
 using Cake.Scripting.IO;
 
 namespace Cake.Scripting
@@ -39,6 +40,7 @@ namespace Cake.Scripting
             // Scripting
             registrar.RegisterType<CakeScriptAliasFinder>().As<IScriptAliasFinder>().Singleton();
             registrar.RegisterType<CakeScriptGenerator>().As<IScriptGenerationService>().Singleton();
+            registrar.RegisterType<CakeAliasGenerator>().As<ICakeAliasGenerator>().Singleton();
         }
     }
 }
