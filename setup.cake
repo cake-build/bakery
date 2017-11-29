@@ -159,7 +159,6 @@ Task("Sign-Binaries")
             .AppendSwitchQuoted("-f", MakeAbsolute(filter).FullPath)
             .AppendSwitchQuotedSecret("-s", secret)
             .AppendSwitchQuotedSecret("-r", user)
-            .AppendSwitchQuoted("-h", "dual")
             .AppendSwitchQuoted("-n", "Cake")
             .AppendSwitchQuoted("-d", "Cake (C# Make) is a cross platform build automation system.")
             .AppendSwitchQuoted("-u", "https://cakebuild.net");
