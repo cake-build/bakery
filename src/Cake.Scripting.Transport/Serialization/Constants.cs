@@ -9,7 +9,7 @@ namespace Cake.Scripting.Transport.Serialization
         public static class CakeScript
         {
             public static readonly byte TypeId = 0x00;
-            public static readonly byte Version = 0x00;
+            public static readonly byte Version = 0x01;
             public static readonly short TypeAndVersion = (short)(TypeId << 8 | Version);
         }
 

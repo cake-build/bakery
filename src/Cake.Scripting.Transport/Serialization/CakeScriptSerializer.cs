@@ -34,8 +34,6 @@ namespace Cake.Scripting.Transport.Serialization
             var bytes = Zip(script.Source);
             writer.Write(bytes.Length);
             writer.Write(bytes);
-            // TODO: Support non-zipped as well
-            // writer.WriteString(script.Source);
 
             // References
             writer.Write(script.References.Count);
@@ -76,8 +74,6 @@ namespace Cake.Scripting.Transport.Serialization
             var bytesLength = reader.ReadInt32();
             var bytes = reader.ReadBytes(bytesLength);
             cakeScript.Source = Unzip(bytes);
-            // TODO: Support non-zipped as well
-            // cakeScript.Source = reader.ReadString();
 
             // References
             var referencesLength = reader.ReadInt32();
