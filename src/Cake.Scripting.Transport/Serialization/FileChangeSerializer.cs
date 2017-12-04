@@ -10,7 +10,7 @@ namespace Cake.Scripting.Transport.Serialization
 {
     internal static class FileChangeSerializer
     {
-        public static void Serialize(BinaryWriter writer, FileChange fileChange)
+        public static void Serialize(BinaryWriter writer, FileChange fileChange, byte version)
         {
             if (writer == null)
             {
@@ -22,7 +22,7 @@ namespace Cake.Scripting.Transport.Serialization
             }
 
             // Type and Version
-            writer.Write(Constants.FileChange.TypeAndVersion);
+            writer.Write(Constants.FileChange.WithVersion(version));
 
             // From disk
             writer.Write(fileChange.FromDisk);
@@ -47,7 +47,7 @@ namespace Cake.Scripting.Transport.Serialization
             }
         }
 
-        public static FileChange Deserialize(BinaryReader reader)
+        public static FileChange Deserialize(BinaryReader reader, out byte version)
         {
             if (reader == null)
             {
@@ -56,9 +56,18 @@ namespace Cake.Scripting.Transport.Serialization
 
             // TypeId and Version
             var typeAndVersion = reader.ReadInt16();
+            version = (byte)(typeAndVersion & 0x00FF);
             if (typeAndVersion != Constants.FileChange.TypeAndVersion)
             {
-                throw new InvalidOperationException("Type and version does not match");
+                var type = (byte)((typeAndVersion & 0xFF00) >> 8);
+                if (type != Constants.FileChange.TypeId)
+                {
+                    throw new InvalidOperationException($"Unsupported type: {type}");
+                }
+                if (version > Constants.Protocol.Latest)
+                {
+                    throw new InvalidOperationException($"Unsupported version: {version}");
+                }
             }
 
             var fileChange = new FileChange();

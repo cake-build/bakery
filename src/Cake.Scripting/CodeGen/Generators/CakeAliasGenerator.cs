@@ -3,37 +3,35 @@
 // See the LICENSE file in the project root for more information.
 
 using System.IO;
-using System.Text;
-using System.Xml.Linq;
+using Cake.Core.Scripting;
+using Cake.Scripting.Reflection.Emitters;
 
 namespace Cake.Scripting.CodeGen.Generators
 {
-    public abstract class CakeAliasGenerator
+    public class CakeAliasGenerator : ICakeAliasGenerator
     {
-        public abstract void Generate(TextWriter writer, CakeScriptAlias alias);
+        private readonly CakeMethodAliasGenerator _methodGenerator;
+        private readonly CakePropertyAliasGenerator _propertyGenerator;
 
-        protected void WriteDocs(TextWriter writer, XElement element)
+        public CakeAliasGenerator()
         {
-            if (element != null)
-            {
-                var builder = new StringBuilder();
-                foreach (var xmlDoc in element.Elements())
-                {
-                    builder.AppendLine($"/// {xmlDoc.ToString().Replace("\n", "\n///")}");
-                }
-                writer.Write(builder.ToString());
-            }
+            var typeEmitter = new TypeEmitter();
+            var parameterEmitter = new ParameterEmitter(typeEmitter);
+
+            _methodGenerator = new CakeMethodAliasGenerator(typeEmitter, parameterEmitter);
+            _propertyGenerator = new CakePropertyAliasGenerator(typeEmitter);
         }
 
-        protected static string GetObsoleteMessage(CakeScriptAlias alias)
+        public void Generate(TextWriter writer, CakeScriptAlias alias)
         {
-            var message = string.Concat(" ", alias.Obsolete.Message ?? string.Empty).TrimEnd();
-            if (string.IsNullOrWhiteSpace(message))
+            if (alias.Type == ScriptAliasType.Method)
             {
-                message = string.Empty;
+                _methodGenerator.Generate(writer, alias);
             }
-            message = $"The alias {alias.Method.Name} has been made obsolete.{message}";
-            return message;
+            else
+            {
+                _propertyGenerator.Generate(writer, alias);
+            }
         }
     }
 }

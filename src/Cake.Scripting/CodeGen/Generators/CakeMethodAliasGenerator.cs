@@ -6,10 +6,11 @@ using System;
 using System.IO;
 using System.Linq;
 using Cake.Scripting.Reflection.Emitters;
+using static Cake.Scripting.CodeGen.Generators.CakeAliasGenerationHelper;
 
 namespace Cake.Scripting.CodeGen.Generators
 {
-    public sealed class CakeMethodAliasGenerator : CakeAliasGenerator
+    public sealed class CakeMethodAliasGenerator : ICakeAliasGenerator
     {
         private readonly TypeEmitter _typeEmitter;
         private readonly ParameterEmitter _parameterEmitter;
@@ -20,8 +21,13 @@ namespace Cake.Scripting.CodeGen.Generators
             _parameterEmitter = parameterEmitter ?? throw new ArgumentNullException(nameof(parameterEmitter));
         }
 
-        public override void Generate(TextWriter writer, CakeScriptAlias alias)
+        public void Generate(TextWriter writer, CakeScriptAlias alias)
         {
+            if (alias == null)
+            {
+                throw new ArgumentNullException(nameof(alias));
+            }
+
             Generate(new IndentedTextWriter(writer), alias);
         }
 

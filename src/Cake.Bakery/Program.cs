@@ -83,10 +83,11 @@ namespace Cake.Bakery
                 var environment = container.Resolve<ICakeEnvironment>();
                 var aliasFinder = container.Resolve<IScriptAliasFinder>();
                 var processor = container.Resolve<Core.Scripting.IScriptProcessor>();
+                var aliasGenerator = container.Resolve<ICakeAliasGenerator>();
 
                 // Rebuild the container for Cached Alias Finder.
                 registrar = new ContainerRegistrar();
-                registrar.RegisterModule(new CacheModule(aliasFinder, processor, environment));
+                registrar.RegisterModule(new CacheModule(aliasFinder, processor, environment, aliasGenerator));
                 registrar.Builder.Update(container);
 
                 // Get Script generator.

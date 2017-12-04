@@ -27,7 +27,7 @@ namespace Cake.Scripting.Transport.Tests.Unit.Serialization
             public void ShouldThrowIfWriterIsNull()
             {
                 // Given, When
-                var exception = Record.Exception(() => FileChangeSerializer.Serialize(null, FileChange.Empty)) as ArgumentNullException;
+                var exception = Record.Exception(() => FileChangeSerializer.Serialize(null, FileChange.Empty, Constants.Protocol.Latest)) as ArgumentNullException;
 
                 // Then
                 Assert.NotNull(exception);
@@ -38,7 +38,7 @@ namespace Cake.Scripting.Transport.Tests.Unit.Serialization
             public void ShouldThrowIfCakeScriptIsNull()
             {
                 // Given, When
-                var exception = Record.Exception(() => FileChangeSerializer.Serialize(_fixture.Writer, null)) as ArgumentNullException;
+                var exception = Record.Exception(() => FileChangeSerializer.Serialize(_fixture.Writer, null, Constants.Protocol.Latest)) as ArgumentNullException;
 
                 // Then
                 Assert.NotNull(exception);
@@ -98,12 +98,13 @@ namespace Cake.Scripting.Transport.Tests.Unit.Serialization
                 });
 
                 // When
-                FileChangeSerializer.Serialize(_fixture.Writer, expected);
+                FileChangeSerializer.Serialize(_fixture.Writer, expected, Constants.Protocol.Latest);
                 _fixture.ResetStreamPosition();
-                var actual = FileChangeSerializer.Deserialize(_fixture.Reader);
+                var actual = FileChangeSerializer.Deserialize(_fixture.Reader, out var version);
 
                 // Then
                 Assert.NotNull(actual);
+                Assert.Equal(Constants.Protocol.V2, version);
                 Assert.Equal(expected.Buffer, actual.Buffer);
                 Assert.Equal(expected.FileName, actual.FileName);
                 Assert.Equal(expected.FromDisk, actual.FromDisk);
@@ -134,15 +135,49 @@ namespace Cake.Scripting.Transport.Tests.Unit.Serialization
                 });
 
                 // When
-                FileChangeSerializer.Serialize(_fixture.Writer, expected);
+                FileChangeSerializer.Serialize(_fixture.Writer, expected, Constants.Protocol.Latest);
                 _fixture.ResetStreamPosition();
-                var actual = FileChangeSerializer.Deserialize(_fixture.Reader);
+                var actual = FileChangeSerializer.Deserialize(_fixture.Reader, out var version);
 
                 // Then
                 Assert.NotNull(actual);
+                Assert.Equal(Constants.Protocol.V2, version);
                 Assert.Equal(expected.LineChanges.ElementAt(0), actual.LineChanges.ElementAt(0));
                 Assert.Equal(new LineChange { NewText = string.Empty }, actual.LineChanges.ElementAt(1));
                 Assert.Equal(expected.LineChanges.ElementAt(2), actual.LineChanges.ElementAt(2));
+            }
+
+            [Fact]
+            public void ShouldSerializeProtocolV1()
+            {
+                // Given
+                var expected = new FileChange
+                {
+                    Buffer = "buffer",
+                    FileName = "fileName",
+                    FromDisk = true
+                };
+                expected.LineChanges.Add(new LineChange
+                {
+                    StartColumn = 1,
+                    EndColumn = 2,
+                    StartLine = 3,
+                    EndLine = 4,
+                    NewText = "5"
+                });
+
+                // When
+                FileChangeSerializer.Serialize(_fixture.Writer, expected, Constants.Protocol.V1);
+                _fixture.ResetStreamPosition();
+                var actual = FileChangeSerializer.Deserialize(_fixture.Reader, out var version);
+
+                // Then
+                Assert.NotNull(actual);
+                Assert.Equal(Constants.Protocol.V1, version);
+                Assert.Equal(expected.Buffer, actual.Buffer);
+                Assert.Equal(expected.FileName, actual.FileName);
+                Assert.Equal(expected.FromDisk, actual.FromDisk);
+                Assert.Equal(expected.LineChanges, actual.LineChanges);
             }
         }
     }

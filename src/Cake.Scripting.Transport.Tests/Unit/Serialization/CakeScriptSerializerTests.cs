@@ -26,7 +26,7 @@ namespace Cake.Scripting.Transport.Tests.Unit.Serialization
             public void ShouldThrowIfWriterIsNull()
             {
                 // Given, When
-                var exception = Record.Exception(() => CakeScriptSerializer.Serialize(null, CakeScript.Empty)) as ArgumentNullException;
+                var exception = Record.Exception(() => CakeScriptSerializer.Serialize(null, CakeScript.Empty, Constants.Protocol.Latest)) as ArgumentNullException;
 
                 // Then
                 Assert.NotNull(exception);
@@ -37,7 +37,7 @@ namespace Cake.Scripting.Transport.Tests.Unit.Serialization
             public void ShouldThrowIfCakeScriptIsNull()
             {
                 // Given, When
-                var exception = Record.Exception(() => CakeScriptSerializer.Serialize(_fixture.Writer, null)) as ArgumentNullException;
+                var exception = Record.Exception(() => CakeScriptSerializer.Serialize(_fixture.Writer, null, Constants.Protocol.Latest)) as ArgumentNullException;
 
                 // Then
                 Assert.NotNull(exception);
@@ -86,7 +86,7 @@ namespace Cake.Scripting.Transport.Tests.Unit.Serialization
                 var expected = _fixture.CreateCakeScriptFromResource(resource, 0, 0);
 
                 // When
-                CakeScriptSerializer.Serialize(_fixture.Writer, expected);
+                CakeScriptSerializer.Serialize(_fixture.Writer, expected, Constants.Protocol.Latest);
                 _fixture.ResetStreamPosition();
                 var actual = CakeScriptSerializer.Deserialize(_fixture.Reader);
 
