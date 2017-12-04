@@ -12,7 +12,7 @@ namespace Cake.Scripting.Transport.Serialization
 {
     internal static class CakeScriptSerializer
     {
-        public static void Serialize(BinaryWriter writer, CakeScript script)
+        public static void Serialize(BinaryWriter writer, CakeScript script, byte version)
         {
             if (writer == null)
             {
@@ -22,18 +22,31 @@ namespace Cake.Scripting.Transport.Serialization
             {
                 throw new ArgumentNullException(nameof(script));
             }
+            if (version > Constants.Protocol.Latest)
+            {
+                throw new ArgumentOutOfRangeException(nameof(version));
+            }
 
             // Type and Version
-            writer.Write(Constants.CakeScript.TypeAndVersion);
+            writer.Write(Constants.CakeScript.WithVersion(version));
 
             // Host object
             writer.WriteString(script.Host.TypeName);
             writer.WriteString(script.Host.AssemblyPath);
 
             // Source
-            var bytes = Zip(script.Source);
-            writer.Write(bytes.Length);
-            writer.Write(bytes);
+            if (version == Constants.Protocol.V2)
+            {
+                // V2 compress source
+                var bytes = Zip(script.Source);
+                writer.Write(bytes.Length);
+                writer.Write(bytes);
+            }
+            else
+            {
+                // V1 source as string
+                writer.Write(script.Source);
+            }
 
             // References
             writer.Write(script.References.Count);
@@ -61,7 +74,7 @@ namespace Cake.Scripting.Transport.Serialization
             var typeAndVersion = reader.ReadInt16();
             if (typeAndVersion != Constants.CakeScript.TypeAndVersion)
             {
-                throw new InvalidOperationException("Type and version does not match");
+                throw new InvalidOperationException($"Unsupported type or version: {typeAndVersion}");
             }
 
             var cakeScript = new CakeScript();
