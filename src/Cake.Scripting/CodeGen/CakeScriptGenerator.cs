@@ -112,7 +112,10 @@ namespace Cake.Scripting.CodeGen
             var aliases = new List<CakeScriptAlias>();
             foreach (var reference in references)
             {
-                aliases.AddRange(_aliasFinder.FindAliases(reference));
+                if (_fileSystem.Exist(reference))
+                {
+                    aliases.AddRange(_aliasFinder.FindAliases(reference));
+                }
             }
 
             // Import all namespaces.
