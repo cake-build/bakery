@@ -70,7 +70,7 @@ namespace Cake.Scripting.Transport.Tcp.Server
 
                         // Request
                         _logger.LogDebug("Received reqeust from client");
-                        var fileChange = FileChangeSerializer.Deserialize(reader);
+                        var fileChange = FileChangeSerializer.Deserialize(reader, out var version);
                         var cakeScript = CakeScript.Empty;
 
                         try
@@ -84,7 +84,7 @@ namespace Cake.Scripting.Transport.Tcp.Server
 
                         // Response
                         _logger.LogDebug("Sending response to client");
-                        CakeScriptSerializer.Serialize(writer, cakeScript);
+                        CakeScriptSerializer.Serialize(writer, cakeScript, version);
                         writer.Flush();
                     }
                 }

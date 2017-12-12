@@ -56,7 +56,7 @@ namespace Cake.Scripting.Transport.Tcp.Client
             {
                 // Send
                 _logger.LogDebug("Sending request to server");
-                FileChangeSerializer.Serialize(_writer, fileChange);
+                FileChangeSerializer.Serialize(_writer, fileChange, Constants.Protocol.Latest);
                 _writer.Flush();
 
                 while (!_stream.DataAvailable)

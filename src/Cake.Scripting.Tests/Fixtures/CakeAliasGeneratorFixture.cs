@@ -15,7 +15,7 @@ using Cake.Scripting.Tests;
 namespace Cake.Scripting.Tests.Fixtures
 {
     public abstract class CakeAliasGeneratorFixture<T>
-        where T : CakeAliasGenerator
+        where T : ICakeAliasGenerator
     {
         private readonly Assembly _assembly;
         private readonly T _generator;

@@ -110,13 +110,20 @@ Task("Run-Bakery-Integration-Tests")
 
 Task("Sign-Binaries")
     .IsDependentOn("Package")
-    .WithCriteria(() => BuildParameters.ShouldPublishNuGet)
+    .WithCriteria(() => BuildParameters.ShouldPublishNuGet ||
+        string.Equals(EnvironmentVariable("SIGNING_TEST"), "true", StringComparison.OrdinalIgnoreCase))
     .Does(() =>
 {
     // Get the secret.
     var secret = EnvironmentVariable("SIGNING_SECRET");
     if(string.IsNullOrWhiteSpace(secret)) {
         throw new InvalidOperationException("Could not resolve signing secret.");
+    }
+
+    // Get the user.
+    var user = EnvironmentVariable("SIGNING_USER");
+    if(string.IsNullOrWhiteSpace(user)) {
+        throw new InvalidOperationException("Could not resolve signing user.");
     }
 
     // Resolve dotnet and version
@@ -151,7 +158,7 @@ Task("Sign-Binaries")
             .AppendSwitchQuoted("-i", MakeAbsolute(file).FullPath)
             .AppendSwitchQuoted("-f", MakeAbsolute(filter).FullPath)
             .AppendSwitchQuotedSecret("-s", secret)
-            .AppendSwitchQuoted("-h", "dual")
+            .AppendSwitchQuotedSecret("-r", user)
             .AppendSwitchQuoted("-n", "Cake")
             .AppendSwitchQuoted("-d", "Cake (C# Make) is a cross platform build automation system.")
             .AppendSwitchQuoted("-u", "https://cakebuild.net");

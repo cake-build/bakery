@@ -6,18 +6,28 @@ namespace Cake.Scripting.Transport.Serialization
 {
     internal static class Constants
     {
+        public static class Protocol
+        {
+            public static readonly byte V1 = 0x00;
+            public static readonly byte V2 = 0x01;
+
+            public static byte Latest => V2;
+        }
+
         public static class CakeScript
         {
             public static readonly byte TypeId = 0x00;
-            public static readonly byte Version = 0x00;
-            public static readonly short TypeAndVersion = (short)(TypeId << 8 | Version);
+            public static readonly short TypeAndVersion = WithVersion(Protocol.Latest);
+
+            public static short WithVersion(byte version) => (short)(TypeId << 8 | version);
         }
 
         public static class FileChange
         {
             public static readonly byte TypeId = 0x01;
-            public static readonly byte Version = 0x00;
-            public static readonly short TypeAndVersion = (short)(TypeId << 8 | Version);
+            public static readonly short TypeAndVersion = WithVersion(Protocol.Latest);
+
+            public static short WithVersion(byte version) => (short)(TypeId << 8 | version);
         }
     }
 }
