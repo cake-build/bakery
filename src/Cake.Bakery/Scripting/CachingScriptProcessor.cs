@@ -41,6 +41,11 @@ namespace Cake.Bakery.Scripting
             return filePaths;
         }
 
+        public void InstallModules(IReadOnlyCollection<PackageReference> modules, DirectoryPath installPath)
+        {
+            // TODO: Figure if we need to do this.
+        }
+
         public void InstallTools(IReadOnlyCollection<PackageReference> tools, DirectoryPath installPath)
         {
             // We don't need to actually install tools with bakery.
