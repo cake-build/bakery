@@ -25,6 +25,7 @@ ToolSettings.SetToolSettings(context: Context,
                             testCoverageExcludeByFile: "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs");
 
 var binArtifactPath = BuildParameters.Paths.Directories.PublishedApplications.Combine("Cake.Bakery/net461");
+var zipArtifactsPath = BuildParameters.Paths.Directories.Build.Combine("Packages/Zip");
 
 Task("Copy-License")
     .IsDependentOn("DotNetCore-Build")
@@ -33,6 +34,53 @@ Task("Copy-License")
 {
     // Copy license
     CopyFileToDirectory("./LICENSE", binArtifactPath);
+});
+
+Task("Zip-Files")
+    .IsDependentOn("Copy-License")
+    .IsDependeeOf("Package")
+    .Does(() =>
+{
+    CleanDirectory(zipArtifactsPath);
+    Zip(binArtifactPath, zipArtifactsPath.CombineWithFilePath($"Cake.Bakery.{BuildParameters.Version.SemVersion}.zip"));
+});
+
+Task("Upload-AppVeyor-Artifacts-Zip")
+    .IsDependentOn("Package")
+    .IsDependeeOf("Upload-AppVeyor-Artifacts")
+    .WithCriteria(() => BuildParameters.IsRunningOnAppVeyor)
+    .Does(() =>
+{
+    foreach(var package in GetFiles(zipArtifactsPath + "/*"))
+    {
+        AppVeyor.UploadArtifact(package);
+    }
+});
+
+Task("Publish-GitHub-Release-Zip")
+    .IsDependentOn("Package")
+    .IsDependentOn("Zip-Files")
+    .IsDependeeOf("Publish-GitHub-Release")
+    .WithCriteria(() => BuildParameters.ShouldPublishGitHub)
+    .Does(() => RequireTool(GitReleaseManagerTool, () => {
+        if(BuildParameters.CanUseGitReleaseManager)
+        {
+            foreach(var package in GetFiles(zipArtifactsPath + "/*"))
+            {
+                GitReleaseManagerAddAssets(BuildParameters.GitHub.UserName, BuildParameters.GitHub.Password, BuildParameters.RepositoryOwner, BuildParameters.RepositoryName, BuildParameters.Version.Milestone, package.ToString());
+            }
+        }
+        else
+        {
+            Warning("Unable to use GitReleaseManager, as necessary credentials are not available");
+        }
+    })
+)
+.OnError(exception =>
+{
+    Error(exception.Message);
+    Information("Publish-GitHub-Release Task failed, but continuing with next Task...");
+    publishingError = true;
 });
 
 // Override default Pack task
@@ -97,6 +145,8 @@ Task("Init-Integration-Tests")
 
 Task("Run-Bakery-Integration-Tests")
     .IsDependentOn("Init-Integration-Tests")
+    .IsDependeeOf("AppVeyor")
+    .IsDependeeOf("Default")
     .Does(() =>
 {
     CakeExecuteScript("./tests/integration/tests.cake", new CakeSettings {
@@ -110,6 +160,12 @@ Task("Run-Bakery-Integration-Tests")
 
 Task("Sign-Binaries")
     .IsDependentOn("Package")
+    .IsDependeeOf("Upload-AppVeyor-Artifacts-Zip")
+    .IsDependeeOf("Upload-AppVeyor-Artifacts")
+    .IsDependeeOf("Publish-MyGet-Packages")
+    .IsDependeeOf("Publish-Nuget-Packages")
+    .IsDependeeOf("Publish-GitHub-Release-Zip")
+    .IsDependeeOf("Publish-GitHub-Release")
     .WithCriteria(() => BuildParameters.ShouldPublishNuGet ||
         string.Equals(EnvironmentVariable("SIGNING_TEST"), "true", StringComparison.OrdinalIgnoreCase))
     .Does(() =>
@@ -144,7 +200,8 @@ Task("Sign-Binaries")
     var filter = File("./signclient.filter");
 
     // Get the files to sign.
-    var files = GetFiles(string.Concat(BuildParameters.Paths.Directories.NuGetPackages, "/", "*.nupkg"));
+    var files = GetFiles(string.Concat(BuildParameters.Paths.Directories.NuGetPackages, "/", "*.nupkg")) +
+                GetFiles(string.Concat(zipArtifactsPath, "/", "*.zip"));
 
     foreach(var file in files)
     {
@@ -172,14 +229,5 @@ Task("Sign-Binaries")
         }
     }
 });
-
-// Hook up integration tests to default and appveyor tasks
-BuildParameters.Tasks.DefaultTask.IsDependentOn("Run-Bakery-Integration-Tests");
-BuildParameters.Tasks.AppVeyorTask.IsDependentOn("Run-Bakery-Integration-Tests");
-
-// Hook up signing task to publish tasks
-BuildParameters.Tasks.PublishNuGetPackagesTask.IsDependentOn("Sign-Binaries");
-BuildParameters.Tasks.UploadAppVeyorArtifactsTask.IsDependentOn("Run-Bakery-Integration-Tests")
-                                                 .IsDependentOn("Sign-Binaries");
 
 Build.RunDotNetCore();
