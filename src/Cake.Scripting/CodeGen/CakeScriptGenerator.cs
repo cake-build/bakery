@@ -6,8 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
+using System.Runtime.Serialization.Json;
 using System.Xml;
 using System.Xml.Linq;
 using Cake.Core;
@@ -38,6 +41,7 @@ namespace Cake.Scripting.CodeGen
         private readonly DirectoryPath _addinRoot;
         private readonly DirectoryPath _cakeRoot;
         private readonly ScriptHost _hostObject;
+        private readonly Lazy<ISet<FilePath>> _defaultReferences;
 
         public CakeScriptGenerator(
             IBufferedFileSystem fileSystem,
@@ -63,6 +67,7 @@ namespace Cake.Scripting.CodeGen
             _addinRoot = GetAddinPath(_environment.WorkingDirectory);
             _cakeRoot = GetCakePath(GetToolPath(_environment.WorkingDirectory));
             _hostObject = GetHostObject(_cakeRoot);
+            _defaultReferences = new Lazy<ISet<FilePath>>(() => GetDefaultReferences(_cakeRoot));
         }
 
         public CakeScript Generate(FileChange fileChange)
@@ -104,7 +109,7 @@ namespace Cake.Scripting.CodeGen
 
             // Load all references.
             _log.Verbose("Adding references...");
-            var references = new HashSet<FilePath>(GetDefaultReferences(_cakeRoot));
+            var references = new HashSet<FilePath>(_defaultReferences.Value);
             references.AddRange(result.References.Select(r => new FilePath(r)));
 
             // Find aliases
@@ -176,8 +181,7 @@ namespace Cake.Scripting.CodeGen
             };
         }
 
-        // TODO: Move to conventions
-        private IEnumerable<FilePath> GetDefaultReferences(DirectoryPath root)
+        private ISet<FilePath> GetDefaultReferences(DirectoryPath root)
         {
             // Prepare the default assemblies.
             var references = new HashSet<FilePath>();
@@ -191,6 +195,10 @@ namespace Cake.Scripting.CodeGen
             references.Add(typeof(XmlReader).GetTypeInfo().Assembly.Location); // System.Xml
             references.Add(typeof(XDocument).GetTypeInfo().Assembly.Location); // System.Xml.Linq
             references.Add(typeof(DataTable).GetTypeInfo().Assembly.Location); // System.Data
+            references.Add(typeof(ZipArchive).GetTypeInfo().Assembly.Location); // System.IO.Compression
+            references.Add(typeof(ZipFile).GetTypeInfo().Assembly.Location); // System.IO.Compression.FileSystem
+            references.Add(typeof(HttpClient).GetTypeInfo().Assembly.Location); // System.Net.Http
+            references.Add(typeof(DataContractJsonSerializer).GetTypeInfo().Assembly.Location); // System.Runtime.Serialization
 
             // Return the assemblies.
             return references;
