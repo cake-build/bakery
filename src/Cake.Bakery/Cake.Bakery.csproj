@@ -11,8 +11,8 @@
   </PropertyGroup>
   <Import Project="..\Shared.props" />
   <ItemGroup>
-    <PackageReference Include="Cake.Core" Version="0.24.0-alpha0061" />
-    <PackageReference Include="Cake.NuGet" Version="0.24.0-alpha0061" />
+    <PackageReference Include="Cake.Core" Version="0.25.0" />
+    <PackageReference Include="Cake.NuGet" Version="0.25.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
