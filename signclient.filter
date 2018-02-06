@@ -4,3 +4,7 @@ tools/Cake.Bakery.exe
 tools/Cake.Scripting.Abstractions.dll
 tools/Cake.Scripting.dll
 tools/Cake.Scripting.Transport.dll
+Cake.Bakery.exe
+Cake.Scripting.Abstractions.dll
+Cake.Scripting.dll
+Cake.Scripting.Transport.dll
