@@ -1,6 +1,6 @@
 // Tools
 #tool "nuget:?package=Cake.Bakery&prerelease"
-#tool "nuget:https://api.nuget.org/v3/index.json?package=Cake&version=0.23.0"
+#tool "nuget:https://api.nuget.org/v3/index.json?package=Cake&version=0.26.0"
 
 // Addins
 #addin "nuget:https://api.nuget.org/v3/index.json?package=xunit.assert&version=2.2.0"
