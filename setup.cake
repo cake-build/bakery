@@ -271,6 +271,21 @@ BuildParameters.Tasks.DotNetCorePackTask
     .IsDependentOn("Copy-License")
     .Does(() =>
 {
+    var msBuildSettings = new DotNetCoreMSBuildSettings()
+                                .WithProperty("Version", BuildParameters.Version.SemVersion)
+                                .WithProperty("AssemblyVersion", BuildParameters.Version.Version)
+                                .WithProperty("FileVersion",  BuildParameters.Version.Version)
+                                .WithProperty("AssemblyInformationalVersion", BuildParameters.Version.InformationalVersion);
+
+    if(!IsRunningOnWindows())
+    {
+        var frameworkPathOverride = new FilePath(typeof(object).Assembly.Location).GetDirectory().FullPath + "/";
+
+        // Use FrameworkPathOverride when not running on Windows.
+        Information("Build will use FrameworkPathOverride={0} since not building on Windows.", frameworkPathOverride);
+        msBuildSettings.WithProperty("FrameworkPathOverride", frameworkPathOverride);
+    }
+
     var projects = GetFiles(BuildParameters.SourceDirectoryPath + "/**/*.csproj");
     foreach(var project in projects)
     {
@@ -284,11 +299,7 @@ BuildParameters.Tasks.DotNetCorePackTask
             NoBuild = true,
             Configuration = BuildParameters.Configuration,
             OutputDirectory = BuildParameters.Paths.Directories.NuGetPackages,
-            ArgumentCustomization = args => args
-                .Append("/p:Version={0}", BuildParameters.Version.SemVersion)
-                .Append("/p:AssemblyVersion={0}", BuildParameters.Version.Version)
-                .Append("/p:FileVersion={0}", BuildParameters.Version.Version)
-                .Append("/p:AssemblyInformationalVersion={0}", BuildParameters.Version.InformationalVersion)
+            MSBuildSettings = msBuildSettings
         });
     }
 
