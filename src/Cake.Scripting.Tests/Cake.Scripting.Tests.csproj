@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>net46</TargetFrameworks>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <IsCakeTestProject>true</IsCakeTestProject>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -108,9 +110,10 @@
     <PackageReference Include="Cake.Core" Version="0.26.0" />
     <PackageReference Include="Cake.Testing" Version="0.26.0" />
     <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    <PackageReference Include="xunit" Version="2.2.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
+    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
 
   <ItemGroup>
