@@ -6,9 +6,11 @@ Cake server for code generation and script analysis
 
 ## Build Status
 
-|Develop|Master|
-|:--:|:--:|
-|[![Build status](https://ci.appveyor.com/api/projects/status/ayjo26v8rbhp2eqt/branch/develop?svg=true)](https://ci.appveyor.com/project/cakebuild/bakery/branch/develop)|[![Build status](https://ci.appveyor.com/api/projects/status/ayjo26v8rbhp2eqt/branch/develop?svg=true)](https://ci.appveyor.com/project/cakebuild/bakery/branch/master)|
+|Build server|Platform|Develop|Master|
+|:--:|:--:|:--:|:--:|
+|AppVeyor|Windows|[![Build status](https://ci.appveyor.com/api/projects/status/ayjo26v8rbhp2eqt/branch/develop?svg=true)](https://ci.appveyor.com/project/cakebuild/bakery/branch/develop)|[![Build status](https://ci.appveyor.com/api/projects/status/ayjo26v8rbhp2eqt/branch/develop?svg=true)](https://ci.appveyor.com/project/cakebuild/bakery/branch/master)|
+|Bitrise|OS X|[![Build Status](https://www.bitrise.io/app/000857f04ffa750e/status.svg?token=B72wRhe84cgWLCI5k_dgNw&branch=develop)](https://www.bitrise.io/app/000857f04ffa750e)|[![Build Status](https://www.bitrise.io/app/000857f04ffa750e/status.svg?token=B72wRhe84cgWLCI5k_dgNw&branch=master)](https://www.bitrise.io/app/000857f04ffa750e)|
+|Bitrise|Linux|[![Build Status](https://www.bitrise.io/app/704fc45fd74ac20f/status.svg?token=TnnmPBUFK5KISi5WhME5MQ&branch=develop)](https://www.bitrise.io/app/704fc45fd74ac20f)|[![Build Status](https://www.bitrise.io/app/704fc45fd74ac20f/status.svg?token=TnnmPBUFK5KISi5WhME5MQ&branch=master)](https://www.bitrise.io/app/704fc45fd74ac20f)|
 
 ## Code of Conduct
 
