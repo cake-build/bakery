@@ -1,4 +1,5 @@
 # Bakery
+[![NuGet](https://img.shields.io/nuget/v/Cake.Bakery.svg)](https://www.nuget.org/packages/Cake.Bakery)
 [![MyGet](https://img.shields.io/myget/cake/vpre/Cake.Bakery.svg?label=myget)](https://www.myget.org/gallery/cake)
 
 Cake server for code generation and script analysis
