@@ -1,4 +1,4 @@
-#load nuget:https://www.myget.org/F/cake-contrib/api/v3/index.json?package=Cake.Recipe&version=0.3.0-unstable0342&prerelease
+#load nuget:https://www.myget.org/F/cake-contrib/api/v3/index.json?package=Cake.Recipe&version=0.3.0-unstable0362&prerelease
 #tool nuget:https://api.nuget.org/v3/index.json?package=SignClient&version=0.9.0
 
 Environment.SetVariableNames();
@@ -13,6 +13,7 @@ BuildParameters.SetParameters(context: Context,
                             shouldRunDotNetCorePack: true,
                             shouldRunDupFinder: false,
                             shouldRunCodecov: false,
+                            shouldRunGitVersion: true,
                             nugetConfig: "./src/NuGet.Config");
 
 BuildParameters.PrintParameters(Context);
@@ -155,7 +156,7 @@ BuildParameters.Tasks.DotNetCoreBuildTask
 
             // If .NET Core project, copy using dotnet publish for each target framework
             // Otherwise just copy
-            if(parsedProject.IsNetCore)
+            if(parsedProject.IsVS2017ProjectFormat)
             {
                 foreach(var targetFramework in parsedProject.NetCore.TargetFrameworks)
                 {
