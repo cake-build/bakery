@@ -12,13 +12,17 @@ namespace Cake.Scripting.Tests.Fixtures
 {
     public sealed class BufferedFileSystemFixture
     {
+        private static bool IsWindows => System.IO.Path.DirectorySeparatorChar == '\\';
+
         public IFileSystem FileSystem { get; set; }
 
         public ICakeLog Log { get; set; }
 
         public BufferedFileSystemFixture()
         {
-            FileSystem = new FakeFileSystem(FakeEnvironment.CreateWindowsEnvironment());
+            FileSystem = new FakeFileSystem(IsWindows ?
+                FakeEnvironment.CreateWindowsEnvironment() :
+                FakeEnvironment.CreateUnixEnvironment());
             Log = new FakeLog();
         }
 

@@ -72,7 +72,7 @@ namespace Cake.Scripting.Tests.Fixtures
                 _generator.Generate(writer, alias);
 
                 // Return the generated code.
-                return writer.ToString();
+                return writer.ToString().NormalizeGeneratedCode();
             }
         }
     }

@@ -4,6 +4,8 @@
 
 // Addins
 #addin "nuget:https://api.nuget.org/v3/index.json?package=xunit.assert&version=2.2.0"
+#addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Primitives&version=1.1.0"
+#addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.DependencyInjection.Abstractions&version=1.1.0"
 #addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Logging&version=1.1.0"
 #addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Logging.Console&version=1.1.0"
 #addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Logging.Abstractions&version=1.1.0"

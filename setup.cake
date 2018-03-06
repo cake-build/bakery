@@ -1,4 +1,4 @@
-#load nuget:https://www.myget.org/F/cake-contrib/api/v3/index.json?package=Cake.Recipe&version=0.3.0-unstable0342&prerelease
+#load nuget:https://www.myget.org/F/cake-contrib/api/v3/index.json?package=Cake.Recipe&version=0.3.0-unstable0368&prerelease
 #tool nuget:https://api.nuget.org/v3/index.json?package=SignClient&version=0.9.0
 
 Environment.SetVariableNames();
@@ -13,6 +13,7 @@ BuildParameters.SetParameters(context: Context,
                             shouldRunDotNetCorePack: true,
                             shouldRunDupFinder: false,
                             shouldRunCodecov: false,
+                            shouldRunGitVersion: true,
                             nugetConfig: "./src/NuGet.Config");
 
 BuildParameters.PrintParameters(Context);
@@ -89,6 +90,21 @@ BuildParameters.Tasks.DotNetCorePackTask
     .IsDependentOn("Copy-License")
     .Does(() =>
 {
+    var msBuildSettings = new DotNetCoreMSBuildSettings()
+                                .WithProperty("Version", BuildParameters.Version.SemVersion)
+                                .WithProperty("AssemblyVersion", BuildParameters.Version.Version)
+                                .WithProperty("FileVersion",  BuildParameters.Version.Version)
+                                .WithProperty("AssemblyInformationalVersion", BuildParameters.Version.InformationalVersion);
+
+    if(!IsRunningOnWindows())
+    {
+        var frameworkPathOverride = new FilePath(typeof(object).Assembly.Location).GetDirectory().FullPath + "/";
+
+        // Use FrameworkPathOverride when not running on Windows.
+        Information("Build will use FrameworkPathOverride={0} since not building on Windows.", frameworkPathOverride);
+        msBuildSettings.WithProperty("FrameworkPathOverride", frameworkPathOverride);
+    }
+
     var projects = GetFiles(BuildParameters.SourceDirectoryPath + "/**/*.csproj");
     foreach(var project in projects)
     {
@@ -102,11 +118,7 @@ BuildParameters.Tasks.DotNetCorePackTask
             NoBuild = true,
             Configuration = BuildParameters.Configuration,
             OutputDirectory = BuildParameters.Paths.Directories.NuGetPackages,
-            ArgumentCustomization = args => args
-                .Append("/p:Version={0}", BuildParameters.Version.SemVersion)
-                .Append("/p:AssemblyVersion={0}", BuildParameters.Version.Version)
-                .Append("/p:FileVersion={0}", BuildParameters.Version.Version)
-                .Append("/p:AssemblyInformationalVersion={0}", BuildParameters.Version.InformationalVersion)
+            MSBuildSettings = msBuildSettings
         });
     }
 
