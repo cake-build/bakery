@@ -27,6 +27,11 @@ ToolSettings.SetToolSettings(context: Context,
 
 var binArtifactPath = BuildParameters.Paths.Directories.PublishedApplications.Combine("Cake.Bakery/net461");
 var zipArtifactsPath = BuildParameters.Paths.Directories.Build.Combine("Packages/Zip");
+var omnisharpBaseDownloadURL = "https://omnisharpdownload.blob.core.windows.net/ext";
+var omnisharpMonoRuntimeMacOS = $"{omnisharpBaseDownloadURL}/mono.osx-5.12.0.226.zip";
+var omnisharpMonoRuntimeLinux32= $"{omnisharpBaseDownloadURL}/mono.linux-x86-5.12.0.226.zip";
+var omnisharpMonoRuntimeLinux64= $"{omnisharpBaseDownloadURL}/mono.linux-x86_64-5.12.0.226.zip";
+var omnisharpMonoFramework = $"{omnisharpBaseDownloadURL}/framework-5.12.0.226.zip";
 
 Task("Copy-License")
     .IsDependentOn("DotNetCore-Build")
@@ -155,19 +160,71 @@ Task("Init-Integration-Tests")
         "./tests/integration/packages");
 });
 
+Task("Download-Mono-Assets")
+    .WithCriteria(() => !BuildParameters.IsRunningOnWindows)
+    .Does(() => 
+{
+    CleanDirectories(new [] {
+        "./tests/integration/mono",
+        "./tests/integration/mono/framework"
+    });
+
+    string downloadUrl = null;
+    switch(Context.Environment.Platform.Family)
+    {
+        case PlatformFamily.OSX:
+            downloadUrl = omnisharpMonoRuntimeMacOS;
+            break;
+        case PlatformFamily.Linux:
+            downloadUrl = Context.Environment.Platform.Is64Bit ?
+                omnisharpMonoRuntimeLinux64 :
+                omnisharpMonoRuntimeLinux32;
+            break;
+        default:
+            break;
+    }
+
+    if (string.IsNullOrEmpty(downloadUrl))
+    {
+        return;
+    }
+
+    var zipFile = DownloadFile(downloadUrl);
+    Unzip(zipFile, "./tests/integration/mono");
+
+    zipFile = DownloadFile(omnisharpMonoFramework);
+    Unzip(zipFile, "./tests/integration/mono/framework");
+
+    StartProcess("chmod", "u+x ./tests/integration/mono/run");
+    var monoExec = GetFiles("./tests/integration/mono/mono.*").First().FullPath;
+    StartProcess("chmod", $"u+x {monoExec}");
+});
+
 Task("Run-Bakery-Integration-Tests")
     .IsDependentOn("Init-Integration-Tests")
+    .IsDependentOn("Download-Mono-Assets")
     .IsDependeeOf("AppVeyor")
     .IsDependeeOf("Default")
     .Does(() =>
 {
-    CakeExecuteScript("./tests/integration/tests.cake", new CakeSettings {
+    var settings = new CakeSettings {
         Verbosity = Context.Log.Verbosity,
         WorkingDirectory = "./tests/integration/",
         Arguments = new Dictionary<string, string> {
             { "NuGet_Source", MakeAbsolute(new DirectoryPath("./tests/integration/packages")).FullPath }
         }
-    });
+    };
+
+    CakeExecuteScript("./tests/integration/tests.cake", settings);
+
+    // If not running on Windows, also run with OmniSharp Mono.
+    if (!BuildParameters.IsRunningOnWindows)
+    {
+        settings.ArgumentCustomization = args => args.Prepend($"--no-omnisharp {MakeAbsolute(Context.Environment.ApplicationRoot).CombineWithFilePath("Cake.exe")}");
+        settings.ToolPath = "./tests/integration/mono/run";
+
+        CakeExecuteScript("./tests/integration/tests.cake", settings);
+    }
 });
 
 Task("Sign-Binaries")

@@ -261,4 +261,5 @@ tools/**
 !tools/packages.config
 BuildArtifacts/
 tests/integration/tools/
+tests/integration/mono/
 .dotnet/
