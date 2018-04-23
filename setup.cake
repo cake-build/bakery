@@ -1,4 +1,4 @@
-#load nuget:https://www.myget.org/F/cake-contrib/api/v3/index.json?package=Cake.Recipe&version=0.3.0-unstable0280&prerelease
+#load nuget:https://www.myget.org/F/cake-contrib/api/v3/index.json?package=Cake.Recipe&version=0.3.0-unstable0368&prerelease
 #tool nuget:https://api.nuget.org/v3/index.json?package=SignClient&version=0.9.0
 
 Environment.SetVariableNames();
@@ -13,6 +13,7 @@ BuildParameters.SetParameters(context: Context,
                             shouldRunDotNetCorePack: true,
                             shouldRunDupFinder: false,
                             shouldRunCodecov: false,
+                            shouldRunGitVersion: true,
                             nugetConfig: "./src/NuGet.Config");
 
 BuildParameters.PrintParameters(Context);
@@ -25,6 +26,7 @@ ToolSettings.SetToolSettings(context: Context,
                             testCoverageExcludeByFile: "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs");
 
 var binArtifactPath = BuildParameters.Paths.Directories.PublishedApplications.Combine("Cake.Bakery/net461");
+var zipArtifactsPath = BuildParameters.Paths.Directories.Build.Combine("Packages/Zip");
 
 Task("Copy-License")
     .IsDependentOn("DotNetCore-Build")
@@ -35,12 +37,74 @@ Task("Copy-License")
     CopyFileToDirectory("./LICENSE", binArtifactPath);
 });
 
+Task("Zip-Files")
+    .IsDependentOn("Copy-License")
+    .IsDependeeOf("Package")
+    .Does(() =>
+{
+    CleanDirectory(zipArtifactsPath);
+    Zip(binArtifactPath, zipArtifactsPath.CombineWithFilePath($"Cake.Bakery.{BuildParameters.Version.SemVersion}.zip"));
+});
+
+Task("Upload-AppVeyor-Artifacts-Zip")
+    .IsDependentOn("Package")
+    .IsDependeeOf("Upload-AppVeyor-Artifacts")
+    .WithCriteria(() => BuildParameters.IsRunningOnAppVeyor)
+    .Does(() =>
+{
+    foreach(var package in GetFiles(zipArtifactsPath + "/*"))
+    {
+        AppVeyor.UploadArtifact(package);
+    }
+});
+
+Task("Publish-GitHub-Release-Zip")
+    .IsDependentOn("Package")
+    .IsDependentOn("Zip-Files")
+    .IsDependeeOf("Publish-GitHub-Release")
+    .WithCriteria(() => BuildParameters.ShouldPublishGitHub)
+    .Does(() => RequireTool(GitReleaseManagerTool, () => {
+        if(BuildParameters.CanUseGitReleaseManager)
+        {
+            foreach(var package in GetFiles(zipArtifactsPath + "/*"))
+            {
+                GitReleaseManagerAddAssets(BuildParameters.GitHub.UserName, BuildParameters.GitHub.Password, BuildParameters.RepositoryOwner, BuildParameters.RepositoryName, BuildParameters.Version.Milestone, package.ToString());
+            }
+        }
+        else
+        {
+            Warning("Unable to use GitReleaseManager, as necessary credentials are not available");
+        }
+    })
+)
+.OnError(exception =>
+{
+    Error(exception.Message);
+    Information("Publish-GitHub-Release Task failed, but continuing with next Task...");
+    publishingError = true;
+});
+
 // Override default Pack task
 BuildParameters.Tasks.DotNetCorePackTask.Task.Actions.Clear();
 BuildParameters.Tasks.DotNetCorePackTask
     .IsDependentOn("Copy-License")
     .Does(() =>
 {
+    var msBuildSettings = new DotNetCoreMSBuildSettings()
+                                .WithProperty("Version", BuildParameters.Version.SemVersion)
+                                .WithProperty("AssemblyVersion", BuildParameters.Version.Version)
+                                .WithProperty("FileVersion",  BuildParameters.Version.Version)
+                                .WithProperty("AssemblyInformationalVersion", BuildParameters.Version.InformationalVersion);
+
+    if(!IsRunningOnWindows())
+    {
+        var frameworkPathOverride = new FilePath(typeof(object).Assembly.Location).GetDirectory().FullPath + "/";
+
+        // Use FrameworkPathOverride when not running on Windows.
+        Information("Build will use FrameworkPathOverride={0} since not building on Windows.", frameworkPathOverride);
+        msBuildSettings.WithProperty("FrameworkPathOverride", frameworkPathOverride);
+    }
+
     var projects = GetFiles(BuildParameters.SourceDirectoryPath + "/**/*.csproj");
     foreach(var project in projects)
     {
@@ -54,11 +118,7 @@ BuildParameters.Tasks.DotNetCorePackTask
             NoBuild = true,
             Configuration = BuildParameters.Configuration,
             OutputDirectory = BuildParameters.Paths.Directories.NuGetPackages,
-            ArgumentCustomization = args => args
-                .Append("/p:Version={0}", BuildParameters.Version.SemVersion)
-                .Append("/p:AssemblyVersion={0}", BuildParameters.Version.Version)
-                .Append("/p:FileVersion={0}", BuildParameters.Version.Version)
-                .Append("/p:AssemblyInformationalVersion={0}", BuildParameters.Version.InformationalVersion)
+            MSBuildSettings = msBuildSettings
         });
     }
 
@@ -97,6 +157,8 @@ Task("Init-Integration-Tests")
 
 Task("Run-Bakery-Integration-Tests")
     .IsDependentOn("Init-Integration-Tests")
+    .IsDependeeOf("AppVeyor")
+    .IsDependeeOf("Default")
     .Does(() =>
 {
     CakeExecuteScript("./tests/integration/tests.cake", new CakeSettings {
@@ -110,6 +172,12 @@ Task("Run-Bakery-Integration-Tests")
 
 Task("Sign-Binaries")
     .IsDependentOn("Package")
+    .IsDependeeOf("Upload-AppVeyor-Artifacts-Zip")
+    .IsDependeeOf("Upload-AppVeyor-Artifacts")
+    .IsDependeeOf("Publish-MyGet-Packages")
+    .IsDependeeOf("Publish-Nuget-Packages")
+    .IsDependeeOf("Publish-GitHub-Release-Zip")
+    .IsDependeeOf("Publish-GitHub-Release")
     .WithCriteria(() => BuildParameters.ShouldPublishNuGet ||
         string.Equals(EnvironmentVariable("SIGNING_TEST"), "true", StringComparison.OrdinalIgnoreCase))
     .Does(() =>
@@ -144,7 +212,8 @@ Task("Sign-Binaries")
     var filter = File("./signclient.filter");
 
     // Get the files to sign.
-    var files = GetFiles(string.Concat(BuildParameters.Paths.Directories.NuGetPackages, "/", "*.nupkg"));
+    var files = GetFiles(string.Concat(BuildParameters.Paths.Directories.NuGetPackages, "/", "*.nupkg")) +
+                GetFiles(string.Concat(zipArtifactsPath, "/", "*.zip"));
 
     foreach(var file in files)
     {
@@ -172,14 +241,5 @@ Task("Sign-Binaries")
         }
     }
 });
-
-// Hook up integration tests to default and appveyor tasks
-BuildParameters.Tasks.DefaultTask.IsDependentOn("Run-Bakery-Integration-Tests");
-BuildParameters.Tasks.AppVeyorTask.IsDependentOn("Run-Bakery-Integration-Tests");
-
-// Hook up signing task to publish tasks
-BuildParameters.Tasks.PublishNuGetPackagesTask.IsDependentOn("Sign-Binaries");
-BuildParameters.Tasks.UploadAppVeyorArtifactsTask.IsDependentOn("Run-Bakery-Integration-Tests")
-                                                 .IsDependentOn("Sign-Binaries");
 
 Build.RunDotNetCore();

@@ -261,3 +261,4 @@ tools/**
 !tools/packages.config
 BuildArtifacts/
 tests/integration/tools/
+.dotnet/

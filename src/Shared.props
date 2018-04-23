@@ -18,6 +18,12 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
+  <ItemGroup Condition="$(IsCakeTestProject) == 'true'">
+    <Content Include="$(MSBuildThisFileDirectory)xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <!-- StyleCop -->
   <PropertyGroup>
     <CodeAnalysisRuleSet Condition="$(IsCakeTestProject) == ''">$(MSBuildThisFileDirectory)Cake.ruleset</CodeAnalysisRuleSet>

@@ -1,9 +1,11 @@
 // Tools
 #tool "nuget:?package=Cake.Bakery&prerelease"
-#tool "nuget:https://api.nuget.org/v3/index.json?package=Cake&version=0.23.0"
+#tool "nuget:https://api.nuget.org/v3/index.json?package=Cake&version=0.27.0"
 
 // Addins
 #addin "nuget:https://api.nuget.org/v3/index.json?package=xunit.assert&version=2.2.0"
+#addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Primitives&version=1.1.0"
+#addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.DependencyInjection.Abstractions&version=1.1.0"
 #addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Logging&version=1.1.0"
 #addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Logging.Console&version=1.1.0"
 #addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Logging.Abstractions&version=1.1.0"
@@ -19,14 +21,6 @@ using Cake.Scripting.Abstractions.Models;
 using Cake.Scripting.Transport.Tcp.Client;
 using Microsoft.Extensions.Logging;
 using Xunit;
-
-AppDomain.CurrentDomain.AssemblyResolve += (sender, args) => {
-    if (args.Name.StartsWith("System.Runtime.InteropServices.RuntimeInformation"))
-    {
-        return System.Reflection.Assembly.Load(new System.Reflection.AssemblyName("System.Runtime.InteropServices.RuntimeInformation, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"));
-    }
-    return null;
-};
 
 // Globals
 IScriptGenerationService service;
