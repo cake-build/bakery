@@ -200,14 +200,7 @@ Task("Sign-Binaries")
         throw new InvalidOperationException("Could not resolve dotnet.");
     }
 
-    // Resolve dotnet version
-    StartProcess(dotnetPath, new ProcessSettings {
-        Arguments = "--version",
-        RedirectStandardOutput = true
-    }, out var versionOutput);
-    var dotnetVersion = versionOutput.First().Substring(0,3);
-
-    var client = File($"./tools/SignClient.0.9.0/tools/netcoreapp{dotnetVersion}/SignClient.dll");
+    var client = File($"./tools/SignClient.0.9.0/tools/netcoreapp2.0/SignClient.dll");
     var settings = File("./signclient.json");
     var filter = File("./signclient.filter");
 
