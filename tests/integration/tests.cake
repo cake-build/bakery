@@ -115,7 +115,7 @@ class MonoScriptGenerationProcess : IScriptGenerationProcess
         process.WaitForExit();
 
         // If OmniSharp bundled Mono runtime, use bootstrap script.
-        var script = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(runtime), "run");
+        var script = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(runtime), "../run");
         if (System.IO.File.Exists(script))
         {
             return (script, "--no-omnisharp ");

@@ -196,7 +196,7 @@ Task("Download-Mono-Assets")
     Unzip(zipFile, "./tests/integration/mono/framework");
 
     StartProcess("chmod", "u+x ./tests/integration/mono/run");
-    var monoExec = GetFiles("./tests/integration/mono/mono.*").First().FullPath;
+    var monoExec = GetFiles("./tests/integration/mono/bin/mono.*").First().FullPath;
     StartProcess("chmod", $"u+x {monoExec}");
 });
 
