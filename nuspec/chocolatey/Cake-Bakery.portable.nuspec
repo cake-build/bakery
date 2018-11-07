@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>cake-bakery.portable</id>
+    <title>Cake-Bakery.Portable</title>
+    <version>0.0.0</version>
+    <authors>Patrik Svensson, Mattias Karlsson, Gary Ewan Park, Alistair Chapman, Martin Björkström, Dave Glick, Pascal Berger and contributors</authors>
+    <summary>Cake (C# Make) is a build automation system with a C# DSL to do things like compiling code, copy files/folders, running unit tests, compress files and build NuGet packages.</summary>
+    <description>The Cake script analyzer and code generator.</description>
+    <projectUrl>https://cakebuild.net/</projectUrl>
+    <packageSourceUrl>https://github.com/cake-build/bakery</packageSourceUrl>
+    <projectSourceUrl>https://github.com/cake-build/bakery</projectSourceUrl>
+    <docsUrl>https://cakebuild.net/docs</docsUrl>
+    <bugTrackerUrl>https://github.com/cake-build/bakery/issues</bugTrackerUrl>
+    <tags>Cake Script Build Bakery</tags>
+    <copyright>Copyright (c) .NET Foundation and contributors</copyright>
+    <licenseUrl>https://github.com/cake-build/bakery/blob/develop/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <iconUrl>https://raw.githubusercontent.com/cake-build/graphics/master/png/cake-medium.png</iconUrl>
+  </metadata>
+  <files>
+    <file src="..\..\BuildArtifacts\temp\_PublishedApplications\Cake.Bakery\net461\**\*.*" exclude="runtimes/*.*" target="tools"/>
+    <file src="..\..\LICENSE" target="tools\LICENSE"/>
+    <file src="VERIFICATION.txt" target="tools"/>
+  </files>
+</package>
