@@ -28,10 +28,9 @@ ToolSettings.SetToolSettings(context: Context,
 var binArtifactPath = BuildParameters.Paths.Directories.PublishedApplications.Combine("Cake.Bakery/net461");
 var zipArtifactsPath = BuildParameters.Paths.Directories.Build.Combine("Packages/Zip");
 var omnisharpBaseDownloadURL = "https://omnisharpdownload.blob.core.windows.net/ext";
-var omnisharpMonoRuntimeMacOS = $"{omnisharpBaseDownloadURL}/mono.osx-5.12.0.301.zip";
+var omnisharpMonoRuntimeMacOS = $"{omnisharpBaseDownloadURL}/mono.macOS-5.12.0.301.zip";
 var omnisharpMonoRuntimeLinux32= $"{omnisharpBaseDownloadURL}/mono.linux-x86-5.12.0.301.zip";
 var omnisharpMonoRuntimeLinux64= $"{omnisharpBaseDownloadURL}/mono.linux-x86_64-5.12.0.301.zip";
-var omnisharpMonoFramework = $"{omnisharpBaseDownloadURL}/framework-5.12.0.301.zip";
 
 Task("Copy-License")
     .IsDependentOn("DotNetCore-Build")
@@ -164,10 +163,7 @@ Task("Download-Mono-Assets")
     .WithCriteria(() => !BuildParameters.IsRunningOnWindows)
     .Does(() => 
 {
-    CleanDirectories(new [] {
-        "./tests/integration/mono",
-        "./tests/integration/mono/framework"
-    });
+    CleanDirectory("./tests/integration/mono");
 
     string downloadUrl = null;
     switch(Context.Environment.Platform.Family)
@@ -192,12 +188,8 @@ Task("Download-Mono-Assets")
     var zipFile = DownloadFile(downloadUrl);
     Unzip(zipFile, "./tests/integration/mono");
 
-    zipFile = DownloadFile(omnisharpMonoFramework);
-    Unzip(zipFile, "./tests/integration/mono/framework");
-
     StartProcess("chmod", "u+x ./tests/integration/mono/run");
-    var monoExec = GetFiles("./tests/integration/mono/bin/mono.*").First().FullPath;
-    StartProcess("chmod", $"u+x {monoExec}");
+    StartProcess("chmod", "u+x ./tests/integration/mono/bin/mono");
 });
 
 Task("Run-Bakery-Integration-Tests")
