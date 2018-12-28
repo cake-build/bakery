@@ -28,10 +28,10 @@ ToolSettings.SetToolSettings(context: Context,
 var binArtifactPath = BuildParameters.Paths.Directories.PublishedApplications.Combine("Cake.Bakery/net461");
 var zipArtifactsPath = BuildParameters.Paths.Directories.Build.Combine("Packages/Zip");
 var omnisharpBaseDownloadURL = "https://omnisharpdownload.blob.core.windows.net/ext";
-var omnisharpMonoRuntimeMacOS = $"{omnisharpBaseDownloadURL}/mono.osx-5.12.0.226.zip";
-var omnisharpMonoRuntimeLinux32= $"{omnisharpBaseDownloadURL}/mono.linux-x86-5.12.0.226.zip";
-var omnisharpMonoRuntimeLinux64= $"{omnisharpBaseDownloadURL}/mono.linux-x86_64-5.12.0.226.zip";
-var omnisharpMonoFramework = $"{omnisharpBaseDownloadURL}/framework-5.12.0.226.zip";
+var omnisharpMonoRuntimeMacOS = $"{omnisharpBaseDownloadURL}/mono.osx-5.12.0.301.zip";
+var omnisharpMonoRuntimeLinux32= $"{omnisharpBaseDownloadURL}/mono.linux-x86-5.12.0.301.zip";
+var omnisharpMonoRuntimeLinux64= $"{omnisharpBaseDownloadURL}/mono.linux-x86_64-5.12.0.301.zip";
+var omnisharpMonoFramework = $"{omnisharpBaseDownloadURL}/framework-5.12.0.301.zip";
 
 Task("Copy-License")
     .IsDependentOn("DotNetCore-Build")
