@@ -1,16 +1,10 @@
 // Tools
 #tool "nuget:?package=Cake.Bakery&prerelease"
-#tool "nuget:https://api.nuget.org/v3/index.json?package=Cake&version=0.27.0"
+#tool "nuget:https://api.nuget.org/v3/index.json?package=Cake&version=0.31.0"
 
 // Addins
 #addin "nuget:https://api.nuget.org/v3/index.json?package=xunit.assert&version=2.2.0"
-#addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Primitives&version=1.1.0"
-#addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.DependencyInjection.Abstractions&version=1.1.0"
-#addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Logging&version=1.1.0"
-#addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Logging.Console&version=1.1.0"
-#addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Logging.Abstractions&version=1.1.0"
-#addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Configuration.Abstractions&version=1.1.0"
-#addin "nuget:https://api.nuget.org/v3/index.json?package=System.Runtime.InteropServices.RuntimeInformation&version=4.0.0"
+#addin "nuget:https://api.nuget.org/v3/index.json?package=Microsoft.Extensions.Logging.Console&version=2.1.1&loaddependencies=true"
 #addin "nuget:?package=Cake.Scripting.Abstractions&prerelease"
 #addin "nuget:?package=Cake.Scripting.Transport&prerelease"
 
