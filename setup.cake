@@ -225,25 +225,40 @@ Task("Run-Bakery-Integration-Tests")
     // If not running on Windows, run with OmniSharp Mono and Mono.
     if (!BuildParameters.IsRunningOnWindows)
     {
-        StartProcess("mono", new ProcessSettings {
+        var exitCode = StartProcess("mono", new ProcessSettings {
             Arguments = MakeAbsolute(new FilePath("./tests/integration/bin/integration.exe")).FullPath + " " +
                 MakeAbsolute(new FilePath("./tests/integration/tools/Cake.Bakery/tools/Cake.Bakery.exe")).FullPath,
             WorkingDirectory = new DirectoryPath("./tests/integration")
         });
 
-        StartProcess("./tests/integration/mono/run", new ProcessSettings {
+        if (exitCode != 0)
+        {
+            throw new Exception("Mono integration tests failed.");
+        }
+
+        exitCode = StartProcess("./tests/integration/mono/run", new ProcessSettings {
             Arguments = "--no-omnisharp " +
                 MakeAbsolute(new FilePath("./tests/integration/bin/integration.exe")).FullPath + " " +
                 MakeAbsolute(new FilePath("./tests/integration/tools/Cake.Bakery/tools/Cake.Bakery.exe")).FullPath,
             WorkingDirectory = new DirectoryPath("./tests/integration")
         });
+
+        if (exitCode != 0)
+        {
+            throw new Exception("OmniSharp Mono integration tests failed.");
+        }
     }
     else
     {
-        StartProcess("./tests/integration/bin/integration.exe", new ProcessSettings {
+        var exitCode = StartProcess("./tests/integration/bin/integration.exe", new ProcessSettings {
             Arguments = MakeAbsolute(new FilePath("./tests/integration/tools/Cake.Bakery/tools/Cake.Bakery.exe")).FullPath,
             WorkingDirectory = new DirectoryPath("./tests/integration")
         });
+
+        if (exitCode != 0)
+        {
+            throw new Exception(".NET Framework integration tests failed.");
+        }
     }
 });
 

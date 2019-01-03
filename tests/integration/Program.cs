@@ -30,7 +30,9 @@ namespace Integration
 
         public void Start(int port, string workingDirectory)
         {
-            var (fileName, arguments) = GetMonoRuntime();
+            var tuple = GetMonoRuntime();
+            var fileName = tuple.Item1;
+            var arguments = tuple.Item2;
 
             if (fileName == null)
             {
@@ -80,7 +82,7 @@ namespace Integration
             _process.BeginOutputReadLine();
         }
 
-        private (string, string) GetMonoRuntime()
+        private Tuple<string, string> GetMonoRuntime()
         {
             // Check using ps how process was started.
             var startInfo = new ProcessStartInfo
@@ -91,18 +93,18 @@ namespace Integration
                 UseShellExecute = false,
             };
             var process = Process.Start(startInfo);
-            var runtime = process.StandardOutput.ReadToEnd().TrimEnd('\n');
+            var runtime = process.StandardOutput.ReadToEnd().TrimEnd(new[] { '\n' });
             process.WaitForExit();
 
             // If OmniSharp bundled Mono runtime, use bootstrap script.
             var script = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(runtime), "../run");
             if (System.IO.File.Exists(script))
             {
-                return (script, "--no-omnisharp ");
+                return Tuple.Create(script, "--no-omnisharp ");
             }
 
             // Else use mono directly.
-            return (runtime, string.Empty);
+            return Tuple.Create(runtime, string.Empty);
         }
 
         public string ServerExecutablePath { get; set; }
@@ -136,7 +138,7 @@ namespace Integration
             var startIndex = sourceLines.FindIndex(x => x.Equals(lineDirective, StringComparison.OrdinalIgnoreCase)) + 1;
             for(var i = 0; i < expectedLines.Count; i++)
             {
-                Assert.Equal(sourceLines[startIndex + i], expectedLines[i].TrimEnd('\r', '\n'));
+                Assert.Equal(sourceLines[startIndex + i], expectedLines[i].TrimEnd(new [] { '\r', '\n' }));
             }
         }
 
@@ -169,7 +171,7 @@ namespace Integration
             var startIndex = sourceLines.FindIndex(x => x.Equals(lineDirective, StringComparison.OrdinalIgnoreCase)) + 1;
             for(var i = 0; i < expectedLines.Count; i++)
             {
-                Assert.Equal(sourceLines[startIndex + i], expectedLines[i].TrimEnd('\r', '\n'));
+                Assert.Equal(sourceLines[startIndex + i], expectedLines[i].TrimEnd(new [] { '\r', '\n' }));
             }
         }
 
@@ -235,7 +237,7 @@ namespace Integration
             var startIndex = sourceLines.FindIndex(x => x.Equals(lineDirective, StringComparison.OrdinalIgnoreCase)) + 1;
             for(var i = 0; i < expectedLines.Count; i++)
             {
-                Assert.Equal(sourceLines[startIndex + i], expectedLines[i].TrimEnd('\r', '\n'));
+                Assert.Equal(sourceLines[startIndex + i], expectedLines[i].TrimEnd(new [] { '\r', '\n' }));
             }
         }
 
@@ -283,7 +285,7 @@ Task(""Foobar"")
 RunTarget(target);";
         const string CakeAddinDirectiveFile = "addin.cake";
 
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             var isRunningOnMono = Type.GetType("Mono.Runtime") != null;
             var loggerFactory = new LoggerFactory()
@@ -300,6 +302,8 @@ RunTarget(target);";
             Should_Generate_From_Buffer();
             Should_Generate_With_Line_Changes();
             Should_Install_Addins();
+
+            return 0;
         }
     }
 }
