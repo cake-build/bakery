@@ -88,6 +88,29 @@ Task("Publish-GitHub-Release-Zip")
     publishingError = true;
 });
 
+// Override default Build and Restore tasks
+(BuildParameters.Tasks.DotNetCoreRestoreTask.Task as CakeTask).Actions.Clear();
+(BuildParameters.Tasks.DotNetCoreBuildTask.Task as CakeTask).Actions.Clear();
+BuildParameters.Tasks.DotNetCoreBuildTask
+    .Does(() =>
+{
+    Information("Building {0}", BuildParameters.SolutionFilePath);
+
+    MSBuild(BuildParameters.SolutionFilePath.FullPath, new MSBuildSettings {
+        Configuration = BuildParameters.Configuration,
+        Restore = true,
+        Properties = {
+            ["Version"] = new[] { BuildParameters.Version.SemVersion },
+            ["AssemblyVersion"] = new[] { BuildParameters.Version.Version },
+            ["FileVersion"] = new[] { BuildParameters.Version.Version },
+            ["AssemblyInformationalVersion"] = new[] { BuildParameters.Version.InformationalVersion },
+        }
+    });
+
+    CleanDirectory(binArtifactPath);
+    CopyFiles(GetFiles($"./src/Cake.Bakery/bin/{BuildParameters.Configuration}/net461/**/*"), binArtifactPath, true);
+});
+
 // Override default Pack task
 (BuildParameters.Tasks.DotNetCorePackTask.Task as CakeTask).Actions.Clear();
 BuildParameters.Tasks.DotNetCorePackTask
@@ -164,21 +187,12 @@ Task("Init-Integration-Tests")
         FallbackSource = new[] { "https://api.nuget.org/v3/index.json" }
     });
 
-    var msBuildSettings = new DotNetCoreMSBuildSettings();
-    if(!IsRunningOnWindows())
-    {
-        var frameworkPathOverride = new FilePath(typeof(object).Assembly.Location).GetDirectory().FullPath + "/";
-
-        // Use FrameworkPathOverride when not running on Windows.
-        Information("Build will use FrameworkPathOverride={0} since not building on Windows.", frameworkPathOverride);
-        msBuildSettings.WithProperty("FrameworkPathOverride", frameworkPathOverride);
-    }
-
-    DotNetCorePublish("./tests/integration/integration.csproj", new DotNetCorePublishSettings {
-        Framework = "net461",
-        Configuration = "Release",
-        OutputDirectory = "./tests/integration/bin/",
-        MSBuildSettings = msBuildSettings
+    MSBuild("./tests/integration/integration.csproj", new MSBuildSettings {
+        Configuration = BuildParameters.Configuration,
+        Restore = true,
+        Properties = {
+            ["OutputPath"] = new[] { "./bin/" }
+        }
     });
 });
 
