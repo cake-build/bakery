@@ -151,12 +151,35 @@ Task("Init-Integration-Tests")
     .Does(() =>
 {
     CleanDirectories(new [] {
-        "./tests/integration/packages",
-        "./tests/integration/tools"
+        "./tests/integration/tools",
+        "./tests/integration/bin"
     });
 
-    CopyFiles(MakeAbsolute(BuildParameters.Paths.Directories.NuGetPackages).FullPath + "/*.nupkg",
-        "./tests/integration/packages");
+    NuGetInstall(new[] { "Cake.Bakery", "Cake" }, new NuGetInstallSettings {
+        ExcludeVersion = true,
+        OutputDirectory = new DirectoryPath("./tests/integration/tools"),
+        DisableParallelProcessing = true,
+        Prerelease = true,
+        Source = new[] { MakeAbsolute(BuildParameters.Paths.Directories.NuGetPackages).FullPath },
+        FallbackSource = new[] { "https://api.nuget.org/v3/index.json" }
+    });
+
+    var msBuildSettings = new DotNetCoreMSBuildSettings();
+    if(!IsRunningOnWindows())
+    {
+        var frameworkPathOverride = new FilePath(typeof(object).Assembly.Location).GetDirectory().FullPath + "/";
+
+        // Use FrameworkPathOverride when not running on Windows.
+        Information("Build will use FrameworkPathOverride={0} since not building on Windows.", frameworkPathOverride);
+        msBuildSettings.WithProperty("FrameworkPathOverride", frameworkPathOverride);
+    }
+
+    DotNetCorePublish("./tests/integration/integration.csproj", new DotNetCorePublishSettings {
+        Framework = "net461",
+        Configuration = "Release",
+        OutputDirectory = "./tests/integration/bin/",
+        MSBuildSettings = msBuildSettings
+    });
 });
 
 Task("Download-Mono-Assets")
@@ -199,23 +222,28 @@ Task("Run-Bakery-Integration-Tests")
     .IsDependeeOf("Default")
     .Does(() =>
 {
-    var settings = new CakeSettings {
-        Verbosity = Context.Log.Verbosity,
-        WorkingDirectory = "./tests/integration/",
-        Arguments = new Dictionary<string, string> {
-            { "NuGet_Source", MakeAbsolute(new DirectoryPath("./tests/integration/packages")).FullPath }
-        }
-    };
-
-    CakeExecuteScript("./tests/integration/tests.cake", settings);
-
-    // If not running on Windows, also run with OmniSharp Mono.
+    // If not running on Windows, run with OmniSharp Mono and Mono.
     if (!BuildParameters.IsRunningOnWindows)
     {
-        settings.ArgumentCustomization = args => args.Prepend($"--no-omnisharp {MakeAbsolute(Context.Environment.ApplicationRoot).CombineWithFilePath("Cake.exe")}");
-        settings.ToolPath = "./tests/integration/mono/run";
+        StartProcess("mono", new ProcessSettings {
+            Arguments = MakeAbsolute(new FilePath("./tests/integration/bin/integration.exe")).FullPath + " " +
+                MakeAbsolute(new FilePath("./tests/integration/tools/Cake.Bakery/tools/Cake.Bakery.exe")).FullPath,
+            WorkingDirectory = new DirectoryPath("./tests/integration")
+        });
 
-        CakeExecuteScript("./tests/integration/tests.cake", settings);
+        StartProcess("./tests/integration/mono/run", new ProcessSettings {
+            Arguments = "--no-omnisharp " +
+                MakeAbsolute(new FilePath("./tests/integration/bin/integration.exe")).FullPath + " " +
+                MakeAbsolute(new FilePath("./tests/integration/tools/Cake.Bakery/tools/Cake.Bakery.exe")).FullPath,
+            WorkingDirectory = new DirectoryPath("./tests/integration")
+        });
+    }
+    else
+    {
+        StartProcess("./tests/integration/bin/integration.exe", new ProcessSettings {
+            Arguments = MakeAbsolute(new FilePath("./tests/integration/tools/Cake.Bakery/tools/Cake.Bakery.exe")).FullPath,
+            WorkingDirectory = new DirectoryPath("./tests/integration")
+        });
     }
 });
 
