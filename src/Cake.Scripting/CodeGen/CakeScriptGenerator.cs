@@ -226,10 +226,46 @@ namespace Cake.Scripting.CodeGen
 
         private DirectoryPath GetCakePath(DirectoryPath toolPath)
         {
+            // Check for local cake in tools path
             var pattern = string.Concat(toolPath.FullPath, "/**/Cake.exe");
             var cakeCorePath = _globber.GetFiles(pattern).FirstOrDefault();
+            if (cakeCorePath != null)
+            {
+                return cakeCorePath.GetDirectory().MakeAbsolute(_environment);
+            }
+            pattern = string.Concat(toolPath.FullPath, "/**/Cake.dll");
+            cakeCorePath = _globber.GetFiles(pattern).FirstOrDefault();
+            if (cakeCorePath != null)
+            {
+                return cakeCorePath.GetDirectory().MakeAbsolute(_environment);
+            }
 
-            return cakeCorePath?.GetDirectory().MakeAbsolute(_environment) ?? toolPath.Combine("Cake").Collapse();
+            // Check path for cake.exe
+            var separatorChar = _environment.Platform.Family == PlatformFamily.Windows ? ';' : ':';
+            var directoriesInPath = (_environment.GetEnvironmentVariable("PATH") ?? string.Empty)
+                .Split(new[] { separatorChar }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => (DirectoryPath)x).ToArray();
+            var cakeExePath = directoriesInPath.FirstOrDefault(x => _fileSystem.Exist(x.CombineWithFilePath("Cake.exe")));
+            if (cakeExePath != null)
+            {
+                return cakeExePath.MakeAbsolute(_environment);
+            }
+
+            // Check path for dotnet-cake.exe
+            var dotnetCakePath = directoriesInPath.FirstOrDefault(x => _fileSystem.Exist(x.CombineWithFilePath("dotnet-cake.exe"))) ??
+                directoriesInPath.FirstOrDefault(x => _fileSystem.Exist(x.CombineWithFilePath("dotnet-cake")));
+            if (dotnetCakePath != null)
+            {
+                pattern = string.Concat(dotnetCakePath.FullPath, "/.store/**/Cake.dll");
+                var cakeDllPath = _globber.GetFiles(pattern).FirstOrDefault();
+
+                if (cakeDllPath != null)
+                {
+                    return cakeDllPath.GetDirectory().MakeAbsolute(_environment);
+                }
+            }
+
+            return toolPath.Combine("Cake").Collapse();
         }
 
         private DirectoryPath GetAddinPath(DirectoryPath root)
