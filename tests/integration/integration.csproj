@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net461</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Xunit.Assert" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Cake.Scripting.Abstractions\Cake.Scripting.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Cake.Scripting.Transport\Cake.Scripting.Transport.csproj" />
+  </ItemGroup>
+</Project>
