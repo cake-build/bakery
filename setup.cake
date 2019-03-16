@@ -312,6 +312,7 @@ Task("Sign-Binaries")
 
     // Get the files to sign.
     var files = GetFiles(string.Concat(BuildParameters.Paths.Directories.NuGetPackages, "/", "*.nupkg")) +
+                GetFiles(string.Concat(BuildParameters.Paths.Directories.ChocolateyPackages , "/", "*.nupkg")) +
                 GetFiles(string.Concat(zipArtifactsPath, "/", "*.zip"));
 
     foreach(var file in files)
