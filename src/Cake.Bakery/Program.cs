@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -15,6 +16,7 @@ using Cake.Core.Configuration;
 using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using Cake.Core.Modules;
+using Cake.Core.Scripting.Processors.Loading;
 using Cake.Core.Text;
 using Cake.NuGet;
 using Cake.Scripting;
@@ -84,10 +86,11 @@ namespace Cake.Bakery
                 var aliasFinder = container.Resolve<IScriptAliasFinder>();
                 var processor = container.Resolve<Core.Scripting.IScriptProcessor>();
                 var aliasGenerator = container.Resolve<ICakeAliasGenerator>();
+                var loadDirectiveProviders = container.Resolve<IEnumerable<ILoadDirectiveProvider>>();
 
                 // Rebuild the container for Cached Alias Finder.
                 registrar = new ContainerRegistrar();
-                registrar.RegisterModule(new CacheModule(aliasFinder, processor, environment, aliasGenerator));
+                registrar.RegisterModule(new CacheModule(aliasFinder, processor, environment, aliasGenerator, loadDirectiveProviders));
                 registrar.Builder.Update(container);
 
                 // Get Script generator.
