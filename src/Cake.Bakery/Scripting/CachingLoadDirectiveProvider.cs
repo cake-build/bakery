@@ -32,7 +32,7 @@ namespace Cake.Bakery.Scripting
                     return;
                 }
 
-                var interceptor = new InterceptingScriptAnalyzerContext();
+                var interceptor = new InterceptingScriptAnalyzerContext(context);
                 provider.Load(interceptor, reference);
                 result = interceptor.FilePaths;
 
@@ -45,22 +45,24 @@ namespace Cake.Bakery.Scripting
             }
         }
 
-        private class InterceptingScriptAnalyzerContext : IScriptAnalyzerContext
+        private sealed class InterceptingScriptAnalyzerContext : IScriptAnalyzerContext
         {
+            private readonly IScriptAnalyzerContext _context;
+
             public List<FilePath> FilePaths { get; } = new List<FilePath>();
 
-            public FilePath Root => throw new System.NotImplementedException();
+            public FilePath Root => _context.Root;
 
-            public IScriptInformation Current => throw new System.NotImplementedException();
+            public IScriptInformation Current => _context.Current;
+
+            public InterceptingScriptAnalyzerContext(IScriptAnalyzerContext context) => _context = context;
 
             public void AddScriptError(string error)
             {
-                throw new System.NotImplementedException();
             }
 
             public void AddScriptLine(string line)
             {
-                throw new System.NotImplementedException();
             }
 
             public void Analyze(FilePath scriptPath)
