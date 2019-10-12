@@ -3,10 +3,12 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Collections.Generic;
 using Cake.Bakery.Scripting;
 using Cake.Core;
 using Cake.Core.Composition;
 using Cake.Core.Scripting;
+using Cake.Core.Scripting.Processors.Loading;
 using Cake.Scripting.CodeGen;
 using IScriptAliasFinder = Cake.Scripting.CodeGen.IScriptAliasFinder;
 
@@ -18,16 +20,19 @@ namespace Cake.Bakery
         private readonly IScriptProcessor _processor;
         private readonly ICakeEnvironment _environment;
         private readonly ICakeAliasGenerator _aliasGenerator;
+        private readonly IEnumerable<ILoadDirectiveProvider> _loadDirectiveProviders;
 
         public CacheModule(IScriptAliasFinder aliasFinder,
             IScriptProcessor processor,
             ICakeEnvironment environment,
-            ICakeAliasGenerator aliasGenerator)
+            ICakeAliasGenerator aliasGenerator,
+            IEnumerable<ILoadDirectiveProvider> loadDirectiveProviders)
         {
             _aliasFinder = aliasFinder ?? throw new ArgumentNullException(nameof(aliasFinder));
             _processor = processor ?? throw new ArgumentNullException(nameof(processor));
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
             _aliasGenerator = aliasGenerator ?? throw new ArgumentNullException(nameof(aliasGenerator));
+            _loadDirectiveProviders = loadDirectiveProviders ?? throw new ArgumentNullException(nameof(loadDirectiveProviders));
         }
 
         public void Register(ICakeContainerRegistrar registrar)
@@ -47,6 +52,9 @@ namespace Cake.Bakery
             var aliasGenerator = new CachingCakeAliasGenerator(_aliasGenerator);
             registrar.RegisterInstance(aliasGenerator)
                 .As<ICakeAliasGenerator>();
+            var loadDirectiveProvider = new CachingLoadDirectiveProvider(_loadDirectiveProviders);
+            registrar.RegisterInstance(loadDirectiveProvider)
+                .As<ILoadDirectiveProvider>();
         }
     }
 }
