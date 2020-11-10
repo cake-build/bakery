@@ -1,4 +1,4 @@
-#load nuget:https://www.myget.org/F/cake-contrib/api/v3/index.json?package=Cake.Recipe&version=2.0.1
+#load nuget:?package=Cake.Recipe&version=2.0.1
 #tool nuget:https://api.nuget.org/v3/index.json?package=SignClient&version=0.9.0
 
 Environment.SetVariableNames();
@@ -13,7 +13,6 @@ BuildParameters.SetParameters(context: Context,
                             shouldRunDotNetCorePack: true,
                             shouldRunDupFinder: false,
                             shouldRunCodecov: false,
-                            shouldRunGitVersion: true,
                             nugetConfig: "./src/NuGet.Config");
 
 BuildParameters.PrintParameters(Context);
@@ -44,15 +43,14 @@ Task("Copy-License")
 Task("Zip-Files")
     .IsDependentOn("Copy-License")
     .IsDependeeOf("Package")
-    .Does(() =>
+    .Does<BuildVersion>((context, buildVersion) =>
 {
     CleanDirectory(zipArtifactsPath);
-    Zip(binArtifactPath, zipArtifactsPath.CombineWithFilePath($"Cake.Bakery.{BuildParameters.Version.SemVersion}.zip"));
+    Zip(binArtifactPath, zipArtifactsPath.CombineWithFilePath($"Cake.Bakery.{buildVersion.SemVersion}.zip"));
 });
 
 Task("Upload-AppVeyor-Artifacts-Zip")
     .IsDependentOn("Package")
-    .IsDependeeOf("Upload-AppVeyor-Artifacts")
     .WithCriteria(() => BuildParameters.IsRunningOnAppVeyor)
     .Does(() =>
 {
@@ -67,12 +65,12 @@ Task("Publish-GitHub-Release-Zip")
     .IsDependentOn("Zip-Files")
     .IsDependeeOf("Publish-GitHub-Release")
     .WithCriteria(() => BuildParameters.ShouldPublishGitHub)
-    .Does(() => RequireTool(GitReleaseManagerTool, () => {
+    .Does<BuildVersion>((context, buildVersion) => RequireTool(BuildParameters.IsDotNetCoreBuild ? ToolSettings.GitReleaseManagerGlobalTool : ToolSettings.GitReleaseManagerTool, () => {
         if(BuildParameters.CanUseGitReleaseManager)
         {
             foreach(var package in GetFiles(zipArtifactsPath + "/*"))
             {
-                GitReleaseManagerAddAssets(BuildParameters.GitHub.UserName, BuildParameters.GitHub.Password, BuildParameters.RepositoryOwner, BuildParameters.RepositoryName, BuildParameters.Version.Milestone, package.ToString());
+                GitReleaseManagerAddAssets(BuildParameters.GitHub.Token, BuildParameters.RepositoryOwner, BuildParameters.RepositoryName, buildVersion.Milestone, package.ToString());
             }
         }
         else
@@ -92,7 +90,7 @@ Task("Publish-GitHub-Release-Zip")
 (BuildParameters.Tasks.DotNetCoreRestoreTask.Task as CakeTask).Actions.Clear();
 (BuildParameters.Tasks.DotNetCoreBuildTask.Task as CakeTask).Actions.Clear();
 BuildParameters.Tasks.DotNetCoreBuildTask
-    .Does(() =>
+    .Does<BuildVersion>((context, buildVersion) =>
 {
     Information("Building {0}", BuildParameters.SolutionFilePath);
 
@@ -100,10 +98,10 @@ BuildParameters.Tasks.DotNetCoreBuildTask
         Configuration = BuildParameters.Configuration,
         Restore = true,
         Properties = {
-            ["Version"] = new[] { BuildParameters.Version.SemVersion },
-            ["AssemblyVersion"] = new[] { BuildParameters.Version.Version },
-            ["FileVersion"] = new[] { BuildParameters.Version.Version },
-            ["AssemblyInformationalVersion"] = new[] { BuildParameters.Version.InformationalVersion },
+            ["Version"] = new[] { buildVersion.SemVersion },
+            ["AssemblyVersion"] = new[] { buildVersion.Version },
+            ["FileVersion"] = new[] { buildVersion.Version },
+            ["AssemblyInformationalVersion"] = new[] { buildVersion.InformationalVersion },
         }
     });
 
@@ -115,13 +113,13 @@ BuildParameters.Tasks.DotNetCoreBuildTask
 (BuildParameters.Tasks.DotNetCorePackTask.Task as CakeTask).Actions.Clear();
 BuildParameters.Tasks.DotNetCorePackTask
     .IsDependentOn("Copy-License")
-    .Does(() =>
+    .Does<BuildVersion>((context, buildVersion) =>
 {
     var msBuildSettings = new DotNetCoreMSBuildSettings()
-                                .WithProperty("Version", BuildParameters.Version.SemVersion)
-                                .WithProperty("AssemblyVersion", BuildParameters.Version.Version)
-                                .WithProperty("FileVersion",  BuildParameters.Version.Version)
-                                .WithProperty("AssemblyInformationalVersion", BuildParameters.Version.InformationalVersion);
+                                .WithProperty("Version", buildVersion.SemVersion)
+                                .WithProperty("AssemblyVersion", buildVersion.Version)
+                                .WithProperty("FileVersion",  buildVersion.Version)
+                                .WithProperty("AssemblyInformationalVersion", buildVersion.InformationalVersion);
 
     if(!IsRunningOnWindows())
     {
@@ -154,7 +152,7 @@ BuildParameters.Tasks.DotNetCorePackTask
 
     // Cake.Bakery - .NET 4.6
     NuGetPack("./nuspec/Cake.Bakery.nuspec", new NuGetPackSettings {
-        Version = BuildParameters.Version.SemVersion,
+        Version = buildVersion.SemVersion,
         //ReleaseNotes = TODO,
         BasePath = binArtifactPath,
         OutputDirectory = BuildParameters.Paths.Directories.NuGetPackages,
@@ -162,7 +160,7 @@ BuildParameters.Tasks.DotNetCorePackTask
         NoPackageAnalysis = true,
         Files = GetFiles(binFullArtifactPath + "/**/*")
                                 .Select(file=>file.FullPath.Substring(binFullArtifactPathLength))
-                                .Select(file=> !file.Equals("LICENSE") ? 
+                                .Select(file=> !file.Equals("LICENSE") ?
                                     new NuSpecContent { Source = file, Target = "tools/" + file } :
                                     new NuSpecContent { Source = file, Target = file })
                                 .ToArray()
@@ -197,8 +195,8 @@ Task("Init-Integration-Tests")
 });
 
 Task("Download-Mono-Assets")
-    .WithCriteria(() => !BuildParameters.IsRunningOnWindows)
-    .Does(() => 
+    .WithCriteria(() => !IsRunningOnWindows())
+    .Does(() =>
 {
     CleanDirectory("./tests/integration/mono");
 
@@ -232,12 +230,12 @@ Task("Download-Mono-Assets")
 Task("Run-Bakery-Integration-Tests")
     .IsDependentOn("Init-Integration-Tests")
     .IsDependentOn("Download-Mono-Assets")
-    .IsDependeeOf("AppVeyor")
+    .IsDependeeOf("CI")
     .IsDependeeOf("Default")
     .Does(() =>
 {
     // If not running on Windows, run with OmniSharp Mono and Mono.
-    if (!BuildParameters.IsRunningOnWindows)
+    if (!IsRunningOnWindows())
     {
         var exitCode = StartProcess("mono", new ProcessSettings {
             Arguments = MakeAbsolute(new FilePath("./tests/integration/bin/integration.exe")).FullPath + " " +
@@ -279,13 +277,15 @@ Task("Run-Bakery-Integration-Tests")
 Task("Sign-Binaries")
     .IsDependentOn("Package")
     .IsDependeeOf("Upload-AppVeyor-Artifacts-Zip")
-    .IsDependeeOf("Upload-AppVeyor-Artifacts")
-    .IsDependeeOf("Publish-MyGet-Packages")
-    .IsDependeeOf("Publish-Nuget-Packages")
+    .IsDependeeOf("Publish-PreRelease-Packages")
+    .IsDependeeOf("Publish-Release-Packages")
     .IsDependeeOf("Publish-GitHub-Release-Zip")
     .IsDependeeOf("Publish-GitHub-Release")
-    .WithCriteria(() => BuildParameters.ShouldPublishNuGet ||
-        string.Equals(EnvironmentVariable("SIGNING_TEST"), "true", StringComparison.OrdinalIgnoreCase))
+    .WithCriteria(() => string.Equals(EnvironmentVariable("SIGNING_TEST"), "true", StringComparison.OrdinalIgnoreCase))
+    .WithCriteria(() => !BuildParameters.IsLocalBuild || BuildParameters.ForceContinuousIntegration, "Skipping because this is a local build, and force isn't being applied")
+    .WithCriteria(() => BuildParameters.IsTagged, "Skipping because current commit is not tagged")
+    .WithCriteria(() => BuildParameters.PreferredBuildAgentOperatingSystem == BuildParameters.BuildAgentOperatingSystem, "Not running on preferred build agent operating system")
+    .WithCriteria(() => BuildParameters.PreferredBuildProviderType == BuildParameters.BuildProvider.Type, "Not running on preferred build provider type")
     .Does(() =>
 {
     // Get the secret.
