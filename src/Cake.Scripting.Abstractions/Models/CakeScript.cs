@@ -16,7 +16,7 @@ namespace Cake.Scripting.Abstractions.Models
 
         public ScriptHost Host => _host ?? (_host = new ScriptHost());
 
-        public string Source { get; set; }
+        public string Source { get; set; } = string.Empty;
 
         public ISet<string> References => _references ?? (_references = new HashSet<string>());
 
