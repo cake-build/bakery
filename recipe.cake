@@ -121,15 +121,6 @@ BuildParameters.Tasks.DotNetCorePackTask
                                 .WithProperty("FileVersion",  buildVersion.Version)
                                 .WithProperty("AssemblyInformationalVersion", buildVersion.InformationalVersion);
 
-    if(!IsRunningOnWindows())
-    {
-        var frameworkPathOverride = new FilePath(typeof(object).Assembly.Location).GetDirectory().FullPath + "/";
-
-        // Use FrameworkPathOverride when not running on Windows.
-        Information("Build will use FrameworkPathOverride={0} since not building on Windows.", frameworkPathOverride);
-        msBuildSettings.WithProperty("FrameworkPathOverride", frameworkPathOverride);
-    }
-
     var projects = GetFiles(BuildParameters.SourceDirectoryPath + "/**/*.csproj");
     foreach(var project in projects)
     {
