@@ -147,6 +147,33 @@ namespace Cake.Scripting.Transport.Tests.Unit.Serialization
                 Assert.Equal(expected.LineChanges.ElementAt(2), actual.LineChanges.ElementAt(2));
             }
 
+            [Theory]
+            [InlineData("\n")]
+            [InlineData("\r\n")]
+            public void ShouldSerializeNewLine(string lineEnding)
+            {
+                // Given
+                var expected = new FileChange();
+                expected.LineChanges.Add(new LineChange
+                {
+                    StartColumn = 0,
+                    EndColumn = 0,
+                    StartLine = 0,
+                    EndLine = 0,
+                    NewText = lineEnding
+                });
+
+                // When
+                FileChangeSerializer.Serialize(_fixture.Writer, expected, Constants.Protocol.Latest);
+                _fixture.ResetStreamPosition();
+                var actual = FileChangeSerializer.Deserialize(_fixture.Reader, out var version);
+
+                // Then
+                Assert.NotNull(actual);
+                Assert.Equal(Constants.Protocol.V2, version);
+                Assert.Equal(expected.LineChanges.ElementAt(0), actual.LineChanges.ElementAt(0));
+            }
+
             [Fact]
             public void ShouldSerializeProtocolV1()
             {

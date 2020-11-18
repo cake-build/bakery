@@ -263,3 +263,4 @@ BuildArtifacts/
 tests/integration/tools/
 tests/integration/mono/
 .dotnet/
+.ionide/

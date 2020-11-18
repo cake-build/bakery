@@ -118,6 +118,95 @@ namespace Cake.Scripting.Tests.Unit.IO
                 // Then
                 Assert.Equal("interface I {}", target.GetFileContent(path));
             }
+
+            [Theory]
+            [InlineData("\n")]
+            [InlineData("\r\n")]
+            public void ShouldInsertNewLineAtBeginning(string lineEnding)
+            {
+                // Given
+                var target = _fixture.CreateBufferedFileSystem();
+                var path = new FilePath("test.cake");
+                target.UpdateFileBuffer(path, "class C {}");
+
+                // When
+                var changes = new[]
+                {
+                    // class C {} -> \nclass C {}
+                    new LineChange
+                    {
+                        StartLine = 0,
+                        StartColumn = 0,
+                        EndLine = 0,
+                        EndColumn = 0,
+                        NewText = lineEnding
+                    }
+                };
+                target.UpdateFileBuffer(path, changes);
+
+                // Then
+                Assert.Equal("\nclass C {}", target.GetFileContent(path));
+            }
+
+            [Theory]
+            [InlineData("\n")]
+            [InlineData("\r\n")]
+            public void ShouldInsertNewLineAtEnd(string lineEnding)
+            {
+                // Given
+                var target = _fixture.CreateBufferedFileSystem();
+                var path = new FilePath("test.cake");
+                target.UpdateFileBuffer(path, "class C {}");
+
+                // When
+                var changes = new[]
+                {
+                    // class C {} -> \nclass C {}
+                    new LineChange
+                    {
+                        StartLine = 0,
+                        StartColumn = 10,
+                        EndLine = 0,
+                        EndColumn = 10,
+                        NewText = lineEnding
+                    }
+                };
+                target.UpdateFileBuffer(path, changes);
+
+                // Then
+                Assert.Equal("class C {}\n", target.GetFileContent(path));
+            }
+
+            [Theory]
+            [InlineData("\n", 10)]
+            [InlineData("\r\n", 10)]
+            public void ShouldInsertMultipleNewLines(string lineEnding, int count)
+            {
+                // Given
+                var target = _fixture.CreateBufferedFileSystem();
+                var path = new FilePath("test.cake");
+                target.UpdateFileBuffer(path, string.Empty);
+
+                // When
+                for (var i = 0; i < count; i++)
+                {
+                    var changes = new[]
+                    {
+                        new LineChange
+                        {
+                            StartLine = i,
+                            StartColumn = 0,
+                            EndLine = i,
+                            EndColumn = 0,
+                            NewText = lineEnding
+                        }
+                    };
+                    target.UpdateFileBuffer(path, changes);
+                }
+
+                // Then
+                Assert.Equal(string.Join(string.Empty, Enumerable.Repeat("\n", count)), target.GetFileContent(path));
+            }
         }
     }
 }
