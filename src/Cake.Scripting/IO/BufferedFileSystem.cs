@@ -101,7 +101,7 @@ namespace Cake.Scripting.IO
                     bufferBuilder.Append(lineChange.NewText);
                 }
 
-                // no changes actually happend?
+                // no changes actually happened?
                 if (stopIndex == 0 && bufferBuilder.Length == 0)
                 {
                     continue;

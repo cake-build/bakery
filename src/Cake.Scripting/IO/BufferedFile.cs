@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 using Cake.Core.IO;
 
 namespace Cake.Scripting.IO
@@ -15,7 +16,7 @@ namespace Cake.Scripting.IO
         public BufferedFile(FilePath filePath, string content)
         {
             Path = filePath;
-            _content = content;
+            _content = content + "\n";
         }
 
         public FilePath Path { get; }
@@ -51,13 +52,7 @@ namespace Cake.Scripting.IO
 
         public Stream Open(FileMode fileMode, FileAccess fileAccess, FileShare fileShare)
         {
-            var stream = new MemoryStream();
-            var writer = new StreamWriter(stream);
-            writer.Write(_content);
-            writer.Flush();
-            stream.Position = 0;
-
-            return stream;
+            return new MemoryStream(Encoding.UTF8.GetBytes(_content));
         }
     }
 }

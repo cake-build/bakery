@@ -96,6 +96,24 @@ namespace Cake.Scripting.Transport.Tests.Unit.Serialization
                 Assert.Equal(expected.References, actual.References);
                 Assert.Equal(expected.Usings, actual.Usings);
             }
+
+            [Fact]
+            public void ShouldSerializeAndSerializeEmpty()
+            {
+                // Given
+                var expected = CakeScript.Empty;
+
+                // When
+                CakeScriptSerializer.Serialize(_fixture.Writer, expected, Constants.Protocol.Latest);
+                _fixture.ResetStreamPosition();
+                var actual = CakeScriptSerializer.Deserialize(_fixture.Reader);
+
+                // Then
+                Assert.NotNull(actual);
+                Assert.Equal(expected.Source, actual.Source);
+                Assert.Equal(expected.References, actual.References);
+                Assert.Equal(expected.Usings, actual.Usings);
+            }
         }
     }
 }
