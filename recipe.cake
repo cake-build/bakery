@@ -265,6 +265,10 @@ Task("Run-Bakery-Integration-Tests")
     }
 });
 
+var shouldDeployBakery = (!BuildParameters.IsLocalBuild || BuildParameters.ForceContinuousIntegration) &&
+                        BuildParameters.IsTagged &&
+                        BuildParameters.PreferredBuildAgentOperatingSystem == BuildParameters.BuildAgentOperatingSystem &&
+                        BuildParameters.PreferredBuildProviderType == BuildParameters.BuildProvider.Type;
 Task("Sign-Binaries")
     .IsDependentOn("Package")
     .IsDependeeOf("Upload-AppVeyor-Artifacts-Zip")
@@ -272,11 +276,7 @@ Task("Sign-Binaries")
     .IsDependeeOf("Publish-Release-Packages")
     .IsDependeeOf("Publish-GitHub-Release-Zip")
     .IsDependeeOf("Publish-GitHub-Release")
-    .WithCriteria(() => string.Equals(EnvironmentVariable("SIGNING_TEST"), "true", StringComparison.OrdinalIgnoreCase))
-    .WithCriteria(() => !BuildParameters.IsLocalBuild || BuildParameters.ForceContinuousIntegration, "Skipping because this is a local build, and force isn't being applied")
-    .WithCriteria(() => BuildParameters.IsTagged, "Skipping because current commit is not tagged")
-    .WithCriteria(() => BuildParameters.PreferredBuildAgentOperatingSystem == BuildParameters.BuildAgentOperatingSystem, "Not running on preferred build agent operating system")
-    .WithCriteria(() => BuildParameters.PreferredBuildProviderType == BuildParameters.BuildProvider.Type, "Not running on preferred build provider type")
+    .WithCriteria(() => shouldDeployBakery || string.Equals(EnvironmentVariable("SIGNING_TEST"), "true", StringComparison.OrdinalIgnoreCase))
     .Does(() =>
 {
     // Get the secret.
