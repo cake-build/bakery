@@ -1,4 +1,4 @@
-#load nuget:?package=Cake.Recipe&version=2.0.1
+#load nuget:?package=Cake.Recipe&version=2.1.0
 #tool nuget:https://api.nuget.org/v3/index.json?package=SignClient&version=0.9.0
 
 Environment.SetVariableNames();
@@ -51,6 +51,7 @@ Task("Zip-Files")
 
 Task("Upload-AppVeyor-Artifacts-Zip")
     .IsDependentOn("Package")
+    .IsDependeeOf("Upload-Artifacts")
     .WithCriteria(() => BuildParameters.IsRunningOnAppVeyor)
     .Does(() =>
 {
@@ -272,6 +273,7 @@ var shouldDeployBakery = (!BuildParameters.IsLocalBuild || BuildParameters.Force
 Task("Sign-Binaries")
     .IsDependentOn("Package")
     .IsDependeeOf("Upload-AppVeyor-Artifacts-Zip")
+    .IsDependeeOf("Upload-Artifacts")
     .IsDependeeOf("Publish-PreRelease-Packages")
     .IsDependeeOf("Publish-Release-Packages")
     .IsDependeeOf("Publish-GitHub-Release-Zip")
