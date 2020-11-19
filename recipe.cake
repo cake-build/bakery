@@ -1,4 +1,4 @@
-#load nuget:?package=Cake.Recipe&version=2.0.1
+#load nuget:?package=Cake.Recipe&version=2.1.0
 #tool nuget:https://api.nuget.org/v3/index.json?package=SignClient&version=0.9.0
 
 Environment.SetVariableNames();
@@ -51,6 +51,7 @@ Task("Zip-Files")
 
 Task("Upload-AppVeyor-Artifacts-Zip")
     .IsDependentOn("Package")
+    .IsDependeeOf("Upload-Artifacts")
     .WithCriteria(() => BuildParameters.IsRunningOnAppVeyor)
     .Does(() =>
 {
@@ -265,18 +266,19 @@ Task("Run-Bakery-Integration-Tests")
     }
 });
 
+var shouldDeployBakery = (!BuildParameters.IsLocalBuild || BuildParameters.ForceContinuousIntegration) &&
+                        BuildParameters.IsTagged &&
+                        BuildParameters.PreferredBuildAgentOperatingSystem == BuildParameters.BuildAgentOperatingSystem &&
+                        BuildParameters.PreferredBuildProviderType == BuildParameters.BuildProvider.Type;
 Task("Sign-Binaries")
     .IsDependentOn("Package")
     .IsDependeeOf("Upload-AppVeyor-Artifacts-Zip")
+    .IsDependeeOf("Upload-Artifacts")
     .IsDependeeOf("Publish-PreRelease-Packages")
     .IsDependeeOf("Publish-Release-Packages")
     .IsDependeeOf("Publish-GitHub-Release-Zip")
     .IsDependeeOf("Publish-GitHub-Release")
-    .WithCriteria(() => string.Equals(EnvironmentVariable("SIGNING_TEST"), "true", StringComparison.OrdinalIgnoreCase))
-    .WithCriteria(() => !BuildParameters.IsLocalBuild || BuildParameters.ForceContinuousIntegration, "Skipping because this is a local build, and force isn't being applied")
-    .WithCriteria(() => BuildParameters.IsTagged, "Skipping because current commit is not tagged")
-    .WithCriteria(() => BuildParameters.PreferredBuildAgentOperatingSystem == BuildParameters.BuildAgentOperatingSystem, "Not running on preferred build agent operating system")
-    .WithCriteria(() => BuildParameters.PreferredBuildProviderType == BuildParameters.BuildProvider.Type, "Not running on preferred build provider type")
+    .WithCriteria(() => shouldDeployBakery || string.Equals(EnvironmentVariable("SIGNING_TEST"), "true", StringComparison.OrdinalIgnoreCase))
     .Does(() =>
 {
     // Get the secret.
