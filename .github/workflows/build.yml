@@ -20,14 +20,16 @@ jobs:
         os: [windows-latest]
 
     steps:
-      - uses: actions/checkout@v2.3.2
+      - uses: actions/checkout@v2.2.0
+        with:
+          fetch-depth: 0
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '5.0.100'
       - name: Fetch all tags and branches
         run: git fetch --prune --unshallow
       - name: Cache Tools
-        uses: actions/cache@v2.1.1
+        uses: actions/cache@v2
         with:
           path: tools
           key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
@@ -38,9 +40,8 @@ jobs:
           target: CI
           verbosity: Diagnostic
           cake-version: 1.0.0-rc0001
-          cake-bootstrap: true
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2.1.4
+        uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.os }}-artifacts
           path: |
