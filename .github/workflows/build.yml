@@ -26,8 +26,6 @@ jobs:
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '5.0.100'
-      - name: Fetch all tags and branches
-        run: git fetch --prune --unshallow
       - name: Cache Tools
         uses: actions/cache@v2
         with:
