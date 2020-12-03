@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
@@ -9,13 +9,16 @@
   </PropertyGroup>
   <Import Project="..\Shared.props" />
   <ItemGroup>
+    <InternalsVisibleTo Include="Cake.Scripting.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Cake.Core" Version="0.31.0" />
     <PackageReference Include="Mono.Cecil" Version="0.10.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cake.Scripting.Abstractions\Cake.Scripting.Abstractions.csproj" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Net.Http" />
