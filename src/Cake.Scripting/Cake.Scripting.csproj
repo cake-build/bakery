@@ -9,6 +9,9 @@
   </PropertyGroup>
   <Import Project="..\Shared.props" />
   <ItemGroup>
+    <InternalsVisibleTo Include="Cake.Scripting.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Cake.Core" Version="0.31.0" />
     <PackageReference Include="Mono.Cecil" Version="0.10.1" />
   </ItemGroup>

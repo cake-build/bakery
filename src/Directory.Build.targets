@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <Target Name="AssemblyInfos"
+          BeforeTargets="CoreGenerateAssemblyInfo"
+          Inputs="@InternalsVisibleTo" Outputs="%(InternalsVisibleTo.Identity)"
+          Condition="$(IsPackable) == True"
+  >
+    <ItemGroup>
+      <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+        <_Parameter1>%(InternalsVisibleTo.Identity)</_Parameter1>
+      </AssemblyAttribute>
+    </ItemGroup>
+  </Target>
+</Project>
