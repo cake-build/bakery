@@ -240,20 +240,28 @@ namespace Cake.Scripting.CodeGen
                 return cakeCorePath.GetDirectory().MakeAbsolute(_environment);
             }
 
-            // Check path for cake.exe
+            // get .dotnet/tools default installation folder
+            var userDotNetToolsPaths = new[] { "USERPROFILE", "HOME" }
+                .Select(env => _environment.GetEnvironmentVariable(env))
+                .Where(x => x != null)
+                .Distinct()
+                .Select(x => ((DirectoryPath)x).Combine(".dotnet/tools"))
+                .Where(x => _fileSystem.Exist(x))
+                .ToArray();
+
+            // get all directories in PATH
             var separatorChar = _environment.Platform.Family == PlatformFamily.Windows ? ';' : ':';
             var directoriesInPath = (_environment.GetEnvironmentVariable("PATH") ?? string.Empty)
                 .Split(new[] { separatorChar }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => (DirectoryPath)x).ToArray();
-            var cakeExePath = directoriesInPath.FirstOrDefault(x => _fileSystem.Exist(x.CombineWithFilePath("Cake.exe")));
-            if (cakeExePath != null)
-            {
-                return cakeExePath.MakeAbsolute(_environment);
-            }
 
-            // Check path for dotnet-cake.exe
-            var dotnetCakePath = directoriesInPath.FirstOrDefault(x => _fileSystem.Exist(x.CombineWithFilePath("dotnet-cake.exe"))) ??
-                directoriesInPath.FirstOrDefault(x => _fileSystem.Exist(x.CombineWithFilePath("dotnet-cake")));
+            // Check DotNetToolsPath and PATH for dotnet-cake[.exe]
+            var dotnetCakePath = new[] { "dotnet-cake.exe", "dotnet-cake" }
+                .SelectMany(exe =>
+                    userDotNetToolsPaths
+                        .Union(directoriesInPath)
+                        .Select(dir => dir.CombineWithFilePath(exe)))
+                .FirstOrDefault(x => _fileSystem.Exist(x));
             if (dotnetCakePath != null)
             {
                 pattern = string.Concat(dotnetCakePath.FullPath, "/.store/**/Cake.dll");
@@ -263,6 +271,13 @@ namespace Cake.Scripting.CodeGen
                 {
                     return cakeDllPath.GetDirectory().MakeAbsolute(_environment);
                 }
+            }
+
+            // Check PATH for cake.exe
+            var cakeExePath = directoriesInPath.FirstOrDefault(x => _fileSystem.Exist(x.CombineWithFilePath("Cake.exe")));
+            if (cakeExePath != null)
+            {
+                return cakeExePath.MakeAbsolute(_environment);
             }
 
             return toolPath.Combine("Cake").Collapse();
