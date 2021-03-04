@@ -17,7 +17,8 @@ BuildParameters.SetParameters(context: Context,
                             shouldRunCodecov: false,
                             nugetConfig: "./src/NuGet.Config",
                             gitterMessage: "@/all " + standardNotificationMessage,
-                            twitterMessage: standardNotificationMessage);
+                            twitterMessage: standardNotificationMessage,
+                            preferredBuildProviderType: BuildProviderType.GitHubActions);
 
 BuildParameters.PrintParameters(Context);
 
