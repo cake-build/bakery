@@ -1,12 +1,36 @@
 issue-labels-include:
 - Breaking change
-- Feature
 - Bug
+- Feature
+- Enhancement
 - Improvement
 - Documentation
+- security
 issue-labels-exclude:
 - Build
+- Internal / Refactoring
 issue-labels-alias:
     - name:    Documentation
       header:  Documentation
       plural:  Documentation
+    - name:    security
+      header:  Security
+      plural:  Security
+create:
+  include-sha-section: true
+  sha-section-heading: "SHA256 Hashes of the release artifacts"
+  sha-section-line-format: "- `{1}\t{0}`"
+export:
+  include-created-date-in-title: true
+  created-date-string-format: yyyy-MM-dd
+close:
+  use-issue-comments: true
+  issue-comment: |-
+    :tada: This issue has been resolved in version {milestone} :tada:
+
+    The release is available on:
+
+    - [GitHub Release](https://github.com/{owner}/{repository}/releases/tag/{milestone})
+    - [NuGet Package](https://www.nuget.org/packages/Cake.Bakery/{milestone})
+
+    Your **[GitReleaseManager](https://github.com/GitTools/GitReleaseManager)** bot :package::rocket:

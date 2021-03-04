@@ -1,7 +1,9 @@
-#load nuget:?package=Cake.Recipe&version=2.1.0
+#load nuget:?package=Cake.Recipe&version=2.2.0
 #tool nuget:https://api.nuget.org/v3/index.json?package=SignClient&version=0.9.0
 
 Environment.SetVariableNames();
+
+var standardNotificationMessage = "Version {0} of {1} has just been released, this will be available here https://www.nuget.org/packages/{1}, once package indexing is complete.";
 
 BuildParameters.SetParameters(context: Context,
                             buildSystem: BuildSystem,
@@ -13,7 +15,10 @@ BuildParameters.SetParameters(context: Context,
                             shouldRunDotNetCorePack: true,
                             shouldRunDupFinder: false,
                             shouldRunCodecov: false,
-                            nugetConfig: "./src/NuGet.Config");
+                            nugetConfig: "./src/NuGet.Config",
+                            gitterMessage: "@/all " + standardNotificationMessage,
+                            twitterMessage: standardNotificationMessage,
+                            preferredBuildProviderType: BuildProviderType.GitHubActions);
 
 BuildParameters.PrintParameters(Context);
 

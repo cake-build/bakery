@@ -1,0 +1,75 @@
+name: Build
+
+on:
+  push:
+    paths-ignore:
+      - "README.md"
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    strategy:
+      matrix:
+        os: [windows-latest]
+
+    env:
+      GITHUB_PAT: ${{ secrets.GH_TOKEN }}
+      GITTER_ROOM_ID: ${{ secrets.GITTER_ROOM_ID }}
+      GITTER_TOKEN: ${{ secrets.GITTER_TOKEN }}
+      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+      NUGET_SOURCE: "https://api.nuget.org/v3/index.json"
+      TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+      TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+      TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+      TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+      MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
+      MYGET_SOURCE: ${{ secrets.MYGET_SOURCE }}
+      SIGNING_SECRET: ${{ secrets.SIGNING_SECRET }}
+      SIGNING_USER: ${{ secrets.SIGNING_USER }}
+      CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+      CHOCOLATEY_SOURCE: ${{ secrets.CHOCOLATEY_SOURCE }}
+    steps:
+      - name: Setup dotnet 3.1.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.x'
+      - name: Setup dotnet 5.0.100
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '5.0.100'
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Fetch all tags and branches
+        run: git fetch --prune --unshallow
+
+      - name: Cache Tools
+        uses: actions/cache@v2
+        with:
+          path: tools
+          key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+
+      - name: Build project
+        uses: cake-build/cake-action@v1
+        with:
+          script-path: recipe.cake
+          target: CI
+          verbosity: Normal
+          cake-version: 0.38.5
+          cake-bootstrap: true
+
+      - name: Upload Issues-Report
+        uses: actions/upload-artifact@v2
+        with:
+          if-no-files-found: warn
+          name: issues
+          path: BuildArtifacts/report.html
+
+      - name: Upload Packages
+        uses: actions/upload-artifact@v2
+        with:
+          if-no-files-found: warn
+          name: package
+          path: BuildArtifacts/Packages/**/*
