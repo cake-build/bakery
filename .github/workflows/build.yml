@@ -9,12 +9,30 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    #mimic "skip_branch_with_pr: true", see https://github.community/t/duplicate-checks-on-push-and-pull-request-simultaneous-event/18012/4
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     strategy:
       matrix:
         os: [windows-latest]
 
+    env:
+      AZURE_PASSWORD: ${{ secrets.AZURE_PASSWORD }}
+      AZURE_SOURCE: ${{ secrets.AZURE_SOURCE }}
+      AZURE_USER: ${{ secrets.AZURE_USER }}
+      GITHUB_PAT: ${{ secrets.GH_TOKEN }}
+      GITTER_ROOM_ID: ${{ secrets.GITTER_ROOM_ID }}
+      GPR_PASSWORD: ${{ secrets.GPR_PASSWORD }}
+      GPR_SOURCE: ${{ secrets.GPR_SOURCE }}
+      GPR_USER: ${{ secrets.GPR_USER }}
+      GITTER_TOKEN: ${{ secrets.GITTER_TOKEN }}
+      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+      NUGET_SOURCE: "https://api.nuget.org/v3/index.json"
+      TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+      TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+      TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+      TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+      WYAM_ACCESS_TOKEN: ${{ secrets.WYAM_ACCESS_TOKEN }}
+      WYAM_DEPLOY_BRANCH: "gh-pages"
+      WYAM_DEPLOY_REMOTE: ${{ github.event.repository.html_url }}
     steps:
       - name: Setup dotnet 3.1.x
         uses: actions/setup-dotnet@v1
@@ -24,35 +42,36 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '5.0.100'
-      - name: checkout
-        uses: actions/checkout@v2.3.3
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
       - name: Fetch all tags and branches
         run: git fetch --prune --unshallow
+
       - name: Cache Tools
         uses: actions/cache@v2
         with:
           path: tools
           key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+
       - name: Build project
         uses: cake-build/cake-action@v1
         with:
           script-path: recipe.cake
           target: CI
-          verbosity: Diagnostic
-          cake-version: 0.38.4
+          verbosity: Normal
+          cake-version: 0.38.5
           cake-bootstrap: true
-      # currently, Cake.Recipe does not upload artifacts when run on gh-actions
-      - name: Upload Issues
+
+      - name: Upload Issues-Report
         uses: actions/upload-artifact@v2
         with:
           if-no-files-found: warn
-          name: ${{ matrix.os }} Issues
-          path: |
-            BuildArtifacts/report.html
-            BuildArtifacts/**/coverlet/*.xml
+          name: issues
+          path: BuildArtifacts/report.html
+
       - name: Upload Packages
         uses: actions/upload-artifact@v2
-        if: matrix.os == 'windows-latest'
         with:
           if-no-files-found: warn
           name: package
