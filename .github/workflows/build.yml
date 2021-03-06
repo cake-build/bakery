@@ -30,6 +30,9 @@ jobs:
       SIGNING_USER: ${{ secrets.SIGNING_USER }}
       CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
       CHOCOLATEY_SOURCE: ${{ secrets.CHOCOLATEY_SOURCE }}
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX: 2
     steps:
       - name: Setup dotnet 3.1.x
         uses: actions/setup-dotnet@v1
