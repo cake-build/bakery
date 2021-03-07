@@ -261,7 +261,7 @@ namespace Cake.Scripting.CodeGen
                     userDotNetToolsPaths
                         .Union(directoriesInPath)
                         .Select(dir => dir.CombineWithFilePath(exe)))
-                .FirstOrDefault(x => _fileSystem.Exist(x));
+                .FirstOrDefault(x => _fileSystem.Exist(x))?.GetDirectory();
             if (dotnetCakePath != null)
             {
                 pattern = string.Concat(dotnetCakePath.FullPath, "/.store/**/Cake.dll");
