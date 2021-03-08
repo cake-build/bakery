@@ -264,8 +264,8 @@ namespace Cake.Scripting.CodeGen
                 .FirstOrDefault(x => _fileSystem.Exist(x))?.GetDirectory();
             if (dotnetCakePath != null)
             {
-                pattern = string.Concat(dotnetCakePath.FullPath, "/.store/**/Cake.dll");
-                var cakeDllPath = _globber.GetFiles(pattern).FirstOrDefault();
+                pattern = string.Concat(dotnetCakePath.FullPath, "/.store/**/^{netcoreapp3.1,netcoreapp2.1}/**/Cake.dll");
+                var cakeDllPath = _globber.GetFiles(pattern).LastOrDefault();
 
                 if (cakeDllPath != null)
                 {
