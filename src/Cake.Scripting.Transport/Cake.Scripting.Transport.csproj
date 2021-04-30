@@ -4,6 +4,10 @@
     <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <PlatformTarget>AnyCPU</PlatformTarget>
+
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../../asset/cakebuild.snk</AssemblyOriginatorKeyFile>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -13,7 +17,7 @@
   <Import Project="..\Shared.props" />
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Cake.Scripting.Transport.Tests" />
+    <InternalsVisibleTo Include="Cake.Scripting.Transport.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100f11fa73311abdf24cbb9b20f528a9d2b5d12a1485a4240f6ec93783869a3da88a2db961369f0e6da81bbc1ed823bda5b2a4be7fd556ab63d5672149ac53d97c90e8fb845bf95004cdc7f0e2ea6c02220ca2299cf837c581f858cc1f7cd59dba599b09a7391618620313102f765532ad299390d20786c74a41c73ca4fc90e54df" />
   </ItemGroup>
 
   <ItemGroup>
