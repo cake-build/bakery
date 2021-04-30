@@ -105,7 +105,7 @@ BuildParameters.Tasks.DotNetCoreBuildTask
         Restore = true,
         Properties = {
             ["Version"] = new[] { buildVersion.SemVersion },
-            ["AssemblyVersion"] = new[] { buildVersion.Version },
+            ["AssemblyVersion"] = new[] { "1.0.0.0" },
             ["FileVersion"] = new[] { buildVersion.Version },
             ["AssemblyInformationalVersion"] = new[] { buildVersion.InformationalVersion },
         }
@@ -123,7 +123,7 @@ BuildParameters.Tasks.DotNetCorePackTask
 {
     var msBuildSettings = new DotNetCoreMSBuildSettings()
                                 .WithProperty("Version", buildVersion.SemVersion)
-                                .WithProperty("AssemblyVersion", buildVersion.Version)
+                                .WithProperty("AssemblyVersion", "1.0.0.0")
                                 .WithProperty("FileVersion",  buildVersion.Version)
                                 .WithProperty("AssemblyInformationalVersion", buildVersion.InformationalVersion);
 
