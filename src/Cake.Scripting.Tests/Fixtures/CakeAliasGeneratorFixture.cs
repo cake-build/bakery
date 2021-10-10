@@ -10,7 +10,6 @@ using System.Reflection;
 using Cake.Core.IO;
 using Cake.Scripting.CodeGen;
 using Cake.Scripting.CodeGen.Generators;
-using Cake.Scripting.Tests;
 
 namespace Cake.Scripting.Tests.Fixtures
 {

@@ -4,7 +4,7 @@
 
 using System.Net.Sockets;
 
-namespace Cake.Scripting.Transport.Extensions
+namespace Cake.Scripting.Transport
 {
     internal static class SocketExtensions
     {

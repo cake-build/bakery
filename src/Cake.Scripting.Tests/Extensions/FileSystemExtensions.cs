@@ -6,7 +6,7 @@ using System.IO;
 using System.Text;
 using Cake.Core.IO;
 
-namespace Cake.Scripting.Tests.Extensions
+namespace Cake.Scripting.Tests
 {
     internal static class FileSystemExtensions
     {

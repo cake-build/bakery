@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Cake.Scripting.Abstractions;
 using Cake.Scripting.Abstractions.Models;
-using Cake.Scripting.Transport.Extensions;
 using Cake.Scripting.Transport.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
