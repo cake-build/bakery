@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using Cake.Core.IO;
 using Cake.Scripting.Abstractions.Models;
 using Cake.Scripting.IO;
-using Cake.Scripting.Tests.Extensions;
 using Cake.Scripting.Tests.Fixtures;
 using Cake.Testing;
 using Xunit;

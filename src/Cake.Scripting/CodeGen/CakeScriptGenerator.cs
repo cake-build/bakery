@@ -86,7 +86,10 @@ namespace Cake.Scripting.CodeGen
 
             // Analyze the script file.
             _log.Verbose("Analyzing build script...");
-            var result = _analyzer.Analyze(scriptPath);
+            var result = _analyzer.Analyze(scriptPath, new ScriptAnalyzerSettings
+            {
+                Mode = ScriptAnalyzerMode.Everything,
+            });
 
             // Install addins.
             foreach (var addin in result.Addins)

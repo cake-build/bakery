@@ -1,7 +1,7 @@
 ﻿var target = Argument("target", "Default");
 
 Task("Default")
-  .Does(() =>
+  .Does(ctx =>
 {
   Information("Hello World!");
 });
