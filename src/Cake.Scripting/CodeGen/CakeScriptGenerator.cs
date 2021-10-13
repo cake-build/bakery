@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Runtime.Serialization.Json;
 using System.Xml;
 using System.Xml.Linq;
+using Cake.Common;
 using Cake.Core;
 using Cake.Core.Configuration;
 using Cake.Core.Diagnostics;
@@ -39,7 +40,6 @@ namespace Cake.Scripting.CodeGen
         private readonly IScriptAliasFinder _aliasFinder;
         private readonly ICakeAliasGenerator _aliasGenerator;
         private readonly DirectoryPath _addinRoot;
-        private readonly DirectoryPath _cakeRoot;
         private readonly ScriptHost _hostObject;
         private readonly Lazy<ISet<FilePath>> _defaultReferences;
 
@@ -65,9 +65,8 @@ namespace Cake.Scripting.CodeGen
             _analyzer = new ScriptAnalyzer(_fileSystem, _environment, _log, loadDirectiveProviders);
 
             _addinRoot = GetAddinPath(_environment.WorkingDirectory);
-            _cakeRoot = GetCakePath(GetToolPath(_environment.WorkingDirectory));
-            _hostObject = GetHostObject(_cakeRoot);
-            _defaultReferences = new Lazy<ISet<FilePath>>(() => GetDefaultReferences(_cakeRoot));
+            _hostObject = GetHostObject();
+            _defaultReferences = new Lazy<ISet<FilePath>>(GetDefaultReferences);
         }
 
         public CakeScript Generate(FileChange fileChange)
@@ -86,7 +85,10 @@ namespace Cake.Scripting.CodeGen
 
             // Analyze the script file.
             _log.Verbose("Analyzing build script...");
-            var result = _analyzer.Analyze(scriptPath);
+            var result = _analyzer.Analyze(scriptPath, new ScriptAnalyzerSettings
+            {
+                Mode = ScriptAnalyzerMode.Everything
+            });
 
             // Install addins.
             foreach (var addin in result.Addins)
@@ -181,15 +183,15 @@ namespace Cake.Scripting.CodeGen
             };
         }
 
-        private ISet<FilePath> GetDefaultReferences(DirectoryPath root)
+        private ISet<FilePath> GetDefaultReferences()
         {
             // Prepare the default assemblies.
             var references = new HashSet<FilePath>();
             references.Add(typeof(Action).GetTypeInfo().Assembly.Location); // mscorlib or System.Private.Core
             references.Add(typeof(IQueryable).GetTypeInfo().Assembly.Location); // System.Core or System.Linq.Expressions
 
-            references.Add(root.CombineWithFilePath("Cake.Core.dll").FullPath);
-            references.Add(root.CombineWithFilePath("Cake.Common.dll").FullPath);
+            references.Add(typeof(IScriptHost).Assembly.Location); // Cake.Core
+            references.Add(typeof(EnvironmentAliases).Assembly.Location); // Cake.Common
 
             references.Add(typeof(Uri).GetTypeInfo().Assembly.Location); // System
             references.Add(typeof(XmlReader).GetTypeInfo().Assembly.Location); // System.Xml
@@ -204,11 +206,11 @@ namespace Cake.Scripting.CodeGen
             return references;
         }
 
-        private static ScriptHost GetHostObject(DirectoryPath root)
+        private static ScriptHost GetHostObject()
         {
             return new ScriptHost
             {
-                AssemblyPath = root.CombineWithFilePath("Cake.Core.dll").FullPath,
+                AssemblyPath = new FilePath(typeof(IScriptHost).Assembly.Location).FullPath,
                 TypeName = typeof(IScriptHost).AssemblyQualifiedName
             };
         }

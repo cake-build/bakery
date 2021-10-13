@@ -125,7 +125,7 @@ namespace Integration
             var response = service.Generate(fileChange);
 
             // Then
-            var cakeCorePath = $"{workingDirectory}/tools/Cake/Cake.Core.dll";
+            var cakeCorePath = $"{workingDirectory}/tools/Cake.Bakery/tools/Cake.Core.dll";
             var lineDirective = $"#line 1 \"{workingDirectory}/{CakeHelloWorldFile}\"";
             var sourceLines = response.Source.Split('\n').ToList();
             var expectedLines = CakeHelloWorldSrc.Split('\n').ToList();
@@ -158,7 +158,7 @@ namespace Integration
             var response = service.Generate(fileChange);
 
             // Then
-            var cakeCorePath = $"{workingDirectory}/tools/Cake/Cake.Core.dll";
+            var cakeCorePath = $"{workingDirectory}/tools/Cake.Bakery/tools/Cake.Core.dll";
             var lineDirective = $"#line 1 \"{workingDirectory}/{fileName}\"";
             var sourceLines = response.Source.Split('\n').ToList();
             var expectedLines = CakeHelloWorldSrc.Split('\n').ToList();
@@ -224,7 +224,7 @@ namespace Integration
             var response = service.Generate(fileChange);
 
             // Then
-            var cakeCorePath = $"{workingDirectory}/tools/Cake/Cake.Core.dll";
+            var cakeCorePath = $"{workingDirectory}/tools/Cake.Bakery/tools/Cake.Core.dll";
             var lineDirective = $"#line 1 \"{workingDirectory}/{fileName}\"";
             var sourceLines = response.Source.Split('\n').ToList();
             var expectedLines = CakeHelloWorldModified.Split('\n').ToList();
