@@ -210,7 +210,7 @@ namespace Cake.Scripting.CodeGen
         {
             return new ScriptHost
             {
-                AssemblyPath = typeof(IScriptHost).Assembly.Location,
+                AssemblyPath = new FilePath(typeof(IScriptHost).Assembly.Location).FullPath,
                 TypeName = typeof(IScriptHost).AssemblyQualifiedName
             };
         }
