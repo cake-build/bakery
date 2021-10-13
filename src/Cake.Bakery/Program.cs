@@ -78,7 +78,7 @@ namespace Cake.Bakery
                 // Rebuild the container for NuGet and Buffered File System.
                 registrar = new ContainerRegistrar();
                 registrar.RegisterInstance(configuration);
-                registrar.RegisterModule(new NuGetModule(configuration));
+                registrar.RegisterModule(new NuGetModule());
                 registrar.RegisterModule(new ScriptingModule(fileSystem, log));
                 registrar.Builder.Update(container);
 
