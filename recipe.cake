@@ -92,29 +92,6 @@ Task("Publish-GitHub-Release-Zip")
     publishingError = true;
 });
 
-// Override default Build and Restore tasks
-(BuildParameters.Tasks.DotNetCoreRestoreTask.Task as CakeTask).Actions.Clear();
-(BuildParameters.Tasks.DotNetCoreBuildTask.Task as CakeTask).Actions.Clear();
-BuildParameters.Tasks.DotNetCoreBuildTask
-    .Does<BuildVersion>((context, buildVersion) =>
-{
-    Information("Building {0}", BuildParameters.SolutionFilePath);
-
-    MSBuild(BuildParameters.SolutionFilePath.FullPath, new MSBuildSettings {
-        Configuration = BuildParameters.Configuration,
-        Restore = true,
-        Properties = {
-            ["Version"] = new[] { buildVersion.SemVersion },
-            ["AssemblyVersion"] = new[] { "1.0.0.0" },
-            ["FileVersion"] = new[] { buildVersion.Version },
-            ["AssemblyInformationalVersion"] = new[] { buildVersion.InformationalVersion },
-        }
-    });
-
-    CleanDirectory(binArtifactPath);
-    CopyFiles(GetFiles($"./src/Cake.Bakery/bin/{BuildParameters.Configuration}/net461/**/*"), binArtifactPath, true);
-});
-
 // Override default Pack task
 (BuildParameters.Tasks.DotNetCorePackTask.Task as CakeTask).Actions.Clear();
 BuildParameters.Tasks.DotNetCorePackTask
@@ -182,12 +159,10 @@ Task("Init-Integration-Tests")
         FallbackSource = new[] { "https://api.nuget.org/v3/index.json" }
     });
 
-    MSBuild("./tests/integration/integration.csproj", new MSBuildSettings {
+    DotNetCoreBuild("./tests/integration/Cake.Bakery.Tests.Integration.csproj", new DotNetCoreBuildSettings {
         Configuration = BuildParameters.Configuration,
-        Restore = true,
-        Properties = {
-            ["OutputPath"] = new[] { "./bin/" }
-        }
+        NoRestore = false,
+        OutputDirectory = "./tests/integration/bin"
     });
 });
 
