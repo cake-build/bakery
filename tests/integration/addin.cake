@@ -1,1 +1,1 @@
-#addin nuget:?package=Cake.Wyam&version=0.18.6
+#addin nuget:?package=Cake.Wyam2&version=3.0.0-rc2

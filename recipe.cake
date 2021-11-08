@@ -235,7 +235,7 @@ Task("Run-Bakery-Integration-Tests")
     if (!IsRunningOnWindows())
     {
         var exitCode = StartProcess("mono", new ProcessSettings {
-            Arguments = MakeAbsolute(new FilePath("./tests/integration/bin/integration.exe")).FullPath + " " +
+            Arguments = MakeAbsolute(new FilePath("./tests/integration/bin/Cake.Bakery.Tests.Integration.exe")).FullPath + " " +
                 MakeAbsolute(new FilePath("./tests/integration/tools/Cake.Bakery/tools/Cake.Bakery.exe")).FullPath,
             WorkingDirectory = new DirectoryPath("./tests/integration")
         });
@@ -247,7 +247,7 @@ Task("Run-Bakery-Integration-Tests")
 
         exitCode = StartProcess("./tests/integration/mono/run", new ProcessSettings {
             Arguments = "--no-omnisharp " +
-                MakeAbsolute(new FilePath("./tests/integration/bin/integration.exe")).FullPath + " " +
+                MakeAbsolute(new FilePath("./tests/integration/bin/Cake.Bakery.Tests.Integration.exe")).FullPath + " " +
                 MakeAbsolute(new FilePath("./tests/integration/tools/Cake.Bakery/tools/Cake.Bakery.exe")).FullPath,
             WorkingDirectory = new DirectoryPath("./tests/integration")
         });
@@ -259,7 +259,7 @@ Task("Run-Bakery-Integration-Tests")
     }
     else
     {
-        var exitCode = StartProcess("./tests/integration/bin/integration.exe", new ProcessSettings {
+        var exitCode = StartProcess("./tests/integration/bin/Cake.Bakery.Tests.Integration.exe", new ProcessSettings {
             Arguments = MakeAbsolute(new FilePath("./tests/integration/tools/Cake.Bakery/tools/Cake.Bakery.exe")).FullPath,
             WorkingDirectory = new DirectoryPath("./tests/integration")
         });
