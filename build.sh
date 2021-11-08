@@ -2,7 +2,7 @@
 
 # Define varibles
 SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-DOTNET_VERSION="6.0.100-rc.1.21463.6"
+DOTNET_VERSION="6.0.100"
 
 ###########################################################################
 # INSTALL .NET CORE CLI

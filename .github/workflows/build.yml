@@ -34,14 +34,9 @@ jobs:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX: 2
     steps:
-      - name: Setup dotnet 3.1.x
+      - name: Install .NET Core SDK (global.json)
         uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '3.1.x'
-      - name: Setup dotnet 5.0.100
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '5.0.100'
+
       - name: Checkout the repository
         uses: actions/checkout@v2
 
