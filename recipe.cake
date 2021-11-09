@@ -29,6 +29,10 @@ ToolSettings.SetToolSettings(context: Context,
                             testCoverageExcludeByAttribute: "*.ExcludeFromCodeCoverage*",
                             testCoverageExcludeByFile: "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs");
 
+// workaround https://github.com/cake-contrib/Cake.Recipe/issues/862
+ToolSettings.SetToolPreprocessorDirectives(
+    reSharperTools: "#tool nuget:?package=JetBrains.ReSharper.CommandLineTools&version=2021.2.0");
+
 var binArtifactPath = BuildParameters.Paths.Directories.PublishedApplications.Combine("Cake.Bakery/net6.0");
 var zipArtifactsPath = BuildParameters.Paths.Directories.Build.Combine("Packages/Zip");
 var omnisharpBaseDownloadURL = "https://omnisharpdownload.blob.core.windows.net/ext";
