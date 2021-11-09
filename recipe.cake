@@ -15,6 +15,7 @@ BuildParameters.SetParameters(context: Context,
                             shouldRunDotNetCorePack: true,
                             shouldRunDupFinder: false,
                             shouldRunCodecov: false,
+                            shouldRunInspectCode: false, // we have a workaround in place
                             nugetConfig: "./src/NuGet.Config",
                             gitterMessage: "@/all " + standardNotificationMessage,
                             twitterMessage: standardNotificationMessage,
@@ -318,5 +319,32 @@ Task("Sign-Binaries")
         }
     }
 });
+
+// additional workaround for https://github.com/cake-contrib/Cake.Recipe/issues/862
+// to suppress the --build/--no-build warning that is generated in the default
+BuildParameters.Tasks.InspectCodeTask = Task("InspectCode2021")
+    .WithCriteria(() => BuildParameters.BuildAgentOperatingSystem == PlatformFamily.Windows, "Skipping due to not running on Windows")
+    .Does<BuildData>(data => RequireTool(ToolSettings.ReSharperTools, () => {
+        var inspectCodeLogFilePath = BuildParameters.Paths.Directories.InspectCodeTestResults.CombineWithFilePath("inspectcode.xml");
+
+        var settings = new InspectCodeSettings() {
+            SolutionWideAnalysis = true,
+            OutputFile = inspectCodeLogFilePath,
+            ArgumentCustomization = x => x.Append("--no-build")
+        };
+
+        if (FileExists(BuildParameters.SourceDirectoryPath.CombineWithFilePath(BuildParameters.ResharperSettingsFileName)))
+        {
+            settings.Profile = BuildParameters.SourceDirectoryPath.CombineWithFilePath(BuildParameters.ResharperSettingsFileName);
+        }
+
+        InspectCode(BuildParameters.SolutionFilePath, settings);
+
+        // Pass path to InspectCode log file to Cake.Issues.Recipe
+        IssuesParameters.InputFiles.InspectCodeLogFilePath = inspectCodeLogFilePath;
+    })
+);
+BuildParameters.Tasks.AnalyzeTask.IsDependentOn("InspectCode2021");
+IssuesBuildTasks.ReadIssuesTask.IsDependentOn("InspectCode2021");
 
 Build.RunDotNetCore();
