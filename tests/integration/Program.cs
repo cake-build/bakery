@@ -254,7 +254,7 @@ namespace Integration
             var response = service.Generate(fileChange);
 
             // Then
-            var addin = Path.GetFullPath("./tools/Addins/Cake.Wyam.0.18.6/lib/net45/Cake.Wyam.dll")
+            var addin = Path.GetFullPath("./tools/Addins/Cake.Wyam2.3.0.0-rc2/lib/netstandard2.0/Cake.Wyam.dll")
                 .Replace('\\', '/');
 
             Assert.Contains(addin, response.References);
@@ -267,7 +267,7 @@ namespace Integration
 @"var target = Argument(""target"", ""Default"");
 
 Task(""Default"")
-  .Does(() =>
+  .Does(ctx =>
 {
   Information(""Hello World!"");
 });
@@ -277,7 +277,7 @@ RunTarget(target);";
 @"var target = Argument(""target"", ""Foobar"");
 
 Task(""Foobar"")
-  .Does(() =>
+  .Does(ctx =>
 {
   Verbose(""Hello World!"");
 });

@@ -4,7 +4,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Cake.Scripting;
 using Cake.Scripting.Documentation;
 using Mono.Cecil;
 

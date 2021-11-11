@@ -15,6 +15,7 @@ BuildParameters.SetParameters(context: Context,
                             shouldRunDotNetCorePack: true,
                             shouldRunDupFinder: false,
                             shouldRunCodecov: false,
+                            shouldRunInspectCode: false, // we have a workaround in place
                             nugetConfig: "./src/NuGet.Config",
                             gitterMessage: "@/all " + standardNotificationMessage,
                             twitterMessage: standardNotificationMessage,
@@ -29,7 +30,11 @@ ToolSettings.SetToolSettings(context: Context,
                             testCoverageExcludeByAttribute: "*.ExcludeFromCodeCoverage*",
                             testCoverageExcludeByFile: "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs");
 
-var binArtifactPath = BuildParameters.Paths.Directories.PublishedApplications.Combine("Cake.Bakery/net461");
+// workaround https://github.com/cake-contrib/Cake.Recipe/issues/862
+ToolSettings.SetToolPreprocessorDirectives(
+    reSharperTools: "#tool nuget:?package=JetBrains.ReSharper.CommandLineTools&version=2021.2.0");
+
+var binArtifactPath = BuildParameters.Paths.Directories.PublishedApplications.Combine("Cake.Bakery/net6.0");
 var zipArtifactsPath = BuildParameters.Paths.Directories.Build.Combine("Packages/Zip");
 var omnisharpBaseDownloadURL = "https://omnisharpdownload.blob.core.windows.net/ext";
 var omnisharpMonoRuntimeMacOS = $"{omnisharpBaseDownloadURL}/mono.macOS-5.12.0.301.zip";
@@ -90,29 +95,6 @@ Task("Publish-GitHub-Release-Zip")
     Error(exception.Message);
     Information("Publish-GitHub-Release Task failed, but continuing with next Task...");
     publishingError = true;
-});
-
-// Override default Build and Restore tasks
-(BuildParameters.Tasks.DotNetCoreRestoreTask.Task as CakeTask).Actions.Clear();
-(BuildParameters.Tasks.DotNetCoreBuildTask.Task as CakeTask).Actions.Clear();
-BuildParameters.Tasks.DotNetCoreBuildTask
-    .Does<BuildVersion>((context, buildVersion) =>
-{
-    Information("Building {0}", BuildParameters.SolutionFilePath);
-
-    MSBuild(BuildParameters.SolutionFilePath.FullPath, new MSBuildSettings {
-        Configuration = BuildParameters.Configuration,
-        Restore = true,
-        Properties = {
-            ["Version"] = new[] { buildVersion.SemVersion },
-            ["AssemblyVersion"] = new[] { "1.0.0.0" },
-            ["FileVersion"] = new[] { buildVersion.Version },
-            ["AssemblyInformationalVersion"] = new[] { buildVersion.InformationalVersion },
-        }
-    });
-
-    CleanDirectory(binArtifactPath);
-    CopyFiles(GetFiles($"./src/Cake.Bakery/bin/{BuildParameters.Configuration}/net461/**/*"), binArtifactPath, true);
 });
 
 // Override default Pack task
@@ -182,12 +164,10 @@ Task("Init-Integration-Tests")
         FallbackSource = new[] { "https://api.nuget.org/v3/index.json" }
     });
 
-    MSBuild("./tests/integration/integration.csproj", new MSBuildSettings {
+    DotNetCoreBuild("./tests/integration/Cake.Bakery.Tests.Integration.csproj", new DotNetCoreBuildSettings {
         Configuration = BuildParameters.Configuration,
-        Restore = true,
-        Properties = {
-            ["OutputPath"] = new[] { "./bin/" }
-        }
+        NoRestore = false,
+        OutputDirectory = "./tests/integration/bin"
     });
 });
 
@@ -235,7 +215,7 @@ Task("Run-Bakery-Integration-Tests")
     if (!IsRunningOnWindows())
     {
         var exitCode = StartProcess("mono", new ProcessSettings {
-            Arguments = MakeAbsolute(new FilePath("./tests/integration/bin/integration.exe")).FullPath + " " +
+            Arguments = MakeAbsolute(new FilePath("./tests/integration/bin/Cake.Bakery.Tests.Integration.exe")).FullPath + " " +
                 MakeAbsolute(new FilePath("./tests/integration/tools/Cake.Bakery/tools/Cake.Bakery.exe")).FullPath,
             WorkingDirectory = new DirectoryPath("./tests/integration")
         });
@@ -247,7 +227,7 @@ Task("Run-Bakery-Integration-Tests")
 
         exitCode = StartProcess("./tests/integration/mono/run", new ProcessSettings {
             Arguments = "--no-omnisharp " +
-                MakeAbsolute(new FilePath("./tests/integration/bin/integration.exe")).FullPath + " " +
+                MakeAbsolute(new FilePath("./tests/integration/bin/Cake.Bakery.Tests.Integration.exe")).FullPath + " " +
                 MakeAbsolute(new FilePath("./tests/integration/tools/Cake.Bakery/tools/Cake.Bakery.exe")).FullPath,
             WorkingDirectory = new DirectoryPath("./tests/integration")
         });
@@ -259,7 +239,7 @@ Task("Run-Bakery-Integration-Tests")
     }
     else
     {
-        var exitCode = StartProcess("./tests/integration/bin/integration.exe", new ProcessSettings {
+        var exitCode = StartProcess("./tests/integration/bin/Cake.Bakery.Tests.Integration.exe", new ProcessSettings {
             Arguments = MakeAbsolute(new FilePath("./tests/integration/tools/Cake.Bakery/tools/Cake.Bakery.exe")).FullPath,
             WorkingDirectory = new DirectoryPath("./tests/integration")
         });
@@ -339,5 +319,32 @@ Task("Sign-Binaries")
         }
     }
 });
+
+// additional workaround for https://github.com/cake-contrib/Cake.Recipe/issues/862
+// to suppress the --build/--no-build warning that is generated in the default
+BuildParameters.Tasks.InspectCodeTask = Task("InspectCode2021")
+    .WithCriteria(() => BuildParameters.BuildAgentOperatingSystem == PlatformFamily.Windows, "Skipping due to not running on Windows")
+    .Does<BuildData>(data => RequireTool(ToolSettings.ReSharperTools, () => {
+        var inspectCodeLogFilePath = BuildParameters.Paths.Directories.InspectCodeTestResults.CombineWithFilePath("inspectcode.xml");
+
+        var settings = new InspectCodeSettings() {
+            SolutionWideAnalysis = true,
+            OutputFile = inspectCodeLogFilePath,
+            ArgumentCustomization = x => x.Append("--no-build")
+        };
+
+        if (FileExists(BuildParameters.SourceDirectoryPath.CombineWithFilePath(BuildParameters.ResharperSettingsFileName)))
+        {
+            settings.Profile = BuildParameters.SourceDirectoryPath.CombineWithFilePath(BuildParameters.ResharperSettingsFileName);
+        }
+
+        InspectCode(BuildParameters.SolutionFilePath, settings);
+
+        // Pass path to InspectCode log file to Cake.Issues.Recipe
+        IssuesParameters.InputFiles.InspectCodeLogFilePath = inspectCodeLogFilePath;
+    })
+);
+BuildParameters.Tasks.AnalyzeTask.IsDependentOn("InspectCode2021");
+IssuesBuildTasks.ReadIssuesTask.IsDependentOn("InspectCode2021");
 
 Build.RunDotNetCore();
