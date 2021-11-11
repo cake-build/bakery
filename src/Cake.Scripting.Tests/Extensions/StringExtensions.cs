@@ -13,7 +13,7 @@ namespace Cake.Scripting.Tests
         /// Removes line endings from the specified text.
         /// </summary>
         /// <param name="text">The text.</param>
-        /// <returns>The text without line ending</returns>
+        /// <returns>The text without line ending.</returns>
         public static string NormalizeGeneratedCode(this string text)
         {
             return text.NormalizeLineEndings()
