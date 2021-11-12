@@ -36,10 +36,10 @@ ToolSettings.SetToolPreprocessorDirectives(
 
 var binArtifactPath = BuildParameters.Paths.Directories.PublishedApplications.Combine("Cake.Bakery/net6.0");
 var zipArtifactsPath = BuildParameters.Paths.Directories.Build.Combine("Packages/Zip");
-var omnisharpBaseDownloadURL = "https://omnisharpdownload.blob.core.windows.net/ext";
-var omnisharpMonoRuntimeMacOS = $"{omnisharpBaseDownloadURL}/mono.macOS-5.12.0.301.zip";
-var omnisharpMonoRuntimeLinux32= $"{omnisharpBaseDownloadURL}/mono.linux-x86-5.12.0.301.zip";
-var omnisharpMonoRuntimeLinux64= $"{omnisharpBaseDownloadURL}/mono.linux-x86_64-5.12.0.301.zip";
+var omnisharpBaseDownloadURL = "https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.37.17";
+var omnisharpMonoRuntimeMacOS = $"{omnisharpBaseDownloadURL}/omnisharp-osx.zip";
+var omnisharpMonoRuntimeLinux32= $"{omnisharpBaseDownloadURL}/omnisharp-linux-x86.zip";
+var omnisharpMonoRuntimeLinux64= $"{omnisharpBaseDownloadURL}/omnisharp-linux-x64.zip";
 
 Task("Copy-License")
     .IsDependentOn("DotNetCore-Build")
@@ -50,8 +50,18 @@ Task("Copy-License")
     CopyFileToDirectory("./LICENSE", binArtifactPath);
 });
 
+Task("Copy-CIL-Exe")
+    .IsDependentOn("DotNetCore-Build")
+    .WithCriteria(() => BuildParameters.ShouldRunDotNetCorePack)
+    .Does(() =>
+{
+    // Copy CIL Exe
+    CopyFileToDirectory("./asset/Cake.Bakery.exe", binArtifactPath);
+});
+
 Task("Zip-Files")
     .IsDependentOn("Copy-License")
+    .IsDependentOn("Copy-CIL-Exe")
     .IsDependeeOf("Package")
     .Does<BuildVersion>((context, buildVersion) =>
 {
@@ -101,6 +111,7 @@ Task("Publish-GitHub-Release-Zip")
 (BuildParameters.Tasks.DotNetCorePackTask.Task as CakeTask).Actions.Clear();
 BuildParameters.Tasks.DotNetCorePackTask
     .IsDependentOn("Copy-License")
+    .IsDependentOn("Copy-CIL-Exe")
     .Does<BuildVersion>((context, buildVersion) =>
 {
     var msBuildSettings = new DotNetCoreMSBuildSettings()
@@ -155,14 +166,10 @@ Task("Init-Integration-Tests")
         "./tests/integration/bin"
     });
 
-    NuGetInstall(new[] { "Cake.Bakery", "Cake" }, new NuGetInstallSettings {
-        ExcludeVersion = true,
-        OutputDirectory = new DirectoryPath("./tests/integration/tools"),
-        DisableParallelProcessing = true,
-        Prerelease = true,
-        Source = new[] { MakeAbsolute(BuildParameters.Paths.Directories.NuGetPackages).FullPath },
-        FallbackSource = new[] { "https://api.nuget.org/v3/index.json" }
-    });
+    Unzip(
+        GetFiles($"{MakeAbsolute(BuildParameters.Paths.Directories.NuGetPackages)}/Cake.Bakery.*.nupkg").First(),
+        new DirectoryPath("./tests/integration/tools/Cake.Bakery")
+    );
 
     DotNetCoreBuild("./tests/integration/Cake.Bakery.Tests.Integration.csproj", new DotNetCoreBuildSettings {
         Configuration = BuildParameters.Configuration,
@@ -214,10 +221,14 @@ Task("Run-Bakery-Integration-Tests")
     // If not running on Windows, run with OmniSharp Mono and Mono.
     if (!IsRunningOnWindows())
     {
-        var exitCode = StartProcess("mono", new ProcessSettings {
-            Arguments = MakeAbsolute(new FilePath("./tests/integration/bin/Cake.Bakery.Tests.Integration.exe")).FullPath + " " +
-                MakeAbsolute(new FilePath("./tests/integration/tools/Cake.Bakery/tools/Cake.Bakery.exe")).FullPath,
-            WorkingDirectory = new DirectoryPath("./tests/integration")
+        var exitCode = StartProcess(
+            MakeAbsolute(new FilePath("./tests/integration/bin/Cake.Bakery.Tests.Integration")),
+            new ProcessSettings {
+                Arguments = MakeAbsolute(new FilePath("./tests/integration/tools/Cake.Bakery/tools/Cake.Bakery.exe")).FullPath,
+                WorkingDirectory = new DirectoryPath("./tests/integration"),
+                EnvironmentVariables = new Dictionary<string, string> {
+                    { "CakeBakeryTestsIntegrationMono", Context.Tools.Resolve("mono").FullPath }
+                }
         });
 
         if (exitCode != 0)
@@ -225,11 +236,14 @@ Task("Run-Bakery-Integration-Tests")
             throw new Exception("Mono integration tests failed.");
         }
 
-        exitCode = StartProcess("./tests/integration/mono/run", new ProcessSettings {
-            Arguments = "--no-omnisharp " +
-                MakeAbsolute(new FilePath("./tests/integration/bin/Cake.Bakery.Tests.Integration.exe")).FullPath + " " +
-                MakeAbsolute(new FilePath("./tests/integration/tools/Cake.Bakery/tools/Cake.Bakery.exe")).FullPath,
-            WorkingDirectory = new DirectoryPath("./tests/integration")
+        exitCode = StartProcess(
+            MakeAbsolute(new FilePath("./tests/integration/bin/Cake.Bakery.Tests.Integration")),
+            new ProcessSettings {
+                Arguments = MakeAbsolute(new FilePath("./tests/integration/tools/Cake.Bakery/tools/Cake.Bakery.exe")).FullPath,
+                WorkingDirectory = new DirectoryPath("./tests/integration"),
+                EnvironmentVariables = new Dictionary<string, string> {
+                    { "CakeBakeryTestsIntegrationMono", MakeAbsolute(new FilePath("./tests/integration/mono/bin/mono")).FullPath }
+                }
         });
 
         if (exitCode != 0)
