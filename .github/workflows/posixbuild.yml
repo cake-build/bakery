@@ -1,0 +1,40 @@
+name: Posix Build
+
+on:
+  push:
+    paths-ignore:
+      - "README.md"
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    strategy:
+      matrix:
+        os: [macos-latest]
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Fetch all tags and branches
+        run: git fetch --prune --unshallow
+
+      - name: Install .NET Core SDK (global.json)
+        uses: actions/setup-dotnet@v1
+
+      - name: Cache Tools
+        uses: actions/cache@v2
+        with:
+          path: tools
+          key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+
+      - name: Build project
+        uses: cake-build/cake-action@v1
+        with:
+          script-path: recipe.cake
+          target: Run-Bakery-Integration-Tests
+          verbosity: Normal
+          cake-version: 0.38.5
+          cake-bootstrap: true

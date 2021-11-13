@@ -3,7 +3,8 @@
 #---------------------------------#
 
 # Build worker image (VM template)
-image: Visual Studio 2022
+image: 
+  - Visual Studio 2022
 
 install:
   - ps: dotnet --info
