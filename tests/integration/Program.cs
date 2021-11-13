@@ -10,6 +10,7 @@ using Xunit;
 
 namespace Integration
 {
+    
     class MonoScriptGenerationProcess : IScriptGenerationProcess
     {
         private readonly ILogger _logger;
@@ -84,34 +85,23 @@ namespace Integration
 
         private Tuple<string, string> GetMonoRuntime()
         {
-            // Check using ps how process was started.
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = "sh",
-                Arguments = $"-c \"ps -fp {Process.GetCurrentProcess().Id} | tail -n1 | awk '{{print $8}}'\"",
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-            };
-            var process = Process.Start(startInfo);
-            var runtime = process.StandardOutput.ReadToEnd().TrimEnd(new[] { '\n' });
-            process.WaitForExit();
-
             // If OmniSharp bundled Mono runtime, use bootstrap script.
-            var script = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(runtime), "../run");
+            var script = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Program.MonoRuntime), "../run");
             if (System.IO.File.Exists(script))
             {
                 return Tuple.Create(script, "--no-omnisharp ");
             }
 
             // Else use mono directly.
-            return Tuple.Create(runtime, string.Empty);
+            return Tuple.Create(Program.MonoRuntime, string.Empty);
         }
 
         public string ServerExecutablePath { get; set; }
     }
 
-    class Program
+    public class Program
     {
+        internal static string MonoRuntime = System.Environment.GetEnvironmentVariable("CakeBakeryTestsIntegrationMono");
         static void Should_Generate_From_File()
         {
             // Given
@@ -287,7 +277,7 @@ RunTarget(target);";
 
         static int Main(string[] args)
         {
-            var isRunningOnMono = Type.GetType("Mono.Runtime") != null;
+            var isRunningOnMono = !string.IsNullOrWhiteSpace(MonoRuntime);
             var loggerFactory = new LoggerFactory()
                 .AddConsole(Microsoft.Extensions.Logging.LogLevel.Debug);
 
