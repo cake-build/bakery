@@ -194,6 +194,7 @@ namespace Cake.Scripting.CodeGen
             references.Add(typeof(EnvironmentAliases).Assembly.Location); // Cake.Common
 
             references.Add(typeof(Uri).GetTypeInfo().Assembly.Location); // System
+            references.Add(typeof(Enumerable).GetTypeInfo().Assembly.Location); // System.Linq
             references.Add(typeof(XmlReader).GetTypeInfo().Assembly.Location); // System.Xml
             references.Add(typeof(XDocument).GetTypeInfo().Assembly.Location); // System.Xml.Linq
             references.Add(typeof(DataTable).GetTypeInfo().Assembly.Location); // System.Data
