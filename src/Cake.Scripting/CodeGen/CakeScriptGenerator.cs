@@ -40,6 +40,7 @@ namespace Cake.Scripting.CodeGen
         private readonly IScriptAliasFinder _aliasFinder;
         private readonly ICakeAliasGenerator _aliasGenerator;
         private readonly IScriptConventions _scriptConventions;
+        private readonly IReferenceAssemblyResolver _referenceAssemblyResolver;
         private readonly DirectoryPath _addinRoot;
         private readonly ScriptHost _hostObject;
 
@@ -53,6 +54,7 @@ namespace Cake.Scripting.CodeGen
             ICakeAliasGenerator aliasGenerator,
             ICakeLog log,
             IScriptConventions scriptConventions,
+            IReferenceAssemblyResolver referenceAssemblyResolver,
             IEnumerable<ILoadDirectiveProvider> loadDirectiveProviders = null)
         {
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
@@ -65,6 +67,7 @@ namespace Cake.Scripting.CodeGen
             _aliasGenerator = aliasGenerator ?? throw new ArgumentNullException(nameof(aliasGenerator));
             _analyzer = new ScriptAnalyzer(_fileSystem, _environment, _log, loadDirectiveProviders);
             _scriptConventions = scriptConventions ?? throw new ArgumentNullException(nameof(scriptConventions));
+            _referenceAssemblyResolver = referenceAssemblyResolver ?? throw new ArgumentNullException(nameof(referenceAssemblyResolver));
 
             _addinRoot = GetAddinPath(_environment.WorkingDirectory);
             _hostObject = GetHostObject();
@@ -112,7 +115,12 @@ namespace Cake.Scripting.CodeGen
 
             // Load all references.
             _log.Verbose("Adding references...");
-            var references = new HashSet<FilePath>(_scriptConventions.GetDefaultAssemblies(_environment.ApplicationRoot).Select(a => FilePath.FromString(a.Location)));
+            var references = new HashSet<FilePath>(
+                _scriptConventions
+                .GetDefaultAssemblies(_environment.ApplicationRoot)
+                .Union(_referenceAssemblyResolver.GetReferenceAssemblies())
+                .Select(a => FilePath.FromString(a.Location)));
+
             references.AddRange(result.References.Select(r => new FilePath(r)));
 
             // Find aliases
