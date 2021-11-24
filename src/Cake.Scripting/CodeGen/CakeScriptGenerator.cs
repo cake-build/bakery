@@ -39,9 +39,10 @@ namespace Cake.Scripting.CodeGen
         private readonly IBufferedFileSystem _fileSystem;
         private readonly IScriptAliasFinder _aliasFinder;
         private readonly ICakeAliasGenerator _aliasGenerator;
+        private readonly IScriptConventions _scriptConventions;
+        private readonly IReferenceAssemblyResolver _referenceAssemblyResolver;
         private readonly DirectoryPath _addinRoot;
         private readonly ScriptHost _hostObject;
-        private readonly Lazy<ISet<FilePath>> _defaultReferences;
 
         public CakeScriptGenerator(
             IBufferedFileSystem fileSystem,
@@ -52,6 +53,8 @@ namespace Cake.Scripting.CodeGen
             IScriptAliasFinder aliasFinder,
             ICakeAliasGenerator aliasGenerator,
             ICakeLog log,
+            IScriptConventions scriptConventions,
+            IReferenceAssemblyResolver referenceAssemblyResolver,
             IEnumerable<ILoadDirectiveProvider> loadDirectiveProviders = null)
         {
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
@@ -63,10 +66,11 @@ namespace Cake.Scripting.CodeGen
             _aliasFinder = aliasFinder ?? throw new ArgumentNullException(nameof(aliasFinder));
             _aliasGenerator = aliasGenerator ?? throw new ArgumentNullException(nameof(aliasGenerator));
             _analyzer = new ScriptAnalyzer(_fileSystem, _environment, _log, loadDirectiveProviders);
+            _scriptConventions = scriptConventions ?? throw new ArgumentNullException(nameof(scriptConventions));
+            _referenceAssemblyResolver = referenceAssemblyResolver ?? throw new ArgumentNullException(nameof(referenceAssemblyResolver));
 
             _addinRoot = GetAddinPath(_environment.WorkingDirectory);
             _hostObject = GetHostObject();
-            _defaultReferences = new Lazy<ISet<FilePath>>(GetDefaultReferences);
         }
 
         public CakeScript Generate(FileChange fileChange)
@@ -111,7 +115,12 @@ namespace Cake.Scripting.CodeGen
 
             // Load all references.
             _log.Verbose("Adding references...");
-            var references = new HashSet<FilePath>(_defaultReferences.Value);
+            var references = new HashSet<FilePath>(
+                _scriptConventions
+                .GetDefaultAssemblies(_environment.ApplicationRoot)
+                .Union(_referenceAssemblyResolver.GetReferenceAssemblies())
+                .Select(a => FilePath.FromString(a.Location)));
+
             references.AddRange(result.References.Select(r => new FilePath(r)));
 
             // Find aliases
@@ -128,7 +137,7 @@ namespace Cake.Scripting.CodeGen
             // Import all namespaces.
             _log.Verbose("Importing namespaces...");
             var namespaces = new HashSet<string>(result.Namespaces, StringComparer.Ordinal);
-            namespaces.AddRange(GetDefaultNamespaces());
+            namespaces.AddRange(_scriptConventions.GetDefaultNamespaces());
             namespaces.AddRange(aliases.SelectMany(alias => alias.Namespaces));
 
             // Create the response.
@@ -163,48 +172,6 @@ namespace Cake.Scripting.CodeGen
             }
 
             _fileSystem.UpdateFileBuffer(path, fileChange.Buffer);
-        }
-
-        // TODO: Move to conventions
-        private IEnumerable<string> GetDefaultNamespaces()
-        {
-            return new List<string>
-            {
-                "System",
-                "System.Collections.Generic",
-                "System.Linq",
-                "System.Text",
-                "System.Threading.Tasks",
-                "System.IO",
-                "Cake.Core",
-                "Cake.Core.IO",
-                "Cake.Core.Scripting",
-                "Cake.Core.Diagnostics"
-            };
-        }
-
-        private ISet<FilePath> GetDefaultReferences()
-        {
-            // Prepare the default assemblies.
-            var references = new HashSet<FilePath>();
-            references.Add(typeof(Action).GetTypeInfo().Assembly.Location); // mscorlib or System.Private.Core
-            references.Add(typeof(IQueryable).GetTypeInfo().Assembly.Location); // System.Core or System.Linq.Expressions
-
-            references.Add(typeof(IScriptHost).Assembly.Location); // Cake.Core
-            references.Add(typeof(EnvironmentAliases).Assembly.Location); // Cake.Common
-
-            references.Add(typeof(Uri).GetTypeInfo().Assembly.Location); // System
-            references.Add(typeof(Enumerable).GetTypeInfo().Assembly.Location); // System.Linq
-            references.Add(typeof(XmlReader).GetTypeInfo().Assembly.Location); // System.Xml
-            references.Add(typeof(XDocument).GetTypeInfo().Assembly.Location); // System.Xml.Linq
-            references.Add(typeof(DataTable).GetTypeInfo().Assembly.Location); // System.Data
-            references.Add(typeof(ZipArchive).GetTypeInfo().Assembly.Location); // System.IO.Compression
-            references.Add(typeof(ZipFile).GetTypeInfo().Assembly.Location); // System.IO.Compression.FileSystem
-            references.Add(typeof(HttpClient).GetTypeInfo().Assembly.Location); // System.Net.Http
-            references.Add(typeof(DataContractJsonSerializer).GetTypeInfo().Assembly.Location); // System.Runtime.Serialization
-
-            // Return the assemblies.
-            return references;
         }
 
         private static ScriptHost GetHostObject()
