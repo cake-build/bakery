@@ -22,10 +22,10 @@ namespace Cake.Scripting.Reflection
             {
                 foreach (var reference in Basic.Reference.Assemblies.Net60.All)
                 {
-                    Assembly name;
+                    Assembly assembly;
                     try
                     {
-                        name = Assembly.Load(System.IO.Path.GetFileNameWithoutExtension(reference.FilePath));
+                        assembly = Assembly.Load(System.IO.Path.GetFileNameWithoutExtension(reference.FilePath));
                     }
                     catch (Exception ex)
                     {
@@ -33,7 +33,33 @@ namespace Cake.Scripting.Reflection
                         continue;
                     }
 
-                    yield return name;
+                    if (assembly == null)
+                    {
+                        continue;
+                    }
+
+                    yield return assembly;
+
+                    foreach (var assemblyRefName in assembly.GetReferencedAssemblies())
+                    {
+                        Assembly assemblyRef;
+                        try
+                        {
+                            assemblyRef = Assembly.Load(assemblyRefName);
+                        }
+                        catch (Exception ex)
+                        {
+                            _log.Debug(log => log("Failed to load {0}\r\n{1}", reference.FilePath, ex));
+                            continue;
+                        }
+
+                        if (assemblyRef == null)
+                        {
+                            continue;
+                        }
+
+                        yield return assemblyRef;
+                    }
                 }
             }
 
