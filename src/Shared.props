@@ -4,13 +4,18 @@
   <PropertyGroup>
     <PackageId>$(AssemblyName)</PackageId>
     <Copyright>Copyright (c) .NET Foundation and contributors</Copyright>
-    <Authors>Patrik Svensson, Mattias Karlsson, Gary Ewan Park, Alistair Chapman, Martin Björkström, C. Augusto Proiete, Nils Andresen, and contributors</Authors>
-    <Company>Patrik Svensson, Mattias Karlsson, Gary Ewan Park, Alistair Chapman, Martin Björkström, C. Augusto Proiete, Nils Andresen, and contributors</Company>
+    <Authors>Patrik Svensson, Mattias Karlsson, Gary Ewan Park, Alistair Chapman, Martin Björkström, Dave Glick, Pascal Berger, Jérémie Desautels, Enrico Campidoglio, C. Augusto Proiete, Nils Andresen, and contributors</Authors>
+    <Company>Patrik Svensson, Mattias Karlsson, Gary Ewan Park, Alistair Chapman, Martin Björkström, Dave Glick, Pascal Berger, Jérémie Desautels, Enrico Campidoglio, C. Augusto Proiete, Nils Andresen, and contributors</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>cake-medium.png</PackageIcon>
     <RepositoryUrl>https://github.com/cake-build/bakery</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>Cake;Script;Build</PackageTags>
+    <PublishDocumentationFile>true</PublishDocumentationFile>
+    <PublishReferencesDocumentationFiles>true</PublishReferencesDocumentationFiles>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -44,6 +49,20 @@
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
-</Project>  
+  <!-- https://github.com/dotnet/sdk/issues/1458 -->
+  <Target Name="Copy assemblies satellite symbols" AfterTargets="ResolveAssemblyReferences">
+    <ItemGroup>
+      <SymbolsSatelliteFiles Include="@(ReferenceCopyLocalPaths->'%(RootDir)%(Directory)%(Filename).pdb')" Condition="$([System.IO.File]::Exists('%(RootDir)%(Directory)%(Filename).pdb'))"/>
+      <ReferenceCopyLocalPaths Include="@(SymbolsSatelliteFiles)"/>
+    </ItemGroup>
+  </Target>
+  <Target Name="Copy assemblies satellite symbols" AfterTargets="ResolveAssemblyReferences">
+    <ItemGroup>
+      <SymbolsSatelliteFiles Include="@(ReferenceCopyLocalPaths->'%(RootDir)%(Directory)%(Filename).xml')" Condition="$([System.IO.File]::Exists('%(RootDir)%(Directory)%(Filename).xml'))"/>
+      <ReferenceCopyLocalPaths Include="@(SymbolsSatelliteFiles)"/>
+    </ItemGroup>
+  </Target>
+</Project>
