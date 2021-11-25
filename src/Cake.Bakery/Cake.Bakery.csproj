@@ -4,6 +4,8 @@
     <WarningsAsErrors>true</WarningsAsErrors>
     <PreserveCompilationContext>false</PreserveCompilationContext>
     <OutputType>Exe</OutputType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <Description>The Cake script analyzer and code generator.</Description>
