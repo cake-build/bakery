@@ -33,7 +33,7 @@ namespace Cake.Scripting.Reflection
                 {
                     var emitter = new TypeEmitter();
                     var parameterConstraints = parameter.Constraints.Select(
-                        constraint => emitter.GetString(TypeSignature.Create(constraint)));
+                        constraint => emitter.GetString(TypeSignature.Create(constraint.ConstraintType)));
                     constraints.AddRange(
                         parameterConstraints.Where(constraint => !constraint.Equals("System.ValueType")));
                 }
@@ -49,7 +49,7 @@ namespace Cake.Scripting.Reflection
                     var emitter = new TypeEmitter();
                     constraints.AddRange(
                         parameter.Constraints.Select(
-                            constraint => emitter.GetString(TypeSignature.Create(constraint))));
+                            constraint => emitter.GetString(TypeSignature.Create(constraint.ConstraintType))));
                 }
                 if (parameter.HasDefaultConstructorConstraint)
                 {
