@@ -15,8 +15,8 @@
     <InternalsVisibleTo Include="Cake.Bakery.Tests" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Cake.Core" Version="2.0.0-rc0001" />
-    <PackageReference Include="Cake.NuGet" Version="2.0.0-rc0001" />
+    <PackageReference Include="Cake.Core" Version="2.0.0" />
+    <PackageReference Include="Cake.NuGet" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>
