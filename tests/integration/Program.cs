@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Integration
 {
-    
+
     class MonoScriptGenerationProcess : IScriptGenerationProcess
     {
         private readonly ILogger _logger;
@@ -278,8 +278,10 @@ RunTarget(target);";
         static int Main(string[] args)
         {
             var isRunningOnMono = !string.IsNullOrWhiteSpace(MonoRuntime);
-            var loggerFactory = new LoggerFactory()
-                .AddConsole(Microsoft.Extensions.Logging.LogLevel.Debug);
+            using var loggerFactory = LoggerFactory.Create(
+                                        builder => builder
+                                                    .AddConsole()
+                                                    .SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Debug));
 
             var bakeryPath = args[0];
             workingDirectory = Environment.CurrentDirectory.Replace('\\', '/');;

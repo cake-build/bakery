@@ -1,5 +1,6 @@
-#load nuget:?package=Cake.Recipe&version=2.2.0
+#load nuget:https://api.nuget.org/v3/index.json?package=Cake.Recipe&version=2.2.0
 #tool nuget:https://api.nuget.org/v3/index.json?package=SignClient&version=0.9.0
+#tool nuget:https://api.nuget.org/v3/index.json?package=NuGet.CommandLine&version=5.11.0
 
 Environment.SetVariableNames();
 
