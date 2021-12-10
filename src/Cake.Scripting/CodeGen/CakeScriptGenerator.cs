@@ -126,11 +126,11 @@ namespace Cake.Scripting.CodeGen
             // Find aliases
             _log.Verbose("Finding aliases...");
             var aliases = new List<CakeScriptAlias>();
-            foreach (var reference in references)
+            foreach (var reference in references.Select(_fileSystem.GetFile))
             {
-                if (_fileSystem.Exist(reference))
+                if (reference.Exists && reference.IsClrAssembly())
                 {
-                    aliases.AddRange(_aliasFinder.FindAliases(reference));
+                    aliases.AddRange(_aliasFinder.FindAliases(reference.Path));
                 }
             }
 
