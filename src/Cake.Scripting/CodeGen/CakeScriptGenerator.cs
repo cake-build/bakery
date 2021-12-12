@@ -115,20 +115,21 @@ namespace Cake.Scripting.CodeGen
 
             // Load all references.
             _log.Verbose("Adding references...");
-            var references = new HashSet<FilePath>(
+            var references = new HashSet<IFile>(
                 _scriptConventions
                 .GetDefaultAssemblies(_environment.ApplicationRoot)
                 .Union(_referenceAssemblyResolver.GetReferenceAssemblies())
-                .Select(a => FilePath.FromString(a.Location)));
+                .Select(a => _fileSystem.GetFile(a.Location))
+                .Where(file => !file.Exists || file.IsClrAssembly()));
 
-            references.AddRange(result.References.Select(r => new FilePath(r)));
+            references.AddRange(result.References.Select(r => _fileSystem.GetFile(r)));
 
             // Find aliases
             _log.Verbose("Finding aliases...");
             var aliases = new List<CakeScriptAlias>();
-            foreach (var reference in references.Select(_fileSystem.GetFile))
+            foreach (var reference in references)
             {
-                if (reference.Exists && reference.IsClrAssembly())
+                if (reference.Exists)
                 {
                     aliases.AddRange(_aliasFinder.FindAliases(reference.Path));
                 }
@@ -152,7 +153,7 @@ namespace Cake.Scripting.CodeGen
                               GenerateSource(aliases) +
                               string.Join("\n", result.Lines);
             response.Usings.AddRange(namespaces);
-            response.References.AddRange(references.Select(r => r.FullPath));
+            response.References.AddRange(references.Select(r => r.Path.FullPath));
 
             // Return the response.
             return response;
