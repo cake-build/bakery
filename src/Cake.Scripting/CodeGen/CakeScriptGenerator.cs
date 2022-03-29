@@ -103,6 +103,16 @@ namespace Cake.Scripting.CodeGen
                     var addinReferences = _processor.InstallAddins(new[] { addin }, _addinRoot);
                     foreach (var addinReference in addinReferences)
                     {
+                        // remove the 'runtimes' dlls
+                        var isInRuntimes = addinReference.Segments
+                            .Skip(_addinRoot.Segments.Length)
+                            .Any(s => s.Equals("runtimes", StringComparison.OrdinalIgnoreCase));
+                        if (isInRuntimes)
+                        {
+                            _log.Verbose($"Ignoring {addinReference.FullPath} as it resides under 'runtimes'.");
+                            continue;
+                        }
+
                         result.References.Add(addinReference.FullPath);
                     }
                 }
