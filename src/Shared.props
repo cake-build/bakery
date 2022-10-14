@@ -22,7 +22,7 @@
     <None Include="$(MSBuildThisFileDirectory)../LICENSE" Pack="true" PackagePath="$(PackageLicenseFile)"/>
     <None Include="$(MSBuildThisFileDirectory)../nuspec/cake-medium.png" Pack="true" PackagePath=""/>
 
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
