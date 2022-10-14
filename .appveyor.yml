@@ -6,9 +6,6 @@
 image: 
   - Visual Studio 2022
 
-install:
-  - ps: dotnet --info
-
 #---------------------------------#
 #  Build Script                   #
 #---------------------------------#
