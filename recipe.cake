@@ -175,6 +175,7 @@ Task("Init-Integration-Tests")
     DotNetCoreBuild("./tests/integration/Cake.Bakery.Tests.Integration.csproj", new DotNetCoreBuildSettings {
         Configuration = BuildParameters.Configuration,
         NoRestore = false,
+        Framework = "net6.0",
         OutputDirectory = "./tests/integration/bin"
     });
 });

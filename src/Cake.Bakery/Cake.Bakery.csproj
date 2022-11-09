@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net6.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <PreserveCompilationContext>false</PreserveCompilationContext>
     <OutputType>Exe</OutputType>
@@ -15,9 +15,9 @@
     <InternalsVisibleTo Include="Cake.Bakery.Tests" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Cake.Core" Version="2.3.0" />
-    <PackageReference Include="Cake.NuGet" Version="2.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+    <PackageReference Include="Cake.Core" Version="3.0.0" />
+    <PackageReference Include="Cake.NuGet" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cake.Scripting.Abstractions\Cake.Scripting.Abstractions.csproj" />
