@@ -20,7 +20,12 @@ namespace Cake.Scripting.Reflection
         {
             IEnumerable<Assembly> TryGetReferenceAssemblies()
             {
-                foreach (var reference in Basic.Reference.Assemblies.Net60.All)
+                foreach (var reference in
+#if NET6_0
+            Basic.Reference.Assemblies.Net60.References.All)
+#else
+            Basic.Reference.Assemblies.Net70.References.All)
+#endif
                 {
                     Assembly assembly;
                     try
