@@ -34,11 +34,15 @@ jobs:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX: 2
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v2
+      - name: Get the sources
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      - name: Fetch all tags and branches
-        run: git fetch --prune --unshallow
+      - name: Install .NET SDK 5.0.x
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '5.0.x'
 
       - name: Install .NET SDK 6.0.x
         uses: actions/setup-dotnet@v3
@@ -47,6 +51,8 @@ jobs:
 
       - name: Install .NET Core SDK (global.json)
         uses: actions/setup-dotnet@v3
+        with:
+          global-json-file: global.json
 
       - name: Cache Tools
         uses: actions/cache@v2
