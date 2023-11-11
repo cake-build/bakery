@@ -1,6 +1,28 @@
 #load nuget:https://api.nuget.org/v3/index.json?package=Cake.Recipe&version=2.2.0
-#tool nuget:https://api.nuget.org/v3/index.json?package=SignClient&version=0.9.0
+#tool "dotnet:https://api.nuget.org/v3/index.json?package=sign&version=0.9.1-beta.23530.1&prerelease"
 #tool nuget:https://api.nuget.org/v3/index.json?package=NuGet.CommandLine&version=5.11.0
+
+Setup<CodeSigningCredentials>(context => {
+    var shouldDeployBakery = (!BuildParameters.IsLocalBuild || BuildParameters.ForceContinuousIntegration) &&
+                        BuildParameters.IsTagged &&
+                        BuildParameters.PreferredBuildAgentOperatingSystem == BuildParameters.BuildAgentOperatingSystem &&
+                        BuildParameters.PreferredBuildProviderType == BuildParameters.BuildProvider.Type;
+
+    var testSigning = string.Equals(EnvironmentVariable("SIGNING_TEST"), "true", StringComparison.OrdinalIgnoreCase);
+
+    var shouldSign = testSigning || shouldDeployBakery;
+
+    var codeSigningCredentials =  shouldSign
+                                    ? CodeSigningCredentials.GetCodeSigningCredentials(context)
+                                    : new CodeSigningCredentials();
+
+    if(shouldSign && !codeSigningCredentials.HasCredentials)
+    {
+        throw new InvalidOperationException("Unable to sign Bakery as credentials are not available.");
+    }
+
+    return codeSigningCredentials;
+});
 
 Environment.SetVariableNames();
 
@@ -267,10 +289,7 @@ Task("Run-Bakery-Integration-Tests")
     }
 });
 
-var shouldDeployBakery = (!BuildParameters.IsLocalBuild || BuildParameters.ForceContinuousIntegration) &&
-                        BuildParameters.IsTagged &&
-                        BuildParameters.PreferredBuildAgentOperatingSystem == BuildParameters.BuildAgentOperatingSystem &&
-                        BuildParameters.PreferredBuildProviderType == BuildParameters.BuildProvider.Type;
+
 Task("Sign-Binaries")
     .IsDependentOn("Package")
     .IsDependeeOf("Upload-AppVeyor-Artifacts-Zip")
@@ -279,61 +298,46 @@ Task("Sign-Binaries")
     .IsDependeeOf("Publish-Release-Packages")
     .IsDependeeOf("Publish-GitHub-Release-Zip")
     .IsDependeeOf("Publish-GitHub-Release")
-    .WithCriteria(() => shouldDeployBakery || string.Equals(EnvironmentVariable("SIGNING_TEST"), "true", StringComparison.OrdinalIgnoreCase))
-    .Does(() =>
+    .WithCriteria<CodeSigningCredentials>((context, data) => data.HasCredentials, "Skipping signing as credentials are not available.")
+    .Does<CodeSigningCredentials>((context, data) =>
 {
-    // Get the secret.
-    var secret = EnvironmentVariable("SIGNING_SECRET");
-    if(string.IsNullOrWhiteSpace(secret)) {
-        throw new InvalidOperationException("Could not resolve signing secret.");
-    }
-
-    // Get the user.
-    var user = EnvironmentVariable("SIGNING_USER");
-    if(string.IsNullOrWhiteSpace(user)) {
-        throw new InvalidOperationException("Could not resolve signing user.");
-    }
-
-    // Resolve dotnet and version
-    var dotnetPath = Context.Tools.Resolve("dotnet.exe");
-    if(dotnetPath == null) {
-        throw new InvalidOperationException("Could not resolve dotnet.");
-    }
-
-    var client = File($"./tools/SignClient.0.9.0/tools/netcoreapp2.0/SignClient.dll");
-    var settings = File("./signclient.json");
-    var filter = File("./signclient.filter");
-
     // Get the files to sign.
     var files = GetFiles(string.Concat(BuildParameters.Paths.Directories.NuGetPackages, "/", "*.nupkg")) +
                 GetFiles(string.Concat(BuildParameters.Paths.Directories.ChocolateyPackages , "/", "*.nupkg")) +
                 GetFiles(string.Concat(zipArtifactsPath, "/", "*.zip"));
 
-    foreach(var file in files)
-    {
-        Information("Signing {0}...", file.FullPath);
+    var filter = File("./signclient.filter");
+
+     Parallel.ForEach(
+        files,
+        file => {
+        context.Information("Signing {0}...", file.FullPath);
 
         // Build the argument list.
         var arguments = new ProcessArgumentBuilder()
-            .AppendQuoted(MakeAbsolute(client.Path).FullPath)
-            .Append("sign")
-            .AppendSwitchQuoted("-c", MakeAbsolute(settings.Path).FullPath)
-            .AppendSwitchQuoted("-i", MakeAbsolute(file).FullPath)
-            .AppendSwitchQuoted("-f", MakeAbsolute(filter).FullPath)
-            .AppendSwitchQuotedSecret("-s", secret)
-            .AppendSwitchQuotedSecret("-r", user)
-            .AppendSwitchQuoted("-n", "Cake")
-            .AppendSwitchQuoted("-d", "Cake (C# Make) is a cross platform build automation system.")
-            .AppendSwitchQuoted("-u", "https://cakebuild.net");
+            .Append("code")
+            .Append("azure-key-vault")
+            .AppendQuoted(file.FullPath)
+            .AppendSwitchQuoted("--file-list", filter)
+            .AppendSwitchQuoted("--publisher-name", "Cake")
+            .AppendSwitchQuoted("--description", "Cake (C# Make) is a cross platform build automation system.")
+            .AppendSwitchQuoted("--description-url", "https://cakebuild.net")
+            .AppendSwitchQuotedSecret("--azure-key-vault-tenant-id", data.SignTenantId)
+            .AppendSwitchQuotedSecret("--azure-key-vault-client-id", data.SignClientId)
+            .AppendSwitchQuotedSecret("--azure-key-vault-client-secret", data.SignClientSecret)
+            .AppendSwitchQuotedSecret("--azure-key-vault-certificate", data.SignKeyVaultCertificate)
+            .AppendSwitchQuotedSecret("--azure-key-vault-url", data.SignKeyVaultUrl);
 
         // Sign the binary.
-        var result = StartProcess(dotnetPath, new ProcessSettings {  Arguments = arguments });
+        var result = StartProcess(data.SignPath, new ProcessSettings {  Arguments = arguments });
         if(result != 0)
         {
             // We should not recover from this.
             throw new InvalidOperationException("Signing failed!");
         }
-    }
+
+        context.Information("Done signing {0}.", file.FullPath);
+    });
 });
 
 // additional workaround for https://github.com/cake-contrib/Cake.Recipe/issues/862
@@ -364,3 +368,41 @@ BuildParameters.Tasks.AnalyzeTask.IsDependentOn("InspectCode2021");
 IssuesBuildTasks.ReadIssuesTask.IsDependentOn("InspectCode2021");
 
 Build.RunDotNetCore();
+
+
+public class CodeSigningCredentials
+{
+    public string SignTenantId {  get; private set; }
+    public string SignClientId {  get; private set; }
+    public string SignClientSecret {  get; private set; }
+    public string SignKeyVaultCertificate {  get; private set; }
+    public string SignKeyVaultUrl {  get; private set; }
+    public FilePath SignPath {  get; private set; }
+
+    public bool HasCredentials
+    {
+        get
+        {
+            return
+                !string.IsNullOrEmpty(SignTenantId) &&
+                !string.IsNullOrEmpty(SignClientId) &&
+                !string.IsNullOrEmpty(SignClientSecret) &&
+                !string.IsNullOrEmpty(SignKeyVaultCertificate) &&
+                !string.IsNullOrEmpty(SignKeyVaultUrl);
+        }
+    }
+
+    public static CodeSigningCredentials GetCodeSigningCredentials(ICakeContext context)
+    {
+        return new CodeSigningCredentials {
+            SignTenantId =  context.EnvironmentVariable("SIGN_TENANT_ID"),
+            SignClientId = context.EnvironmentVariable("SIGN_CLIENT_ID"),
+            SignClientSecret = context.EnvironmentVariable("SIGN_CLIENT_SECRET"),
+            SignKeyVaultCertificate = context.EnvironmentVariable("SIGN_KEYVAULT_CERTIFICATE"),
+            SignKeyVaultUrl = context.EnvironmentVariable("SIGN_KEYVAULT_URL"),
+            SignPath = context.Tools.Resolve("sign.exe")
+                        ?? context.Tools.Resolve("sign")
+                        ?? throw new InvalidOperationException("sign.exe could not be located.")
+        };
+    }
+}
