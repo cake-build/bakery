@@ -1,4 +1,4 @@
-#load nuget:https://api.nuget.org/v3/index.json?package=Cake.Recipe&version=2.2.0
+#load nuget:https://api.nuget.org/v3/index.json?package=Cake.Recipe&version=2.2.1
 #tool "dotnet:https://api.nuget.org/v3/index.json?package=sign&version=0.9.1-beta.23530.1&prerelease"
 #tool nuget:https://api.nuget.org/v3/index.json?package=NuGet.CommandLine&version=5.11.0
 
