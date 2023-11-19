@@ -16,8 +16,6 @@ jobs:
 
     env:
       GITHUB_PAT: ${{ secrets.GH_TOKEN }}
-      GITTER_ROOM_ID: ${{ secrets.GITTER_ROOM_ID }}
-      GITTER_TOKEN: ${{ secrets.GITTER_TOKEN }}
       NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
       NUGET_SOURCE: "https://api.nuget.org/v3/index.json"
       TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
@@ -42,15 +40,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install .NET SDK 5.0.x
+      - name: Install .NET SDK 6.0.x - 8.0.x
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '5.0.x'
-
-      - name: Install .NET SDK 6.0.x
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '6.0.x'
+          dotnet-version: |
+            6.0.x
+            7.0.x
+            8.0.x
 
       - name: Install .NET Core SDK (global.json)
         uses: actions/setup-dotnet@v3
